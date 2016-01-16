@@ -7,6 +7,7 @@
 #include <string.h>
 
 class MainProgram : public IterativeRobot {
+
 	LiveWindow *lw;
 	RobotModel *robot;
 	ControlBoard *humanControl;
@@ -19,6 +20,7 @@ class MainProgram : public IterativeRobot {
 
 public:
 	MainProgram(void) {
+
 		lw = LiveWindow::GetInstance();
 		robot = new RobotModel();
 		humanControl = new ControlBoard();
@@ -28,34 +30,42 @@ public:
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
+
 	}
 
 private:
 	void RobotInit() {
+
 		//robot->EnableCompressor();
 		robot->ResetTimer();
 		//robot->ResetDriveEncoders();
 		RefreshAllIni();
+
 	}
 
 	void AutonomousInit() {
+
 		RefreshAllIni();
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
 //		robot->ResetDriveEncoders();
 		autonomousController->StartAutonomous();
+
 	}
 
 	void AutonomousPeriodic() {
+
 		lastTimeSec = currTimeSec;
 		currTimeSec = robot->timer->Get();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 
 		autonomousController->Update(currTimeSec, deltaTimeSec);
+
 	}
 
 	void TeleopInit() {
+
 		RefreshAllIni();
 
 		currTimeSec = 0.0;
@@ -68,9 +78,11 @@ private:
 
 		driveController->RefreshIni();
 		autonomousController->RefreshIni();
+
 	}
 
 	void TeleopPeriodic() {
+		printf("HELLO WORLD");
 		lastTimeSec = currTimeSec;
 		currTimeSec = robot->timer->Get();
 		deltaTimeSec = currTimeSec - lastTimeSec;
@@ -81,27 +93,36 @@ private:
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
+
 	}
 
 	void TestPeriodic() {
+
 		//robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 //		printf("fleft encoder: %f\n", robot->GetFrontLeftEncoderVal());
 //		printf("fright encoder: %f\n", robot->GetFrontRightEncoderVal());
 //		printf("rleft encoder: %f\n", robot->GetRearLeftEncoderVal());
 //		printf("rright encoder: %f\n", robot->GetRearRightEncoderVal());
+
+
 	}
 
 	void DisabledInit() {
+
 		//robot->DisableCompressor();
 		driveController->Reset();
 		autonomousController->Reset();
+
 	}
 
 	void RefreshAllIni() {
+
 		//robot->RefreshIniFile();
 		autonomousController->RefreshIni();
 		driveController->RefreshIni();
+
 	}
+
 };
 
 START_ROBOT_CLASS(MainProgram);
