@@ -24,23 +24,20 @@ RobotModel::RobotModel() {
 	frontRight->SetSafetyEnabled(false);
 	rearRight->SetSafetyEnabled(false);
 
-	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT,
-				LEFT_ENCODER_B_PWM_PORT, true);
-	frontRightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT,
-				RIGHT_ENCODER_B_PWM_PORT, true);
+	/**
+	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
+	frontRightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
 	rearLeftEncoder = new Encoder(REAR_LEFT_ENCODER_A_PORT, REAR_LEFT_ENCODER_B_PORT, true);
 	rearRightEncoder = new Encoder(REAR_RIGHT_ENCODER_A_PORT, REAR_RIGHT_ENCODER_B_PORT, true);
 
-	frontLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
 	// 6 inch wheels (1/2 ft), 256 tics per rotation
+	frontLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
 	frontRightEncoder->SetDistancePerPulse((PI / 2.0) / 256.0);
 	rearLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
 	rearRightEncoder->SetDistancePerPulse((PI / 2.0) / 256.0);
+	**/
 	compressor = new Compressor(COMPRESSOR_PORT);
-
-	gyro = new Gyro(GYRO_PORT);
-	gyro->Reset();
-	gyro->SetSensitivity(0.007);
+	serialPort = new SerialPort(57600, SerialPort::kMXP);
 
 	timer = new Timer();
 	timer->Start();
@@ -50,7 +47,6 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 /*
  * This is given that we will need to negate the speed for the two different sides.
  */
-
 	switch (w) {
 	case (kFrontLeftWheel):
 #if COMP_BOT
@@ -58,8 +54,6 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 #else
 		frontLeft->Set(-speed);
 #endif
-		//SmartDashboard::PutNumber("frontLeft victor",
-		//frontLeft->Get());
 		break;
 	case (kRearLeftWheel):
 #if COMP_BOT
@@ -67,7 +61,6 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 #else
 		rearLeft->Set(-speed);
 #endif
-		//SmartDashboard::PutNumber("rearLeft victor", rearLeft->Get());
 		break;
 	case (kFrontRightWheel):
 #if COMP_BOT
@@ -75,7 +68,6 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 #else
 		frontRight->Set(speed);
 #endif
-		//SmartDashboard::PutNumber("frontRight victor", frontRight->Get());
 		break;
 	case (kRearRightWheel):
 #if COMP_BOT
@@ -83,7 +75,6 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 #else
 		rearRight->Set(speed);
 #endif
-		//SmartDashboard::PutNumber("rearRight victor", rearRight->Get());
 		break;
 	case (kAllWheels):
 		frontLeft->Set(speed);
@@ -132,25 +123,16 @@ bool RobotModel::GetCompressorState() {
 	return (compressor->Enabled());
 }
 
-void RobotModel::ResetGyro() {
-	gyro->Reset();
-}
-
 void RobotModel::ResetTimer() {
 	timer->Reset();
 }
 
-float RobotModel::GetGyroAngle() {
-	return gyro->GetAngle();
-}
-
+/**
 double RobotModel::GetFrontLeftEncoderVal() {
-	// from comp? return frontLeftEncoder->GetDistance();
 	return frontLeftEncoder->GetDistance();
 }
 
 double RobotModel::GetFrontRightEncoderVal() {
-	// from comp? return frontRightEncoder->GetDistance();
 	return frontRightEncoder->GetDistance();
 }
 
@@ -168,6 +150,7 @@ void RobotModel::ResetDriveEncoders() {
 	rearLeftEncoder->Reset();
 	rearRightEncoder->Reset();
 }
+**/
 
 void RobotModel::RefreshIniFile() {
 	delete pini;

@@ -42,10 +42,8 @@ protected:
 	double mLeftJoyX, mLeftJoyY, mRightJoyX, mRightJoyY;
 
 private:
-	Joystick *mLeftJoy, *mRightJoy, *mOperatorJoy, *mIntakeJoy;
-
+	Joystick *mLeftJoy, *mRightJoy, *mOperatorJoy;
 	ButtonReader *mDriveDirectionButton, *fieldRobotButton;
-
 	void ReadAllButtons();
 };
 

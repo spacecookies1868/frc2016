@@ -23,6 +23,7 @@ public:
 		robot = new RobotModel();
 		humanControl = new ControlBoard();
 		driveController = new DriveController(robot, humanControl);
+		autonomousController = new AutonomousController(robot);
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -33,22 +34,17 @@ private:
 	void RobotInit() {
 		robot->EnableCompressor();
 		robot->ResetTimer();
-		robot->ResetGyro();
-		robot->ResetDriveEncoders();
-		printf("robot init\n");
-		driveController->RefreshIni();
-		autonomousController->RefreshIni();
-		//elevatorController->RefreshIni();
+//		robot->ResetDriveEncoders();
+		RefreshAllIni();
 	}
 
 	void AutonomousInit() {
+		RefreshAllIni();
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
-		robot->ResetDriveEncoders();
-		RefreshAllIni();
+//		robot->ResetDriveEncoders();
 		autonomousController->StartAutonomous();
-		printf("auto init\n");
 	}
 
 	void AutonomousPeriodic() {
@@ -57,7 +53,6 @@ private:
 		deltaTimeSec = currTimeSec - lastTimeSec;
 
 		autonomousController->Update(currTimeSec, deltaTimeSec);
-		//printf("auto periodic\n");
 	}
 
 	void TeleopInit() {
@@ -69,7 +64,7 @@ private:
 
 		driveController->Reset();
 		autonomousController->Reset();
-		robot->ResetDriveEncoders();
+//		robot->ResetDriveEncoders();
 
 		driveController->RefreshIni();
 		autonomousController->RefreshIni();
@@ -90,10 +85,10 @@ private:
 
 	void TestPeriodic() {
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
-		printf("fleft encoder: %f\n", robot->GetFrontLeftEncoderVal());
-		printf("fright encoder: %f\n", robot->GetFrontRightEncoderVal());
-		printf("rleft encoder: %f\n", robot->GetRearLeftEncoderVal());
-		printf("rright encoder: %f\n", robot->GetRearRightEncoderVal());
+//		printf("fleft encoder: %f\n", robot->GetFrontLeftEncoderVal());
+//		printf("fright encoder: %f\n", robot->GetFrontRightEncoderVal());
+//		printf("rleft encoder: %f\n", robot->GetRearLeftEncoderVal());
+//		printf("rright encoder: %f\n", robot->GetRearRightEncoderVal());
 	}
 
 	void DisabledInit() {

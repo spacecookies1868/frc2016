@@ -16,23 +16,22 @@ static const int REAR_RIGHT_MOTOR_PWM_PORT			= -1;
 #if COMP_BOT
 
 #else
-static const int LEFT_ENCODER_A_PWM_PORT 			= -1;
-static const int LEFT_ENCODER_B_PWM_PORT			= -1;
-
-static const int RIGHT_ENCODER_A_PWM_PORT			= -1;
-static const int RIGHT_ENCODER_B_PWM_PORT			= -1;
-
-static const int REAR_LEFT_ENCODER_A_PORT			= -1;
-static const int REAR_LEFT_ENCODER_B_PORT			= -1;
-
-static const int REAR_RIGHT_ENCODER_A_PORT			= -1;
-static const int REAR_RIGHT_ENCODER_B_PORT			= -1;
+//static const int LEFT_ENCODER_A_PWM_PORT 			= -1;
+//static const int LEFT_ENCODER_B_PWM_PORT			= -1;
+//
+//static const int RIGHT_ENCODER_A_PWM_PORT			= -1;
+//static const int RIGHT_ENCODER_B_PWM_PORT			= -1;
+//
+//static const int REAR_LEFT_ENCODER_A_PORT			= -1;
+//static const int REAR_LEFT_ENCODER_B_PORT			= -1;
+//
+//static const int REAR_RIGHT_ENCODER_A_PORT			= -1;
+//static const int REAR_RIGHT_ENCODER_B_PORT			= -1;
 #endif
 
 // ***************** MISC *****************
 static const int COMPRESSOR_PORT					= -1;
 static const int PNEUMATICS_CONTROL_MODULE_ID		= -1;
-static const int GYRO_PORT 							= -1;
 
 // ***************** SOLENOID PORTS *****************
 

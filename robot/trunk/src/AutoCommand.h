@@ -17,10 +17,8 @@ using namespace std;
 
 class AutoCommand {
 public:
-	AutoCommand() {
-	}
-	virtual ~AutoCommand() {
-	}
+	AutoCommand() {}
+	virtual ~AutoCommand() {}
 	virtual void Init() = 0;
 	virtual void Update(double currTimeSec, double deltaTimeSec) = 0;
 	virtual bool IsDone() = 0;
@@ -39,6 +37,7 @@ public:
 	virtual AutoCommand* GetNextCommand() {
 		return nextCommand;
 	}
+
 private:
 	AutoCommand *nextCommand;
 };
@@ -64,6 +63,7 @@ public:
 			return falseNextCommand;
 		}
 	}
+
 private:
 	AutoCommand *trueNextCommand;
 	AutoCommand *falseNextCommand;
@@ -108,6 +108,7 @@ public:
 	virtual AutoCommand* GetNextCommand() {
 		return nextCommand;
 	}
+
 private:
 	SimpleAutoCommand* first;
 	SimpleAutoCommand* second;

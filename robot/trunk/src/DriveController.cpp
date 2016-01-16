@@ -8,21 +8,22 @@ DriveController::DriveController(RobotModel *myRobot, RemoteController *myHumanC
 	robot = myRobot;
 	humanControl = myHumanControl;
 	m_stateVal = kInitialize;
+	nextState = kInitialize;
 }
 
 void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 	switch (m_stateVal) {
-		case (kInitialize):
-			nextState = kTeleopDrive;
-			break;
+	case (kInitialize):
+		nextState = kTeleopDrive;
+		break;
 
-		case (kReset):
-			nextState = kTeleopDrive;
-			break;
+	case (kReset):
+		nextState = kTeleopDrive;
+		break;
 
-		case (kTeleopDrive):
-			nextState = kTeleopDrive;
-			break;
+	case (kTeleopDrive):
+		nextState = kTeleopDrive;
+		break;
 	}
 
 	m_stateVal = nextState;
@@ -36,5 +37,4 @@ void DriveController::RefreshIni() {
 
 }
 
-DriveController::~DriveController() {
-}
+DriveController::~DriveController() {}

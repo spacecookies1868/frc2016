@@ -15,16 +15,15 @@ public:
 	virtual ~DriveController();
 
 	enum DriveState {
-			kReset, kInitialize, kTeleopDrive
-		};
+		kReset, kInitialize, kTeleopDrive
+	};
 
 private:
 	RobotModel *robot;
 	RemoteController *humanControl;
-	RobotDrive *myRobotDrive;
 
 	uint32_t m_stateVal;
 	uint32_t nextState;
 };
 
-#endif /*DRIVECONTROLLER_H_*/
+#endif

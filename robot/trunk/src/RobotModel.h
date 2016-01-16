@@ -10,8 +10,7 @@
 
 class RobotModel {
 public:
-	enum Wheels {kFrontLeftWheel, kRearLeftWheel, kFrontRightWheel, kRearRightWheel,
-				 kAllWheels};
+	enum Wheels {kFrontLeftWheel, kRearLeftWheel, kFrontRightWheel, kRearRightWheel, kAllWheels};
 
 	RobotModel();
 	~RobotModel() {}
@@ -26,17 +25,15 @@ public:
 	void ResetCompressor();
 	bool GetCompressorState();
 
+	/*
 	double GetFrontLeftEncoderVal();
 	double GetFrontRightEncoderVal();
 	double GetRearLeftEncoderVal();
 	double GetRearRightEncoderVal();
 	void ResetDriveEncoders();
+	*/
 
 	void RefreshIniFile();
-
-	void ResetGyro();
-	float GetGyroAngle();
-
 	void ResetTimer();
 
 	Timer *timer;
@@ -48,11 +45,9 @@ private:
 
 	//Actuators
 	Victor *frontLeft, *rearLeft, *frontRight, *rearRight;
-	Servo *servo;
 
 	//Sensors
-	Encoder *frontLeftEncoder, *rearLeftEncoder, *frontRightEncoder, *rearRightEncoder, *elevatorEncoder;
-	Gyro *gyro;
+//	Encoder *frontLeftEncoder, *rearLeftEncoder, *frontRightEncoder, *rearRightEncoder;
 	SerialPort *serialPort;
 };
 

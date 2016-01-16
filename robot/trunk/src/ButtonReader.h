@@ -2,6 +2,7 @@
 #define BUTTONREADER_H_
 
 #include "WPILib.h"
+
 class ButtonReader {
 public:
 	ButtonReader(Joystick *joy, int buttonNum);
@@ -47,4 +48,4 @@ private:
 	int downB;
 };
 
-#endif /*BUTTONREADER_H_*/
+#endif

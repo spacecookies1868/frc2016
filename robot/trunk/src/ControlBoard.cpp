@@ -24,11 +24,13 @@ ControlBoard::ControlBoard() {
 
 void ControlBoard::ReadControls() {
 	ReadAllButtons();
+
 	if (fieldRobotButton->IsDown()) {
 		SetFieldCentricDesired(true);
 	} else {
 		SetFieldCentricDesired(false);
 	}
+
 	if (mDriveDirectionButton->GetState()) {
 		SetReverseDriveDesired(true);
 	} else {

@@ -2,12 +2,11 @@
 #include "AutoCommand.h"
 #include "Debugging.h"
 
-AutonomousController::AutonomousController(RobotModel* myRobot,	DriveController* myDriver) {
+AutonomousController::AutonomousController(RobotModel* myRobot) {
 	robot = myRobot;
 	firstCommand = NULL;
 	nextCommand = NULL;
 	currentCommand = NULL;
-	drive = myDriver;
 	autoMode = 0;
 	autoStart = 0;
 }
@@ -16,7 +15,6 @@ AutonomousController::AutonomousController(RobotModel* myRobot,	DriveController*
  * Creates the queue of AutoCommand instances
  */
 void AutonomousController::StartAutonomous() {
-	printf("Starting auto \n");
 	CreateQueue();
 	currentCommand = firstCommand;
 	if (currentCommand != NULL) {
@@ -65,8 +63,7 @@ void AutonomousController::RefreshIni() {
  * @param AutoCommand* myNewAutoCommand is the command to be pushed in, and
  * SimpleAutoCommand* myLastAutoCommand is the command that comes before it
  */
-void AutonomousController::AddtoQueue(AutoCommand* myNewAutoCommand,
-		SimpleAutoCommand* myLastAutoCommand) {
+void AutonomousController::AddtoQueue(AutoCommand* myNewAutoCommand, SimpleAutoCommand* myLastAutoCommand) {
 	myLastAutoCommand->SetNextCommand(myNewAutoCommand);
 }
 

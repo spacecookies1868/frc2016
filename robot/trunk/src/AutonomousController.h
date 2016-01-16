@@ -8,14 +8,14 @@
 #include <string>
 #include <iostream>
 
-//include the controllers as we create their auto implementations as #include
+// use #include to add controllers
 
 class AutonomousController {
 public:
 	enum AutoMode {};
 	enum StartingPosition {};
 
-	AutonomousController(RobotModel* myRobot, DriveController* myDriver); //add controllers as we create them as parameters of the constructor
+	AutonomousController(RobotModel* myRobot); //add controllers as we create them as parameters of the constructor
 	~AutonomousController() {}
 
 	void StartAutonomous();
@@ -24,6 +24,7 @@ public:
 	void RefreshIni();
 
 	unsigned int autoMode;
+
 private:
 	void CreateQueue();
 	void AddtoQueue(AutoCommand* myNewAutoCommand, SimpleAutoCommand* myLastAutoCommand);
@@ -32,7 +33,6 @@ private:
 	AutoCommand* currentCommand;
 	RobotModel* robot;
 	DriveController* drive;
-
 	unsigned int autoStart;
 };
 

@@ -31,6 +31,7 @@ bool ButtonReader::IsDown() {
 bool ButtonReader::GetState() {
 	return currState;
 }
+
 ButtonReader::~ButtonReader() {
 }
 
