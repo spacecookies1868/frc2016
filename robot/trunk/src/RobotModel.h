@@ -10,21 +10,21 @@
 
 class RobotModel {
 public:
-	enum Wheels {kFrontLeftWheel, kRearLeftWheel, kFrontRightWheel, kRearRightWheel, kAllWheels};
+	//enum Wheels {kFrontLeftWheel, kRearLeftWheel, kFrontRightWheel, kRearRightWheel, kAllWheels};
 
 	RobotModel();
 	~RobotModel() {}
-
+/*
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetWheelSpeed(Wheels w);
-
+*/
 	double GetVoltage();
-
+/*
 	void EnableCompressor();
 	void DisableCompressor();
 	void ResetCompressor();
 	bool GetCompressorState();
-
+*/
 	/*
 	double GetFrontLeftEncoderVal();
 	double GetFrontRightEncoderVal();
@@ -33,18 +33,18 @@ public:
 	void ResetDriveEncoders();
 	*/
 
-	void RefreshIniFile();
+	//void RefreshIniFile();
 	void ResetTimer();
 
 	Timer *timer;
-	Ini* pini;
+	//Ini* pini;
 	PowerDistributionPanel* pdp;
 
 private:
-	Compressor *compressor;
+	//Compressor *compressor;
 
 	//Actuators
-	Victor *frontLeft, *rearLeft, *frontRight, *rearRight;
+	//Victor *frontLeft, *rearLeft, *frontRight, *rearRight;
 
 	//Sensors
 //	Encoder *frontLeftEncoder, *rearLeftEncoder, *frontRightEncoder, *rearRightEncoder;

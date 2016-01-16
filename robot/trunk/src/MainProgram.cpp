@@ -32,9 +32,9 @@ public:
 
 private:
 	void RobotInit() {
-		robot->EnableCompressor();
+		//robot->EnableCompressor();
 		robot->ResetTimer();
-//		robot->ResetDriveEncoders();
+		//robot->ResetDriveEncoders();
 		RefreshAllIni();
 	}
 
@@ -84,7 +84,7 @@ private:
 	}
 
 	void TestPeriodic() {
-		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		//robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 //		printf("fleft encoder: %f\n", robot->GetFrontLeftEncoderVal());
 //		printf("fright encoder: %f\n", robot->GetFrontRightEncoderVal());
 //		printf("rleft encoder: %f\n", robot->GetRearLeftEncoderVal());
@@ -92,13 +92,13 @@ private:
 	}
 
 	void DisabledInit() {
-		robot->DisableCompressor();
+		//robot->DisableCompressor();
 		driveController->Reset();
 		autonomousController->Reset();
 	}
 
 	void RefreshAllIni() {
-		robot->RefreshIniFile();
+		//robot->RefreshIniFile();
 		autonomousController->RefreshIni();
 		driveController->RefreshIni();
 	}

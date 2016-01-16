@@ -48,10 +48,12 @@ void AutonomousController::Update(double currTimeSec, double deltaTimeSec) {
 void AutonomousController::Reset() {
 	firstCommand = NULL;
 	currentCommand = NULL;
+	/*
 	robot->SetWheelSpeed(RobotModel::kFrontLeftWheel, 0.0);
 	robot->SetWheelSpeed(RobotModel::kRearLeftWheel, 0.0);
 	robot->SetWheelSpeed(RobotModel::kFrontRightWheel, 0.0);
 	robot->SetWheelSpeed(RobotModel::kRearRightWheel, 0.0);
+	*/
 }
 
 void AutonomousController::RefreshIni() {

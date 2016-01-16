@@ -13,7 +13,6 @@
 class AutonomousController {
 public:
 	enum AutoMode {};
-	enum StartingPosition {};
 
 	AutonomousController(RobotModel* myRobot); //add controllers as we create them as parameters of the constructor
 	~AutonomousController() {}

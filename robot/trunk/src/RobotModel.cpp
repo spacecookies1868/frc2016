@@ -5,10 +5,10 @@
 #include "Debugging.h"
 
 RobotModel::RobotModel() {
-	pini = new Ini("/home/lvuser/robot.ini");
+	//pini = new Ini("/home/lvuser/robot.ini");
 
 	pdp = new PowerDistributionPanel();
-
+/*
 	frontLeft = new Victor(FRONT_LEFT_MOTOR_PWM_PORT);
 	rearLeft = new Victor(REAR_LEFT_MOTOR_PWM_PORT);
 	frontRight = new Victor(FRONT_RIGHT_MOTOR_PWM_PORT);
@@ -23,7 +23,7 @@ RobotModel::RobotModel() {
 	rearLeft->SetSafetyEnabled(false);
 	frontRight->SetSafetyEnabled(false);
 	rearRight->SetSafetyEnabled(false);
-
+*/
 	/**
 	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	frontRightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
@@ -36,17 +36,17 @@ RobotModel::RobotModel() {
 	rearLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
 	rearRightEncoder->SetDistancePerPulse((PI / 2.0) / 256.0);
 	**/
-	compressor = new Compressor(COMPRESSOR_PORT);
+//	compressor = new Compressor(COMPRESSOR_PORT);
 	serialPort = new SerialPort(57600, SerialPort::kMXP);
 
 	timer = new Timer();
 	timer->Start();
 }
-
+/*
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 /*
  * This is given that we will need to negate the speed for the two different sides.
- */
+
 	switch (w) {
 	case (kFrontLeftWheel):
 #if COMP_BOT
@@ -102,10 +102,11 @@ float RobotModel::GetWheelSpeed(Wheels w) {
 	}
 	return false;
 }
+*/
 double RobotModel::GetVoltage() {
 	return pdp->GetVoltage();
 }
-
+/*
 void RobotModel::EnableCompressor() {
 	compressor->Start();
 }
@@ -122,7 +123,7 @@ void RobotModel::ResetCompressor() {
 bool RobotModel::GetCompressorState() {
 	return (compressor->Enabled());
 }
-
+*/
 void RobotModel::ResetTimer() {
 	timer->Reset();
 }
@@ -151,8 +152,9 @@ void RobotModel::ResetDriveEncoders() {
 	rearRightEncoder->Reset();
 }
 **/
-
+/*
 void RobotModel::RefreshIniFile() {
 	delete pini;
 	pini = new Ini("/home/lvuser/robot.ini");
 }
+*/
