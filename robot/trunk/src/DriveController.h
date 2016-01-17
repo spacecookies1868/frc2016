@@ -11,7 +11,8 @@ public:
 	void Update(double currTimeSec, double deltaTimeSec);
 	void RefreshIni();
 	void Reset();
-
+	void ArcadeDrive(double myX, double myY);
+	int DriveDirection();
 	virtual ~DriveController();
 
 	enum DriveState {
@@ -21,6 +22,8 @@ public:
 private:
 	RobotModel *robot;
 	RemoteController *humanControl;
+
+	double joyX, joyY;
 
 	uint32_t m_stateVal;
 	uint32_t nextState;

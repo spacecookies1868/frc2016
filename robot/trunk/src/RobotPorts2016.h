@@ -3,12 +3,10 @@
 #include "Debugging.h"
 
 // ***************** PWM PORTS *****************
-/*
 static const int FRONT_LEFT_MOTOR_PWM_PORT 			= -1;
 static const int REAR_LEFT_MOTOR_PWM_PORT			= -1;
 static const int FRONT_RIGHT_MOTOR_PWM_PORT			= -1;
 static const int REAR_RIGHT_MOTOR_PWM_PORT			= -1;
-*/
 
 // ***************** DIGITAL I/O PORTS *****************
 
@@ -32,12 +30,11 @@ static const int REAR_RIGHT_MOTOR_PWM_PORT			= -1;
 // ***************** SOLENOID PORTS *****************
 
 // ***************** JOYSTICK USB PORTS *****************
-/*
 static const int LEFT_JOY_USB_PORT						= -1;
 static const int RIGHT_JOY_USB_PORT						= -1;
 static const int OPERATOR_JOY_USB_PORT					= -1;
-*/
 
 // ***************** BUTTON PORTS *****************
+static const int DRIVE_DIRECTION_BUTTON_PORT			= -1;
 
 #endif

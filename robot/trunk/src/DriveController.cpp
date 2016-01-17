@@ -9,6 +9,8 @@ DriveController::DriveController(RobotModel *myRobot, RemoteController *myHumanC
 	humanControl = myHumanControl;
 	m_stateVal = kInitialize;
 	nextState = kInitialize;
+	joyX = 0.0;
+	joyY = 0.0;
 }
 
 void DriveController::Update(double currTimeSec, double deltaTimeSec) {
@@ -22,6 +24,11 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		break;
 
 	case (kTeleopDrive):
+		joyX = humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kX);
+		joyY = humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kY);
+
+		ArcadeDrive(joyX, joyY);
+
 		nextState = kTeleopDrive;
 		break;
 	}
@@ -31,6 +38,19 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 
 void DriveController::Reset() {
 	m_stateVal = kInitialize;
+}
+
+void DriveController::ArcadeDrive(double leftJoy, double rightJoy) {
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, DriveDirection() * leftJoy + rightJoy);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, DriveDirection() * leftJoy - rightJoy);
+}
+
+int DriveController::DriveDirection(){
+	if (humanControl->ReverseDriveDesired()) {
+		return -1;
+	} else {
+		return 1;
+	}
 }
 
 void DriveController::RefreshIni() {

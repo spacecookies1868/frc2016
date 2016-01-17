@@ -6,45 +6,44 @@
 #include <stdlib.h>
 
 ControlBoard::ControlBoard() {
-	/*
-	mLeftJoy  = new Joystick(LEFT_JOY_USB_PORT);
-	mRightJoy = new Joystick(RIGHT_JOY_USB_PORT);
-	mOperatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
-*/
-/*
-	mLeftJoyX = 0.0;
-	mLeftJoyY = 0.0;
-	mRightJoyX = 0.0;
-	mRightJoyY = 0.0;
-	*/
+	leftJoy  = new Joystick(LEFT_JOY_USB_PORT);
+	rightJoy = new Joystick(RIGHT_JOY_USB_PORT);
+	operatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
+
+	driveDirectionButton = new ButtonReader(operatorJoy, DRIVE_DIRECTION_BUTTON_PORT);
+
+	leftJoyX = 0.0;
+	leftJoyY = 0.0;
+	rightJoyX = 0.0;
+	rightJoyY = 0.0;
+	reverseDriveDesired = false;
 };
 
 void ControlBoard::ReadControls() {
 	ReadAllButtons();
-/*
-	mLeftJoyX = mLeftJoy->GetX();
-	mLeftJoyY = -mLeftJoy->GetY();
-	mRightJoyX = mRightJoy->GetX();
-	mRightJoyY = -mRightJoy->GetY();
-	*/
+	leftJoyX = leftJoy->GetX();
+	leftJoyY = leftJoy->GetY();
+	rightJoyX = rightJoy->GetX();
+	rightJoyY = rightJoy->GetY();
+	SetReverseDriveDesired(driveDirectionButton->GetState());
 }
-/*
+
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
 	switch (j) {
 		case (kLeftJoy):
 			if (a == kX) {
-				return mLeftJoyX;
+				return leftJoyX;
 			}
 			if (a == kY) {
-				return mLeftJoyY;
+				return leftJoyY;
 			}
 			break;
 		case (kRightJoy):
 			if (a == kX) {
-				return mRightJoyX;
+				return rightJoyX;
 			}
 			if (a == kY) {
-				return mRightJoyY;
+				return rightJoyY;
 			}
 			break;
 		break;
@@ -54,9 +53,15 @@ double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
 	}
 	return 0.0;
 }
-*/
 
+bool ControlBoard::ReverseDriveDesired() {
+	return reverseDriveDesired;
+}
+
+void ControlBoard::SetReverseDriveDesired(bool desired) {
+	reverseDriveDesired = desired;
+}
 
 void ControlBoard::ReadAllButtons() {
-	//fieldRobotButton->ReadValue();
+	driveDirectionButton->ReadValue();
 }

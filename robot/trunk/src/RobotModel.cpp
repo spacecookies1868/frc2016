@@ -8,7 +8,7 @@ RobotModel::RobotModel() {
 	//pini = new Ini("/home/lvuser/robot.ini");
 
 	pdp = new PowerDistributionPanel();
-/*
+
 	frontLeft = new Victor(FRONT_LEFT_MOTOR_PWM_PORT);
 	rearLeft = new Victor(REAR_LEFT_MOTOR_PWM_PORT);
 	frontRight = new Victor(FRONT_RIGHT_MOTOR_PWM_PORT);
@@ -23,7 +23,7 @@ RobotModel::RobotModel() {
 	rearLeft->SetSafetyEnabled(false);
 	frontRight->SetSafetyEnabled(false);
 	rearRight->SetSafetyEnabled(false);
-*/
+
 	/**
 	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	frontRightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
@@ -42,39 +42,16 @@ RobotModel::RobotModel() {
 	timer = new Timer();
 	timer->Start();
 }
-/*
-void RobotModel::SetWheelSpeed(Wheels w, double speed) {
-/*
- * This is given that we will need to negate the speed for the two different sides.
 
+void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 	switch (w) {
-	case (kFrontLeftWheel):
-#if COMP_BOT
+	case (kLeftWheels):
 		frontLeft->Set(speed);
-#else
-		frontLeft->Set(-speed);
-#endif
-		break;
-	case (kRearLeftWheel):
-#if COMP_BOT
 		rearLeft->Set(speed);
-#else
-		rearLeft->Set(-speed);
-#endif
 		break;
-	case (kFrontRightWheel):
-#if COMP_BOT
-		frontRight->Set(-speed);
-#else
+	case (kRightWheels):
 		frontRight->Set(speed);
-#endif
-		break;
-	case (kRearRightWheel):
-#if COMP_BOT
-		rearRight->Set(-speed);
-#else
 		rearRight->Set(speed);
-#endif
 		break;
 	case (kAllWheels):
 		frontLeft->Set(speed);
@@ -87,22 +64,16 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 
 float RobotModel::GetWheelSpeed(Wheels w) {
 	switch(w) {
-	case (kFrontLeftWheel):
+	case (kLeftWheels):
 		return frontLeft->Get();
 		break;
-	case (kRearLeftWheel):
-		return rearLeft->Get();
-		break;
-	case (kFrontRightWheel):
+	case (kRightWheels):
 		return frontRight->Get();
-		break;
-	case (kRearRightWheel):
-		return rearRight->Get();
 		break;
 	}
 	return false;
 }
-*/
+
 double RobotModel::GetVoltage() {
 	return pdp->GetVoltage();
 }
@@ -151,8 +122,7 @@ void RobotModel::ResetDriveEncoders() {
 	rearLeftEncoder->Reset();
 	rearRightEncoder->Reset();
 }
-**/
-/*
+
 void RobotModel::RefreshIniFile() {
 	delete pini;
 	pini = new Ini("/home/lvuser/robot.ini");

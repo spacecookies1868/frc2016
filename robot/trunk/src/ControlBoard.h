@@ -15,18 +15,18 @@ public:
 	~ControlBoard() {};
 
 	virtual void ReadControls();
-/*
-	double GetJoystickValue(Joysticks j, Axes a) ;
-*/
 
-
+	double GetJoystickValue(Joysticks j, Axes a);
+	bool ReverseDriveDesired();
+	void SetReverseDriveDesired(bool desired);
 
 protected:
-	//bool fieldCentricDesired, mReverseDriveDesired;
-	//double mLeftJoyX, mLeftJoyY, mRightJoyX, mRightJoyY;
+	bool reverseDriveDesired;
+	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 
 private:
-	//Joystick *mLeftJoy, *mRightJoy, *mOperatorJoy;
+	Joystick *leftJoy, *rightJoy, *operatorJoy;
+	ButtonReader *driveDirectionButton;
 	void ReadAllButtons();
 };
 
