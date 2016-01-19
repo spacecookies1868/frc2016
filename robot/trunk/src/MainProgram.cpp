@@ -64,9 +64,6 @@ private:
 		driveController->Reset();
 		autonomousController->Reset();
 //		robot->ResetDriveEncoders();
-
-		driveController->RefreshIni();
-		autonomousController->RefreshIni();
 	}
 
 	void TeleopPeriodic() {

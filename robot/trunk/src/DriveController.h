@@ -5,7 +5,7 @@
 #include "RemoteControl.h"
 #include "Debugging.h"
 
-class DriveController{
+class DriveController {
 public:
 	DriveController(RobotModel*, RemoteController*);
 	void Update(double currTimeSec, double deltaTimeSec);
@@ -16,7 +16,7 @@ public:
 	virtual ~DriveController();
 
 	enum DriveState {
-		kReset, kInitialize, kTeleopDrive
+		kInitialize, kTeleopDrive
 	};
 
 private:

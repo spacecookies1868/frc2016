@@ -19,15 +19,11 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		nextState = kTeleopDrive;
 		break;
 
-	case (kReset):
-		nextState = kTeleopDrive;
-		break;
-
 	case (kTeleopDrive):
-		joyX = humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kX);
+		joyX = humanControl->GetJoystickValue(RemoteController::kRightJoy, RemoteController::kX);
 		joyY = humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kY);
 
-		ArcadeDrive(joyX, joyY);
+		ArcadeDrive(joyY, joyX);
 
 		nextState = kTeleopDrive;
 		break;
