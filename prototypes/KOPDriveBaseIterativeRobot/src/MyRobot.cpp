@@ -1,26 +1,37 @@
 #include "WPILib.h"
+//#define ARCADE_DRIVE
 
 class Robot: public IterativeRobot
 {
 
 private:
 	LiveWindow *lw = LiveWindow::GetInstance();
+
 	Joystick *rightJoy;
 	Joystick *leftJoy;
 	Joystick *operatorJoy;
 	Joystick *intakeJoy;
 
-	Talon *lfWheel; //left front wheel
-	Talon *lrWheel; //left rear wheel
-	Talon *rfWheel; //right front wheel
-	Talon *rrWheel; //right rear wheel
+	Talon *leftDriveMotorA;
+	Talon *leftDriveMotorB;
+	Talon *rightDriveMotorA;
+	Talon *rightDriveMotorB;
 	Talon *armControlTalon;
 	Talon *intakeTalon;
 
-	//double rightJoyY;
-	double rightJoyX;
-	double leftJoyY;
-	//double leftJoyX;
+	double moveValue;
+	double rotateValue;
+	double leftMotorOutput;
+	double rightMotorOutput;
+
+	bool armButtonPressed;
+	bool armSolenoidATrue;
+
+	Compressor *compressor;
+
+	Solenoid *armSolenoidA;
+	Solenoid *armSolenoidB;
+
 
 public:
 	Robot(void) {
@@ -29,21 +40,30 @@ public:
 		operatorJoy = new Joystick(2);
 		intakeJoy = new Joystick(3);
 
-		lfWheel = new Talon(8);
-		lrWheel = new Talon(9);
-		rfWheel = new Talon(0);
-		rrWheel = new Talon(1);
-		armControlTalon = new Talon(2);
-		intakeTalon = new Talon(7);
+		leftDriveMotorA = new Talon(8);
+		leftDriveMotorB = new Talon(9);
+		rightDriveMotorA = new Talon(0);
+		rightDriveMotorB = new Talon(1);
+		armControlTalon = new Talon(7);
+		intakeTalon = new Talon(2);
 
-		//rightJoyY = 0.0;
-		rightJoyX = 0.0;
-		leftJoyY = 0.0;
-		//leftJoyX = 0.0;
+		moveValue = 0.0;
+		rotateValue = 0.0;
+		leftMotorOutput = 0.0;
+		rightMotorOutput = 0.0;
+
+		armButtonPressed = false;
+		armSolenoidATrue = false;
+
+		armSolenoidA = new Solenoid(0);
+		armSolenoidB = new Solenoid(1);
+
+		compressor = new Compressor(0);
 
 	}
 
 	void RobotInit() {
+		compressor->Start();
 
 	}
 
@@ -60,42 +80,78 @@ public:
 	}
 
 	void TeleopPeriodic() {
-		//leftJoyX = leftJoy->GetX();
-		leftJoyY = leftJoy->GetY();
-		rightJoyX = -rightJoy->GetX();
-		//rightJoyY = rightJoy->GetY();
 
-		lrWheel->SetSpeed(-leftJoyY - rightJoyX);
-		lfWheel->SetSpeed(-leftJoyY - rightJoyX);
-		rfWheel->SetSpeed(leftJoyY - rightJoyX);
-		rrWheel->SetSpeed(leftJoyY - rightJoyX);
+#ifdef ARCADE_DRIVE
+		//Drive code: Arcade Drive
+		moveValue =leftJoy->GetY();
+		rotateValue = -rightJoy->GetX();
 
-		//Lower buttons down
+		leftMotorOutput = moveValue;
+		rightMotorOutput = moveValue;
+
+		leftMotorOutput += rotateValue;
+		rightMotorOutput -= rotateValue;
+
+		if (leftMotorOutput > 1.0) {
+			rightMotorOutput = rightMotorOutput / leftMotorOutput;
+			leftMotorOutput = 1.0;
+		} else if (leftMotorOutput < -1.0) {
+			rightMotorOutput = -rightMotorOutput / leftMotorOutput;
+			leftMotorOutput = -1.0;
+		} else if (rightMotorOutput > 1.0){
+			leftMotorOutput = leftMotorOutput / rightMotorOutput;
+			rightMotorOutput = 1.0;
+		} else if (rightMotorOutput < -1.0) {
+			leftMotorOutput = -leftMotorOutput/rightMotorOutput;
+			rightMotorOutput = -1.0;
+		}
+
+		leftDriveMotorB->SetSpeed(-leftMotorOutput);
+		leftDriveMotorA->SetSpeed(-leftMotorOutput);
+		rightDriveMotorA->SetSpeed(rightMotorOutput);
+		rightDriveMotorB->SetSpeed(rightMotorOutput);
+#else
+		leftMotorOutput = leftJoy->GetY();
+		rightMotorOutput = rightJoy->GetY();
+
+		leftDriveMotorB->SetSpeed(-leftMotorOutput);
+		leftDriveMotorA->SetSpeed(-leftMotorOutput);
+		rightDriveMotorA->SetSpeed(rightMotorOutput);
+		rightDriveMotorB->SetSpeed(rightMotorOutput);
+
+
+#endif
+		//Motor control from operator and intake joysticks
 		if (operatorJoy->GetRawButton(3)) {
-			armControlTalon->SetSpeed(0.4);
-		}
-
-		//Lower buttons up
-		else if (operatorJoy->GetRawButton(4)) {
+			//Upper buttons down
+			armControlTalon->SetSpeed(0.7);
+		} else if (operatorJoy->GetRawButton(4)) {
+			//Upper buttons up
 			armControlTalon->SetSpeed(-0.4);
-		}
-
-		else {
+		} else {
+			//Upper buttons in neutral position
 			armControlTalon->SetSpeed(0.0);
 		}
 
-		//Upper buttons down
 		if (intakeJoy->GetRawButton(3)) {
-			intakeTalon->SetSpeed(0.4);
-		}
-
-		//Upper buttons up
-		else if (intakeJoy->GetRawButton(4)) {
-			intakeTalon->SetSpeed(-0.4);
-		}
-
-		else {
+			//Lower buttons down
+			intakeTalon->SetSpeed(-0.6);
+		} else if (intakeJoy->GetRawButton(4)) {
+			//Lower buttons up
+			intakeTalon->SetSpeed(0.6);
+		} else {
+			//Lower buttons in neutral position
 			intakeTalon->SetSpeed(0.0);
+		}
+
+		//Piston control
+		if (operatorJoy->GetRawButton(8) && !armButtonPressed) {
+			armSolenoidA->Set(!armSolenoidATrue);
+			armSolenoidB->Set(armSolenoidATrue);
+			armSolenoidATrue = !armSolenoidATrue;
+			armButtonPressed = true;
+		} else if (!operatorJoy->GetRawButton(8) && armButtonPressed) {
+			armButtonPressed = false;
 		}
 	}
 
