@@ -33,18 +33,25 @@ public:
 	void ResetDriveEncoders();
 	*/
 
-	void RefreshIniFile();
+	void RefreshIni();
 	void ResetTimer();
 
+	bool IsLowGear();
+	void ShiftToLowGear();
+	void ShiftToHighGear();
 	Timer *timer;
-	//Ini* pini;
+//	Ini* pini;
 	PowerDistributionPanel* pdp;
 
 private:
+	bool isLowGear;
 	//Compressor *compressor;
 
 	//Actuators
 	Victor *frontLeft, *rearLeft, *frontRight, *rearRight;
+
+	// Solenoids
+	Solenoid *shiftGear;
 
 	//Sensors
 //	Encoder *frontLeftEncoder, *rearLeftEncoder, *frontRightEncoder, *rearRightEncoder;

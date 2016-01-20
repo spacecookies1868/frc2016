@@ -10,7 +10,8 @@ public:
 
 	virtual double GetJoystickValue(Joysticks j, Axes a) = 0;
 
-	virtual bool ReverseDriveDesired() = 0;
+	virtual bool GetReverseDriveDesired() = 0;
+	virtual bool GetLowGearDesired() = 0;
 
 	virtual ~RemoteController() {}
 };

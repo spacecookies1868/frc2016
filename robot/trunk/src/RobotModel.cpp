@@ -5,8 +5,6 @@
 #include "Debugging.h"
 
 RobotModel::RobotModel() {
-	//pini = new Ini("/home/lvuser/robot.ini");
-
 	pdp = new PowerDistributionPanel();
 
 	frontLeft = new Victor(FRONT_LEFT_MOTOR_PWM_PORT);
@@ -23,6 +21,9 @@ RobotModel::RobotModel() {
 	rearLeft->SetSafetyEnabled(false);
 	frontRight->SetSafetyEnabled(false);
 	rearRight->SetSafetyEnabled(false);
+
+	isLowGear = false;
+	shiftGear = new Solenoid(GEAR_SHIFTER_SOLENOID_PORT);
 
 	/**
 	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
@@ -74,6 +75,18 @@ float RobotModel::GetWheelSpeed(Wheels w) {
 	return false;
 }
 
+bool RobotModel::IsLowGear() {
+	return isLowGear;
+}
+
+void RobotModel::ShiftToHighGear() {
+	shiftGear->Set(true);
+}
+
+void RobotModel::ShiftToLowGear() {
+	shiftGear->Set(false);
+}
+
 double RobotModel::GetVoltage() {
 	return pdp->GetVoltage();
 }
@@ -122,9 +135,9 @@ void RobotModel::ResetDriveEncoders() {
 	rearLeftEncoder->Reset();
 	rearRightEncoder->Reset();
 }
-
-void RobotModel::RefreshIniFile() {
-	delete pini;
-	pini = new Ini("/home/lvuser/robot.ini");
-}
 */
+
+void RobotModel::RefreshIni() {
+//	delete pini;
+//	pini = new Ini("/home/lvuser/robot.ini");
+}

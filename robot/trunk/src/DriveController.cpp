@@ -20,10 +20,20 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		break;
 
 	case (kTeleopDrive):
-		joyX = humanControl->GetJoystickValue(RemoteController::kRightJoy, RemoteController::kX);
-		joyY = humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kY);
+		if(humanControl->GetLowGearDesired()){
+			if (!(robot->IsLowGear())){
+				robot->ShiftToLowGear();
+			}
+		} else {
+			if (robot->IsLowGear()) {
+				robot->ShiftToHighGear();
+			}
+		}
 
-		ArcadeDrive(joyY, joyX);
+		joyX = DriveDirection() * humanControl->GetJoystickValue(RemoteController::kRightJoy, RemoteController::kX);
+		joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kY);
+
+		ArcadeDrive(joyX, joyY);
 
 		nextState = kTeleopDrive;
 		break;
@@ -36,13 +46,36 @@ void DriveController::Reset() {
 	m_stateVal = kInitialize;
 }
 
-void DriveController::ArcadeDrive(double leftJoy, double rightJoy) {
-	robot->SetWheelSpeed(RobotModel::kLeftWheels, DriveDirection() * leftJoy + rightJoy);
-	robot->SetWheelSpeed(RobotModel::kRightWheels, DriveDirection() * leftJoy - rightJoy);
+void DriveController::ArcadeDrive(double myX, double myY) {
+	float moveValue = myY;
+	float rotateValue = -myX;
+
+	float leftMotorOutput = moveValue;
+	float rightMotorOutput = moveValue;
+
+	leftMotorOutput += rotateValue;
+	rightMotorOutput -= rotateValue;
+
+	if (leftMotorOutput > 1.0) {
+		rightMotorOutput = rightMotorOutput / leftMotorOutput;
+		leftMotorOutput = 1.0;
+	} else if (leftMotorOutput < -1.0) {
+		rightMotorOutput = -rightMotorOutput / leftMotorOutput;
+		leftMotorOutput = -1.0;
+	} else if (rightMotorOutput > 1.0){
+		leftMotorOutput = leftMotorOutput / rightMotorOutput;
+		rightMotorOutput = 1.0;
+	} else if (rightMotorOutput < -1.0) {
+		leftMotorOutput = -leftMotorOutput/rightMotorOutput;
+		rightMotorOutput = -1.0;
+	}
+
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, -leftMotorOutput);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
 }
 
 int DriveController::DriveDirection(){
-	if (humanControl->ReverseDriveDesired()) {
+	if (humanControl->GetReverseDriveDesired()) {
 		return -1;
 	} else {
 		return 1;

@@ -11,12 +11,14 @@ ControlBoard::ControlBoard() {
 	operatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
 
 	driveDirectionButton = new ButtonReader(operatorJoy, DRIVE_DIRECTION_BUTTON_PORT);
+	gearShiftButton = new ButtonReader(operatorJoy, HIGH_LOW_GEAR_BUTTON_PORT);
 
 	leftJoyX = 0.0;
 	leftJoyY = 0.0;
 	rightJoyX = 0.0;
 	rightJoyY = 0.0;
 	reverseDriveDesired = false;
+	lowGearDesired = false;
 };
 
 void ControlBoard::ReadControls() {
@@ -26,6 +28,7 @@ void ControlBoard::ReadControls() {
 	rightJoyX = rightJoy->GetX();
 	rightJoyY = rightJoy->GetY();
 	SetReverseDriveDesired(driveDirectionButton->GetState());
+	SetGearShiftDesired(gearShiftButton->IsDown());
 }
 
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
@@ -33,16 +36,14 @@ double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
 		case (kLeftJoy):
 			if (a == kX) {
 				return leftJoyX;
-			}
-			if (a == kY) {
+			} else if (a == kY) {
 				return leftJoyY;
 			}
 			break;
 		case (kRightJoy):
 			if (a == kX) {
 				return rightJoyX;
-			}
-			if (a == kY) {
+			} else if (a == kY) {
 				return rightJoyY;
 			}
 			break;
@@ -54,7 +55,7 @@ double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
 	return 0.0;
 }
 
-bool ControlBoard::ReverseDriveDesired() {
+bool ControlBoard::GetReverseDriveDesired() {
 	return reverseDriveDesired;
 }
 
@@ -62,6 +63,19 @@ void ControlBoard::SetReverseDriveDesired(bool desired) {
 	reverseDriveDesired = desired;
 }
 
+bool ControlBoard::GetLowGearDesired() {
+	return lowGearDesired;
+}
+
+void ControlBoard::SetGearShiftDesired(bool desired) {
+	if (desired && lowGearDesired) {
+		lowGearDesired = false;
+	} else if (desired) {
+		lowGearDesired = true;
+	}
+}
+
 void ControlBoard::ReadAllButtons() {
 	driveDirectionButton->ReadValue();
+	gearShiftButton->ReadValue();
 }

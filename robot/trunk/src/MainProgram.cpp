@@ -60,14 +60,9 @@ private:
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
-
-		driveController->Reset();
-		autonomousController->Reset();
-//		robot->ResetDriveEncoders();
 	}
 
 	void TeleopPeriodic() {
-		printf("HELLO WORLD");
 		lastTimeSec = currTimeSec;
 		currTimeSec = robot->timer->Get();
 		deltaTimeSec = currTimeSec - lastTimeSec;
@@ -95,7 +90,7 @@ private:
 	}
 
 	void RefreshAllIni() {
-		//robot->RefreshIniFile();
+		robot->RefreshIni();
 		autonomousController->RefreshIni();
 		driveController->RefreshIni();
 	}

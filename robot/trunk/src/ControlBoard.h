@@ -17,16 +17,19 @@ public:
 	virtual void ReadControls();
 
 	double GetJoystickValue(Joysticks j, Axes a);
-	bool ReverseDriveDesired();
+
+	bool GetReverseDriveDesired();
 	void SetReverseDriveDesired(bool desired);
 
+	bool GetLowGearDesired();
+	void SetGearShiftDesired(bool desired);
 protected:
-	bool reverseDriveDesired;
+	bool reverseDriveDesired, lowGearDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 
 private:
 	Joystick *leftJoy, *rightJoy, *operatorJoy;
-	ButtonReader *driveDirectionButton;
+	ButtonReader *driveDirectionButton, *gearShiftButton;
 	void ReadAllButtons();
 };
 
