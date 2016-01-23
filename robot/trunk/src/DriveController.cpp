@@ -4,7 +4,7 @@
 #include "WPILib.h"
 #include <math.h>
 
-DriveController::DriveController(RobotModel *myRobot, RemoteController *myHumanControl){
+DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanControl){
 	robot = myRobot;
 	humanControl = myHumanControl;
 	m_stateVal = kInitialize;
@@ -30,8 +30,8 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		joyX = DriveDirection() * humanControl->GetJoystickValue(RemoteController::kRightJoy, RemoteController::kX);
-		joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteController::kLeftJoy, RemoteController::kY);
+		joyX = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		ArcadeDrive(joyX, joyY);
 

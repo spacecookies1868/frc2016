@@ -7,23 +7,23 @@
 RobotModel::RobotModel() {
 	pdp = new PowerDistributionPanel();
 
-	frontLeft = new Victor(FRONT_LEFT_MOTOR_PWM_PORT);
-	rearLeft = new Victor(REAR_LEFT_MOTOR_PWM_PORT);
-	frontRight = new Victor(FRONT_RIGHT_MOTOR_PWM_PORT);
-	rearRight = new Victor(REAR_RIGHT_MOTOR_PWM_PORT);
+	leftDriveMotorA = new Victor(LEFT_DRIVE_MOTOR_A_PWM_PORT);
+	leftDriveMotorB = new Victor(LEFT_DRIVE_MOTOR_B_PWM_PORT);
+	rightDriveMotorA = new Victor(RIGHT_DRIVE_MOTOR_A_PWM_PORT);
+	rightDriveMotorB = new Victor(RIGHT_DRIVE_MOTOR_B_PWM_PORT);
 
-	frontLeft->SetExpiration(0.5);
-	rearLeft->SetExpiration(0.5);
-	frontRight->SetExpiration(0.5);
-	rearRight->SetExpiration(0.5);
+	leftDriveMotorA->SetExpiration(0.5);
+	leftDriveMotorB->SetExpiration(0.5);
+	rightDriveMotorA->SetExpiration(0.5);
+	rightDriveMotorB->SetExpiration(0.5);
 
-	frontLeft->SetSafetyEnabled(false);
-	rearLeft->SetSafetyEnabled(false);
-	frontRight->SetSafetyEnabled(false);
-	rearRight->SetSafetyEnabled(false);
+	leftDriveMotorA->SetSafetyEnabled(false);
+	leftDriveMotorB->SetSafetyEnabled(false);
+	rightDriveMotorA->SetSafetyEnabled(false);
+	rightDriveMotorB->SetSafetyEnabled(false);
 
 	isLowGear = false;
-	shiftGear = new Solenoid(GEAR_SHIFTER_SOLENOID_PORT);
+	gearShiftSolenoid = new Solenoid(GEAR_SHIFT_SOLENOID_PORT);
 
 	/**
 	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
@@ -47,18 +47,18 @@ RobotModel::RobotModel() {
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 	switch (w) {
 	case (kLeftWheels):
-		frontLeft->Set(speed);
-		rearLeft->Set(speed);
+		leftDriveMotorA->Set(speed);
+		leftDriveMotorB->Set(speed);
 		break;
 	case (kRightWheels):
-		frontRight->Set(speed);
-		rearRight->Set(speed);
+		rightDriveMotorA->Set(speed);
+		rightDriveMotorB->Set(speed);
 		break;
 	case (kAllWheels):
-		frontLeft->Set(speed);
-		rearLeft->Set(speed);
-		frontRight->Set(speed);
-		rearRight->Set(speed);
+		leftDriveMotorA->Set(speed);
+		leftDriveMotorB->Set(speed);
+		rightDriveMotorA->Set(speed);
+		rightDriveMotorB->Set(speed);
 		break;
 	}
 }
@@ -66,10 +66,13 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 float RobotModel::GetWheelSpeed(Wheels w) {
 	switch(w) {
 	case (kLeftWheels):
-		return frontLeft->Get();
+		return leftDriveMotorA->Get();
 		break;
 	case (kRightWheels):
-		return frontRight->Get();
+		return rightDriveMotorA->Get();
+		break;
+	default:
+		return 0.0;
 		break;
 	}
 	return false;
@@ -80,36 +83,23 @@ bool RobotModel::IsLowGear() {
 }
 
 void RobotModel::ShiftToHighGear() {
-	shiftGear->Set(true);
+	gearShiftSolenoid->Set(true);
 }
 
 void RobotModel::ShiftToLowGear() {
-	shiftGear->Set(false);
+	gearShiftSolenoid->Set(false);
 }
 
 double RobotModel::GetVoltage() {
 	return pdp->GetVoltage();
 }
-/*
-void RobotModel::EnableCompressor() {
-	compressor->Start();
-}
 
-void RobotModel::DisableCompressor() {
-	compressor->Stop();
-}
-
-void RobotModel::ResetCompressor() {
-	compressor->Stop();
-	compressor->Start();
-}
-
-bool RobotModel::GetCompressorState() {
-	return (compressor->Enabled());
-}
-*/
 void RobotModel::ResetTimer() {
 	timer->Reset();
+}
+
+double RobotModel::GetTime() {
+	return timer->Get();
 }
 
 /**
@@ -138,6 +128,6 @@ void RobotModel::ResetDriveEncoders() {
 */
 
 void RobotModel::RefreshIni() {
-//	delete pini;
-//	pini = new Ini("/home/lvuser/robot.ini");
+	/*delete pini;
+	pini = new Ini("/home/lvuser/robot.ini");*/
 }

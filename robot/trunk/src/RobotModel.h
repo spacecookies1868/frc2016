@@ -19,12 +19,7 @@ public:
 	float GetWheelSpeed(Wheels w);
 
 	double GetVoltage();
-/*
-	void EnableCompressor();
-	void DisableCompressor();
-	void ResetCompressor();
-	bool GetCompressorState();
-*/
+
 	/*
 	double GetFrontLeftEncoderVal();
 	double GetFrontRightEncoderVal();
@@ -39,22 +34,29 @@ public:
 	bool IsLowGear();
 	void ShiftToLowGear();
 	void ShiftToHighGear();
-	Timer *timer;
+
+	double GetTime();
+
 //	Ini* pini;
-	PowerDistributionPanel* pdp;
 
 private:
 	bool isLowGear;
 	//Compressor *compressor;
 
+	PowerDistributionPanel* pdp;
+
+	Timer *timer;
+
 	//Actuators
-	Victor *frontLeft, *rearLeft, *frontRight, *rearRight;
+	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB;
 
 	// Solenoids
-	Solenoid *shiftGear;
+	Solenoid *gearShiftSolenoid;
 
 	//Sensors
 //	Encoder *frontLeftEncoder, *rearLeftEncoder, *frontRightEncoder, *rearRightEncoder;
+
+	//Port the NavX plugs into
 	SerialPort *serialPort;
 };
 

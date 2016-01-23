@@ -27,8 +27,17 @@ void ControlBoard::ReadControls() {
 	leftJoyY = leftJoy->GetY();
 	rightJoyX = rightJoy->GetX();
 	rightJoyY = rightJoy->GetY();
-	SetReverseDriveDesired(driveDirectionButton->GetState());
-	SetGearShiftDesired(gearShiftButton->IsDown());
+
+	if (driveDirectionButton->IsDown()) {
+		reverseDriveDesired = true;
+	}
+
+	// IMPORTANT: This assumes WasJustPressed() applies to high gear and WasJustReleased applies to low gear
+	if (gearShiftButton->IsDown()) {
+		lowGearDesired = false;
+	} else {
+		lowGearDesired = true;
+	}
 }
 
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
@@ -47,7 +56,6 @@ double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
 				return rightJoyY;
 			}
 			break;
-		break;
 		default:
 			return 0.0;
 			break;
@@ -59,20 +67,8 @@ bool ControlBoard::GetReverseDriveDesired() {
 	return reverseDriveDesired;
 }
 
-void ControlBoard::SetReverseDriveDesired(bool desired) {
-	reverseDriveDesired = desired;
-}
-
 bool ControlBoard::GetLowGearDesired() {
 	return lowGearDesired;
-}
-
-void ControlBoard::SetGearShiftDesired(bool desired) {
-	if (desired && lowGearDesired) {
-		lowGearDesired = false;
-	} else if (desired) {
-		lowGearDesired = true;
-	}
 }
 
 void ControlBoard::ReadAllButtons() {

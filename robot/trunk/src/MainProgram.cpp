@@ -32,7 +32,6 @@ public:
 
 private:
 	void RobotInit() {
-		//robot->EnableCompressor();
 		robot->ResetTimer();
 		//robot->ResetDriveEncoders();
 		RefreshAllIni();
@@ -40,6 +39,7 @@ private:
 
 	void AutonomousInit() {
 		RefreshAllIni();
+		robot->ResetTimer();
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
@@ -49,14 +49,14 @@ private:
 
 	void AutonomousPeriodic() {
 		lastTimeSec = currTimeSec;
-		currTimeSec = robot->timer->Get();
+		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 		autonomousController->Update(currTimeSec, deltaTimeSec);
 	}
 
 	void TeleopInit() {
 		RefreshAllIni();
-
+		robot->ResetTimer();
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
@@ -64,7 +64,7 @@ private:
 
 	void TeleopPeriodic() {
 		lastTimeSec = currTimeSec;
-		currTimeSec = robot->timer->Get();
+		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 
 		humanControl->ReadControls();
@@ -84,7 +84,6 @@ private:
 	}
 
 	void DisabledInit() {
-		//robot->DisableCompressor();
 		driveController->Reset();
 		autonomousController->Reset();
 	}

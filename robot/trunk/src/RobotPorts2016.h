@@ -3,10 +3,10 @@
 #include "Debugging.h"
 
 // ***************** PWM PORTS *****************
-static const int FRONT_LEFT_MOTOR_PWM_PORT 			= -1;
-static const int REAR_LEFT_MOTOR_PWM_PORT			= -1;
-static const int FRONT_RIGHT_MOTOR_PWM_PORT			= -1;
-static const int REAR_RIGHT_MOTOR_PWM_PORT			= -1;
+static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= -1;
+static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= -1;
+static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= -1;
+static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= -1;
 
 // ***************** DIGITAL I/O PORTS *****************
 
@@ -28,7 +28,7 @@ static const int REAR_RIGHT_MOTOR_PWM_PORT			= -1;
 //static const int PNEUMATICS_CONTROL_MODULE_ID		= -1;
 
 // ***************** SOLENOID PORTS *****************
-static const int GEAR_SHIFTER_SOLENOID_PORT				= -1;
+static const int GEAR_SHIFT_SOLENOID_PORT				= -1;
 
 // ***************** JOYSTICK USB PORTS *****************
 static const int LEFT_JOY_USB_PORT						= -1;

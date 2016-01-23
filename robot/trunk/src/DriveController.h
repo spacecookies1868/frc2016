@@ -7,7 +7,7 @@
 
 class DriveController {
 public:
-	DriveController(RobotModel*, RemoteController*);
+	DriveController(RobotModel*, RemoteControl*);
 	void Update(double currTimeSec, double deltaTimeSec);
 	void RefreshIni();
 	void Reset();
@@ -21,7 +21,7 @@ public:
 
 private:
 	RobotModel *robot;
-	RemoteController *humanControl;
+	RemoteControl *humanControl;
 
 	double joyX, joyY;
 

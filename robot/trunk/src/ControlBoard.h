@@ -9,7 +9,7 @@
 #include <cstring>
 #include <stdlib.h>
 
-class ControlBoard : public RemoteController {
+class ControlBoard : public RemoteControl {
 public:
 	ControlBoard();
 	~ControlBoard() {};
@@ -19,10 +19,7 @@ public:
 	double GetJoystickValue(Joysticks j, Axes a);
 
 	bool GetReverseDriveDesired();
-	void SetReverseDriveDesired(bool desired);
-
 	bool GetLowGearDesired();
-	void SetGearShiftDesired(bool desired);
 protected:
 	bool reverseDriveDesired, lowGearDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;

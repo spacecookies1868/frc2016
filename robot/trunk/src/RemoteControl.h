@@ -1,10 +1,10 @@
 #ifndef REMOTECONTROL_H
 #define REMOTECONTROL_H
 
-class RemoteController {
+class RemoteControl {
 public:
 	enum Joysticks {kLeftJoy, kRightJoy};
-	typedef enum Axes {kX, kY} uint32_t;
+	enum Axes {kX, kY};
 
 	virtual void ReadControls() = 0;
 
@@ -13,7 +13,7 @@ public:
 	virtual bool GetReverseDriveDesired() = 0;
 	virtual bool GetLowGearDesired() = 0;
 
-	virtual ~RemoteController() {}
+	virtual ~RemoteControl() {}
 };
 
 #endif
