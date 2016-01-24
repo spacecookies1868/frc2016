@@ -39,7 +39,7 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 float RobotModel::GetWheelSpeed(Wheels w) {
 	switch(w) {
 	case(kLeftWheels):
-		return leftDriveMotorA->Get();
+		return -leftDriveMotorA->Get();
 	case(kRightWheels):
 		return rightDriveMotorA->Get();
 	default:

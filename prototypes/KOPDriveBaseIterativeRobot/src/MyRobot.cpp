@@ -1,5 +1,6 @@
 #include "WPILib.h"
 #include "RobotModel.h"
+#include "ControlBoard.h"
 #define ARCADE_DRIVE
 
 class Robot: public IterativeRobot
@@ -8,36 +9,26 @@ class Robot: public IterativeRobot
 private:
 	LiveWindow *lw = LiveWindow::GetInstance();
 
-	Joystick *rightJoy;
-	Joystick *leftJoy;
-	Joystick *operatorJoy;
-	Joystick *intakeJoy;
-
 	double moveValue;
 	double rotateValue;
 	double leftMotorOutput;
 	double rightMotorOutput;
 
-	bool armButtonPressed;
 	bool armSolenoidATrue;
 
 	RobotModel *myRobot;
+	RemoteControl *humanControl;
 
 public:
 	Robot(void) {
 		myRobot = new RobotModel();
-
-		rightJoy = new Joystick(1);
-		leftJoy = new Joystick(0);
-		operatorJoy = new Joystick(2);
-		intakeJoy = new Joystick(3);
+		humanControl = new ControlBoard();
 
 		moveValue = 0.0;
 		rotateValue = 0.0;
 		leftMotorOutput = 0.0;
 		rightMotorOutput = 0.0;
 
-		armButtonPressed = false;
 		armSolenoidATrue = false;
 
 
@@ -63,14 +54,14 @@ public:
 
 #ifdef ARCADE_DRIVE
 		//Drive code: Arcade Drive
-		moveValue =leftJoy->GetY();
-		rotateValue = -rightJoy->GetX();
+		moveValue = humanControl->GetJoystickValues(RemoteControl::kLeftJoy, RemoteControl::kY);
+		rotateValue = humanControl->GetJoystickValues(RemoteControl::kRightJoy, RemoteControl::kX);
 
 		leftMotorOutput = moveValue;
 		rightMotorOutput = moveValue;
 
-		leftMotorOutput += rotateValue;
-		rightMotorOutput -= rotateValue;
+		leftMotorOutput -= rotateValue;
+		rightMotorOutput += rotateValue;
 
 		if (leftMotorOutput > 1.0) {
 			rightMotorOutput = rightMotorOutput / leftMotorOutput;
@@ -89,18 +80,18 @@ public:
 		myRobot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 		myRobot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
 #else //Tank drive
-		leftMotorOutput = leftJoy->GetY();
-		rightMotorOutput = rightJoy->GetY();
+		leftMotorOutput = humanControl->GetJoystickValues(RemoteControl::kLeftJoy, RemoteControl::kY);
+		rightMotorOutput = humanControl->GetJoystickValues(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		myRobot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 		myRobot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
 
 #endif
 		//Motor control from operator and intake joysticks
-		if (operatorJoy->GetRawButton(3)) {
+		if (humanControl->GetArmControlButtonDown()) {
 			//Upper buttons down
 			myRobot->SetArmControlSpeed(0.7);
-		} else if (operatorJoy->GetRawButton(4)) {
+		} else if (humanControl->GetArmControlButtonUp()) {
 			//Upper buttons up
 			myRobot->SetArmControlSpeed(-0.4);
 		} else {
@@ -108,10 +99,10 @@ public:
 			myRobot->SetArmControlSpeed(0.0);
 		}
 
-		if (intakeJoy->GetRawButton(3)) {
+		if (humanControl->GetIntakeButtonIn()) {
 			//Lower buttons down
 			myRobot->SetIntakeSpeed(-0.6);
-		} else if (intakeJoy->GetRawButton(4)) {
+		} else if (humanControl->GetIntakeButtonOut()) {
 			//Lower buttons up
 			myRobot->SetIntakeSpeed(0.6);
 		} else {
@@ -120,12 +111,9 @@ public:
 		}
 
 		//Piston control
-		if (operatorJoy->GetRawButton(8) && !armButtonPressed) {
+		if (humanControl->GetArmControlButtonPressed()) {
 			myRobot->SetArmSolenoid(!armSolenoidATrue);
 			armSolenoidATrue = !armSolenoidATrue;
-			armButtonPressed = true;
-		} else if (!operatorJoy->GetRawButton(8) && armButtonPressed) {
-			armButtonPressed = false;
 		}
 	}
 
