@@ -19,14 +19,16 @@
 #include "RemoteControl.h"
 #include <fstream>
 #include <string>
+#include <ctime>
 
-#define LOG(myRobot, stateName, state) (Logger::LogAction(myRobot, __FILE__, __LINE__, stateName, state))
+#define LOG(myRobot, stateName, state) {DO_PERIODIC(25, Logger::LogAction(myRobot, __FILE__, __LINE__, stateName, state))}
 
 class Logger {
 public:
 	static void LogState(RobotModel* myRobot, RemoteControl *myHumanControl);
 	static void LogAction(RobotModel* myRobot, const std::string& fileName, int line,
 			const std::string& stateName, bool state);
+	static std::string GetTimeStamp(const char* fileName);
 private:
 	static std::string dataFilePath, actionFilePath;
 	static std::ofstream logData, logAction;
