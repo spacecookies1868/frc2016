@@ -44,7 +44,12 @@ RobotModel::RobotModel() {
 	timer->Start();
 }
 
+void RobotModel::Reset() {
+	isLowGear = !gearShiftSolenoid->Get();
+}
+
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
+	//IMPORTANT: Check which motors need to be inverted.
 	switch (w) {
 	case (kLeftWheels):
 		leftDriveMotorA->Set(speed);
@@ -64,6 +69,7 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 }
 
 float RobotModel::GetWheelSpeed(Wheels w) {
+	//IMPORTANT: Check which motors need to be inverted.
 	switch(w) {
 	case (kLeftWheels):
 		return leftDriveMotorA->Get();
@@ -84,10 +90,12 @@ bool RobotModel::IsLowGear() {
 
 void RobotModel::ShiftToHighGear() {
 	gearShiftSolenoid->Set(true);
+	isLowGear = false;
 }
 
 void RobotModel::ShiftToLowGear() {
 	gearShiftSolenoid->Set(false);
+	isLowGear = true;
 }
 
 double RobotModel::GetVoltage() {

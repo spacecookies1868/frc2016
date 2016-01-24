@@ -9,7 +9,7 @@
 class MainProgram : public IterativeRobot {
 	LiveWindow *lw;
 	RobotModel *robot;
-	ControlBoard *humanControl;
+	RemoteControl *humanControl;
 	DriveController *driveController;
 	AutonomousController *autonomousController;
 
@@ -40,6 +40,11 @@ private:
 	void AutonomousInit() {
 		RefreshAllIni();
 		robot->ResetTimer();
+
+		robot->Reset();
+		driveController->Reset();
+		autonomousController->Reset();
+
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
@@ -57,6 +62,11 @@ private:
 	void TeleopInit() {
 		RefreshAllIni();
 		robot->ResetTimer();
+
+		robot->Reset();
+		driveController->Reset();
+		autonomousController->Reset();
+
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
@@ -84,6 +94,7 @@ private:
 	}
 
 	void DisabledInit() {
+		robot->Reset();
 		driveController->Reset();
 		autonomousController->Reset();
 	}

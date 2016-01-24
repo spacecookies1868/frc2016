@@ -18,6 +18,8 @@ public:
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetWheelSpeed(Wheels w);
 
+	void Reset();
+
 	double GetVoltage();
 
 	/*

@@ -9,8 +9,6 @@ DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanCont
 	humanControl = myHumanControl;
 	m_stateVal = kInitialize;
 	nextState = kInitialize;
-	joyX = 0.0;
-	joyY = 0.0;
 }
 
 void DriveController::Update(double currTimeSec, double deltaTimeSec) {
@@ -30,8 +28,8 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		joyX = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
-		joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
+		double joyX = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		double joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		ArcadeDrive(joyX, joyY);
 

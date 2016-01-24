@@ -23,8 +23,6 @@ private:
 	RobotModel *robot;
 	RemoteControl *humanControl;
 
-	double joyX, joyY;
-
 	uint32_t m_stateVal;
 	uint32_t nextState;
 };

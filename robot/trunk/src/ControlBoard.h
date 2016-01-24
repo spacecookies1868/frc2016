@@ -20,11 +20,10 @@ public:
 
 	bool GetReverseDriveDesired();
 	bool GetLowGearDesired();
-protected:
-	bool reverseDriveDesired, lowGearDesired;
-	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 
 private:
+	bool reverseDriveDesired, lowGearDesired;
+	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 	Joystick *leftJoy, *rightJoy, *operatorJoy;
 	ButtonReader *driveDirectionButton, *gearShiftButton;
 	void ReadAllButtons();
