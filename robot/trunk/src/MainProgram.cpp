@@ -77,6 +77,9 @@ private:
 		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 
+		//IMPORTANT: Test to understand whether GetTime() works
+		printf("Get Time: %f \n", GetTime());
+
 		humanControl->ReadControls();
 		driveController->Update(currTimeSec, deltaTimeSec);
 

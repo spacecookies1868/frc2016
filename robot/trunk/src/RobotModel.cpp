@@ -23,7 +23,7 @@ RobotModel::RobotModel() {
 	rightDriveMotorB->SetSafetyEnabled(false);
 
 	isLowGear = false;
-	gearShiftSolenoid = new Solenoid(GEAR_SHIFT_SOLENOID_PORT);
+	gearShiftSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, GEAR_SHIFT_SOLENOID_PORT);
 
 	/**
 	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
@@ -37,7 +37,7 @@ RobotModel::RobotModel() {
 	rearLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
 	rearRightEncoder->SetDistancePerPulse((PI / 2.0) / 256.0);
 	**/
-//	compressor = new Compressor(COMPRESSOR_PORT);
+	compressor = new Compressor(COMPRESSOR_PORT);
 	serialPort = new SerialPort(57600, SerialPort::kMXP);
 
 	timer = new Timer();

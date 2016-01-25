@@ -43,7 +43,7 @@ public:
 
 private:
 	bool isLowGear;
-	//Compressor *compressor;
+	Compressor *compressor;
 
 	PowerDistributionPanel* pdp;
 
