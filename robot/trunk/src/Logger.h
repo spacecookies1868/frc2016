@@ -30,7 +30,6 @@ public:
 			const std::string& stateName, bool state);
 	static std::string GetTimeStamp(const char* fileName);
 private:
-	static std::string dataFilePath, actionFilePath;
 	static std::ofstream logData, logAction;
 };
 

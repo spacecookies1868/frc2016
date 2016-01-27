@@ -4,6 +4,7 @@
 #include "DriveController.h"
 #include "AutonomousController.h"
 #include "Debugging.h"
+#include "Logger.h"
 #include <string.h>
 
 class MainProgram : public IterativeRobot {
@@ -86,6 +87,9 @@ private:
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
+
+		Logger::LogState(robot, humanControl);
+		LOG(robot, "kInit", 1);
 	}
 
 	void TestPeriodic() {
@@ -100,6 +104,9 @@ private:
 		robot->Reset();
 		driveController->Reset();
 		autonomousController->Reset();
+	}
+
+	void DisabledPeriodic() {
 	}
 
 	void RefreshAllIni() {

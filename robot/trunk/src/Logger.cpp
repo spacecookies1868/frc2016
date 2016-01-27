@@ -7,15 +7,12 @@
 
 #include "Logger.h"
 
-std::string Logger::dataFilePath = GetTimeStamp((std::string("/home/lvuser/%H_%M_datalog.txt")).c_str());
-std::string Logger::actionFilePath = GetTimeStamp((std::string("/home/lvuser/%H_%M_actionlog.txt")).c_str());
 std::ofstream Logger::logData;
 std::ofstream Logger::logAction;
 
 void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
-	// std::string fileName = dataFilePath + std::to_string(myRobot->GetTime());
 	if (!logData.is_open()) {
-		logData.open(dataFilePath, std::ofstream::out);
+		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
 		//<< "# Time   LeftWheelSpeed   RightWheelSpeed   IsLowGear   Voltage ";
 	}
 	logData << myRobot->GetTime() <<", " <<
@@ -41,20 +38,24 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int line,
 		const std::string& stateName, bool state) {
 	if (!logAction.is_open()) {
-		logAction.open(actionFilePath, std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
 	}
 	logAction << myRobot->GetTime() << ", " << fileName << ", " << line << ", " << stateName
 			<< ", " << state << "\r\n";
 }
 
 std::string Logger::GetTimeStamp(const char* fileName) {
+/*	struct timespec tp;
+	clock_gettime(CLOCK_REALTIME,&tp);
+	double realTime = (double)tp.tv_sec + (double)((double)tp.tv_nsec*1e-9);
+*/
 	time_t rawtime = time(0);
 	struct tm * timeinfo;
 	char buffer [80];
 
 	time (&rawtime);
 	timeinfo = localtime(&rawtime);
-
 	strftime (buffer, 80, fileName, timeinfo); // fileName contains %F_%H_%M
+
 	return buffer;
 }
