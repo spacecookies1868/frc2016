@@ -24,7 +24,7 @@ public:
 		robot = new RobotModel();
 		humanControl = new ControlBoard();
 		driveController = new DriveController(robot, humanControl);
-		autonomousController = new AutonomousController(robot);
+		autonomousController = new AutonomousController(robot, driveController);
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -77,9 +77,6 @@ private:
 		lastTimeSec = currTimeSec;
 		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
-
-		//IMPORTANT: Test to understand whether GetTime() works
-		printf("Get Time: %f \n", GetTime());
 
 		humanControl->ReadControls();
 		driveController->Update(currTimeSec, deltaTimeSec);

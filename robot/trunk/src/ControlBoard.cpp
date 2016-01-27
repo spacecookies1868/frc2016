@@ -10,8 +10,8 @@ ControlBoard::ControlBoard() {
 	rightJoy = new Joystick(RIGHT_JOY_USB_PORT);
 	operatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
 
-	driveDirectionButton = new ButtonReader(operatorJoy, DRIVE_DIRECTION_BUTTON_PORT);
-	gearShiftButton = new ButtonReader(operatorJoy, HIGH_LOW_GEAR_BUTTON_PORT);
+	driveDirectionButton = new ButtonReader(rightJoy, DRIVE_DIRECTION_BUTTON_PORT);
+	gearShiftButton = new ButtonReader(leftJoy, HIGH_LOW_GEAR_BUTTON_PORT);
 
 	leftJoyX = 0.0;
 	leftJoyY = 0.0;
@@ -28,16 +28,9 @@ void ControlBoard::ReadControls() {
 	rightJoyX = rightJoy->GetX();
 	rightJoyY = rightJoy->GetY();
 
-	if (driveDirectionButton->IsDown()) {
-		reverseDriveDesired = true;
-	}
+	reverseDriveDesired = driveDirectionButton->IsDown();
 
-	// IMPORTANT: This assumes WasJustPressed() applies to high gear and WasJustReleased applies to low gear
-	if (gearShiftButton->IsDown()) {
-		lowGearDesired = false;
-	} else {
-		lowGearDesired = true;
-	}
+	lowGearDesired = gearShiftButton->IsDown();
 }
 
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {

@@ -14,7 +14,7 @@ class AutonomousController {
 public:
 	enum AutoMode {};
 
-	AutonomousController(RobotModel* myRobot); //add controllers as we create them as parameters of the constructor
+	AutonomousController(RobotModel* myRobot, DriveController* myDrive); //add controllers as we create them as parameters of the constructor
 	~AutonomousController() {}
 
 	void StartAutonomous();

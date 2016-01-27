@@ -28,7 +28,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		double joyX = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		double joyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
 		double joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		ArcadeDrive(joyX, joyY);
@@ -46,13 +46,13 @@ void DriveController::Reset() {
 
 void DriveController::ArcadeDrive(double myX, double myY) {
 	float moveValue = myY;
-	float rotateValue = -myX;
+	float rotateValue = myX;
 
 	float leftMotorOutput = moveValue;
 	float rightMotorOutput = moveValue;
 
-	leftMotorOutput += rotateValue;
-	rightMotorOutput -= rotateValue;
+	leftMotorOutput -= rotateValue;
+	rightMotorOutput += rotateValue;
 
 	if (leftMotorOutput > 1.0) {
 		rightMotorOutput = rightMotorOutput / leftMotorOutput;
@@ -68,7 +68,7 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 		rightMotorOutput = -1.0;
 	}
 
-	robot->SetWheelSpeed(RobotModel::kLeftWheels, -leftMotorOutput);
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
 }
 

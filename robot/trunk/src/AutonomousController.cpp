@@ -2,13 +2,14 @@
 #include "AutoCommand.h"
 #include "Debugging.h"
 
-AutonomousController::AutonomousController(RobotModel* myRobot) {
+AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive) {
 	robot = myRobot;
 	firstCommand = NULL;
 	nextCommand = NULL;
 	currentCommand = NULL;
 	autoMode = 0;
 	autoStart = 0;
+	drive = myDrive;
 }
 
 /**
