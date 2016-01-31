@@ -12,7 +12,6 @@ public:
 	bool WasJustPressed();
 	bool WasJustReleased();
 	bool StateJustChanged();
-	virtual bool GetState();
 
 private:
 	Joystick *joystick;

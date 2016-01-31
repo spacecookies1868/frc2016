@@ -33,6 +33,7 @@ private:
 	RobotModel* robot;
 	DriveController* drive;
 	unsigned int autoStart;
+	double timeFinished;
 };
 
 #endif

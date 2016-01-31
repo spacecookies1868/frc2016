@@ -81,7 +81,6 @@ float RobotModel::GetWheelSpeed(Wheels w) {
 		return 0.0;
 		break;
 	}
-	return false;
 }
 
 bool RobotModel::IsLowGear() {

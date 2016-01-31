@@ -10,6 +10,7 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	autoMode = 0;
 	autoStart = 0;
 	drive = myDrive;
+	timeFinished = 0.0;
 }
 
 /**
@@ -34,12 +35,14 @@ void AutonomousController::Update(double currTimeSec, double deltaTimeSec) {
 			currentCommand = currentCommand->GetNextCommand();
 			if (currentCommand != NULL) {
 				currentCommand->Init();
+			} else {
+				timeFinished = currTimeSec;
 			}
 		} else {
 			currentCommand->Update(currTimeSec, deltaTimeSec);
 		}
 	} else {
-		DO_PERIODIC(100, printf("Queue finished at: %f \n", currTimeSec));
+		DO_PERIODIC(100, printf("Queue finished at: %f \n", timeFinished));
 	}
 }
 
