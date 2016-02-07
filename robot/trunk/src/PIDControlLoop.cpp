@@ -11,6 +11,8 @@ PIDConfig::PIDConfig() {
 	desiredAccuracy = 0.0;
 	maxAbsITerm = 0.1;
 	minAbsError = 0.0;
+
+	timeLimit = 1.5; // time threshold
 }
 
 PIDControlLoop::PIDControlLoop(PIDConfig* myConfig) {
@@ -24,12 +26,14 @@ void PIDControlLoop::Init(double myInitialSensorValue,
 	desiredSensorValue = myDesiredSensorValue;
 	oldError = 0.0;
 	sumError = 0.0;
+	timeCount = 0.0; // for time threshold
 }
 
 void PIDControlLoop::Init(PIDConfig* myConfig, double myInitialSensorValue,
 						  double myDesiredSensorValue) {
 	pidConfig = myConfig;
 	Init(myInitialSensorValue, myDesiredSensorValue);
+	timeCount = 0.0; // for time threshold
 }
 
 // Returns the actuator value (motor speed, etc.)
@@ -113,6 +117,32 @@ bool PIDControlLoop::ControlLoopDone(double currentSensorValue) {
 				 <= pidConfig->desiredAccuracy) {
 		return true;
 	} else {
+		return false;
+	}
+}
+
+/** when the value returned is close enough to what we want for a certain length of time.
+	new and better version of ControlLoopDone(double currentSensorValue)
+	@param currentSensorValue the current value of the sensor
+	@param deltaTime the increment of time between each loop of the code
+*/
+bool PIDControlLoop::ControlLoopDone(double currentSensorValue, double deltaTime) {
+	if (fabs(desiredSensorValue - currentSensorValue) <= pidConfig->desiredAccuracy) {
+		// we want to start incrementing timeCount only if we're within the
+		// threshold that we've set
+		timeCount += deltaTime;
+
+		if (timeCount >= pidConfig->timeLimit) {
+			// we are done with the control loop once the counter has reached
+			// the time threshold we set
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		// if the sensor value exits the range of "okay" desired values, then
+		// reset the counter and start over
+		timeCount = 0;
 		return false;
 	}
 }

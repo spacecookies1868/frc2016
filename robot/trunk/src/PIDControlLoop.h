@@ -18,6 +18,8 @@ struct PIDConfig {
 	double desiredAccuracy;
 	double maxAbsITerm;
 	double minAbsError;
+
+	double timeLimit;  /*!< required time the sensor must be within the setpoint before ending control loop */
 };
 
 class PIDControlLoop {
@@ -29,6 +31,7 @@ class PIDControlLoop {
 	double Update(double currentSensorValue); // Returns the actuator value (motor speed, etc.)
 	double Update(double currValue, double desiredValue);
 	bool ControlLoopDone(double currentSensorValue);
+	bool ControlLoopDone(double currentSensorValue, double deltaTime);
 
 	static double Saturate(double value, double maxAbsValue);
 
@@ -55,6 +58,8 @@ private:
 	double pTerm;
 	double iTerm;
 	double dTerm;
+
+	double timeCount;  /*!< counter to keep track of how long sensor value has been in range of setpoint */
 };
 
 #endif
