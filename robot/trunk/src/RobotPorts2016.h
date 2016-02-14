@@ -3,10 +3,15 @@
 #include "Debugging.h"
 
 // ***************** PWM PORTS *****************
-static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 0;
-static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 1;
-static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 2;
-static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 5;
+//static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 0;
+//static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 1;
+//static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 2;
+//static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 5;
+
+static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 7;
+static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 9;
+static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 1;
+static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 2;
 
 // ***************** DIGITAL I/O PORTS *****************
 
