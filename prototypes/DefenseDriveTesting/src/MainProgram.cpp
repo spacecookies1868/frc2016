@@ -15,8 +15,12 @@ public:
 
 	MainProgram() {
 		robot = new RobotModel();
+		defenseDrive = new DefenseDrive(robot);
 		timer = new Timer();
 		compressor = new Compressor();
+		currTimeSec = 0.0;
+		lastTimeSec = 0.0;
+		deltaTimeSec = 0.0;
 	}
 
 	void RobotInit()
@@ -26,13 +30,9 @@ public:
 
 	void AutonomousInit()
 	{
-		defenseDrive = new DefenseDrive(robot);
 		defenseDrive->Init();
 		timer->Reset();
 		timer->Start();
-		currTimeSec = 0.0;
-		lastTimeSec = 0.0;
-		deltaTimeSec = 0.0;
 	}
 
 	void AutonomousPeriodic()

@@ -6,7 +6,6 @@ DefenseDrive::DefenseDrive(RobotModel* myRobot) {
 	nextState = kBeforeUpRamp;
 	currRoll = 0.0;
 	lastRoll = 0.0;
-	//finalRoll = 0.0;
 	deltaRoll = 0.0;
 	speed = 0.0;
 	startRoll = 0.0;
@@ -17,12 +16,16 @@ DefenseDrive::DefenseDrive(RobotModel* myRobot) {
 }
 
 void DefenseDrive::Init() {
-	speed = 0.3;
+	speed = 0.4;
 	isFlatThreshold = 2.0;
 	onRampThreshold = 5.0;
 	slopeOfRamp = 3.0;
 	currRoll = robot->GetRoll();
 	startRoll = robot->GetRoll();
+	deltaRoll = 0.0;
+	currState = kInit;
+	nextState = kBeforeUpRamp;
+	startRoll = 0.0;
 }
 
 void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
@@ -79,7 +82,7 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 	case (kDone):
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 		nextState = kDone;
-		printf("kDone\n");
+		printf("kDone\n");	// never actually enters kDone in this program
 		break;
 	}
 	currState = nextState;

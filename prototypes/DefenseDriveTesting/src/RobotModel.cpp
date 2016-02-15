@@ -5,10 +5,10 @@ RobotModel::RobotModel() {
 	navx = new AHRS(SerialPort::Port::kMXP, AHRS::SerialDataType::kProcessedData, update_rate_hz);
 	navx->ZeroYaw();
 
-	leftA = new Talon(1);
-	leftB = new Talon(0);
-	rightA = new Talon(2);
-	rightB = new Talon(5);
+	leftA = new Talon(9);
+	leftB = new Talon(7);
+	rightA = new Talon(1);
+	rightB = new Talon(2);
 }
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
