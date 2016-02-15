@@ -35,14 +35,55 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
  * 			/ rightjoy x / rightjoy y / reverse desired / gearshift desired /
  */
 
+/* overloaded methods with time stamp */
+
 void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int line,
-		const std::string& stateName, bool state) {
+				const std::string& stateName, double state) {
 	if (!logAction.is_open()) {
-		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
 	}
 	logAction << myRobot->GetTime() << ", " << fileName << ", " << line << ", " << stateName
 			<< ", " << state << "\r\n";
+	logAction.flush();
 }
+
+void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int line,
+				const std::string& stateName, const std::string& state) {
+	if (!logAction.is_open()) {
+			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+	}
+	logAction << myRobot->GetTime() << ", " << fileName << ", " << line << ", " << stateName
+			<< ", " << state << "\r\n";
+	logAction.flush();
+}
+
+/* overloaded methods without time stamp */
+void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
+			bool state) {
+	if (!logAction.is_open()) {
+			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+	}
+	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
+	logAction.flush();
+}
+void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
+			double state) {
+	if (!logAction.is_open()) {
+				logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+	}
+	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
+	logAction.flush();
+}
+void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
+			const std::string& state) {
+	if (!logAction.is_open()) {
+				logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+	}
+	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
+	logAction.flush();
+}
+
+
 
 std::string Logger::GetTimeStamp(const char* fileName) {
 /*	struct timespec tp;
