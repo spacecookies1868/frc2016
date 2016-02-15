@@ -2,7 +2,7 @@
 #include "AutoCommand.h"
 #include "Debugging.h"
 
-AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive) {
+AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure) {
 	robot = myRobot;
 	firstCommand = NULL;
 	nextCommand = NULL;
@@ -10,6 +10,7 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	autoMode = 0;
 	autoStart = 0;
 	drive = myDrive;
+	superstructure = mySuperstructure;
 	timeFinished = 0.0;
 }
 

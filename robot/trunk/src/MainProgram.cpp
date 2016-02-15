@@ -2,6 +2,7 @@
 #include "ControlBoard.h"
 #include "RobotModel.h"
 #include "DriveController.h"
+#include "SuperstructureController.h"
 #include "AutonomousController.h"
 #include "Debugging.h"
 #include "Logger.h"
@@ -12,6 +13,7 @@ class MainProgram : public IterativeRobot {
 	RobotModel *robot;
 	RemoteControl *humanControl;
 	DriveController *driveController;
+	SuperstructureController *superstructureController;
 	AutonomousController *autonomousController;
 
 	double currTimeSec;
@@ -24,7 +26,8 @@ public:
 		robot = new RobotModel();
 		humanControl = new ControlBoard();
 		driveController = new DriveController(robot, humanControl);
-		autonomousController = new AutonomousController(robot, driveController);
+		superstructureController = new SuperstructureController(robot, humanControl);
+		autonomousController = new AutonomousController(robot, driveController, superstructureController);
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -44,6 +47,7 @@ private:
 
 		robot->Reset();
 		driveController->Reset();
+		superstructureController->Reset();
 		autonomousController->Reset();
 
 		currTimeSec = 0.0;
@@ -66,6 +70,7 @@ private:
 
 		robot->Reset();
 		driveController->Reset();
+		superstructureController->Reset();
 		autonomousController->Reset();
 
 		currTimeSec = 0.0;
@@ -80,6 +85,7 @@ private:
 
 		humanControl->ReadControls();
 		driveController->Update(currTimeSec, deltaTimeSec);
+		superstructureController->Update(currTimeSec, deltaTimeSec);
 
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
@@ -100,6 +106,7 @@ private:
 	void DisabledInit() {
 		robot->Reset();
 		driveController->Reset();
+		superstructureController->Reset();
 		autonomousController->Reset();
 	}
 
@@ -110,6 +117,7 @@ private:
 		robot->RefreshIni();
 		autonomousController->RefreshIni();
 		driveController->RefreshIni();
+		superstructureController->RefreshIni();
 	}
 
 };

@@ -1,8 +1,6 @@
 #ifndef AUTONOMOUSCONTROLLER_H
 #define AUTONOMOUSCONTROLLER_H
 
-#include "WPILib.h"
-#include "RobotModel.h"
 #include "AutoCommand.h"
 #include <vector>
 #include <string>
@@ -14,7 +12,7 @@ class AutonomousController {
 public:
 	enum AutoMode {};
 
-	AutonomousController(RobotModel* myRobot, DriveController* myDrive); //add controllers as we create them as parameters of the constructor
+	AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure); //add controllers as we create them as parameters of the constructor
 	~AutonomousController() {}
 
 	void StartAutonomous();
@@ -32,6 +30,7 @@ private:
 	AutoCommand* currentCommand;
 	RobotModel* robot;
 	DriveController* drive;
+	SuperstructureController* superstructure;
 	unsigned int autoStart;
 	double timeFinished;
 };

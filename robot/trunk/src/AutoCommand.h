@@ -6,6 +6,7 @@
 #include "RobotModel.h"
 #include "RemoteControl.h"
 #include "DriveController.h"
+#include "SuperstructureController.h"
 #include "ControlBoard.h"
 #include <vector>
 #include <string>
