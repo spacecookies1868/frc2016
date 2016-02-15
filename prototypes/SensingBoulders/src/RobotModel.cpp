@@ -7,6 +7,11 @@ RobotModel::RobotModel() {
 	servoDirection = true;
 }
 
+void RobotModel::InitServo(double angle) {
+	servoAngle = angle;
+	servo->SetAngle(servoAngle);
+}
+
 void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle) {
 	servoAngle = servo->GetAngle();
 	if (servoAngle > endAngle){

@@ -14,6 +14,7 @@ public:
 //	float GetWheelSpeed(Wheels w);
 
 	//void Reset();
+	void InitServo(double angle);
 	void SetServo(double startAngle, double endAngle, double deltaAngle);
 	double GetServoAngle();
 

@@ -23,6 +23,8 @@ private:
 	double currAngle, currDistance;
 	bool isDone;
 	RobotModel* robot;
+
+	void PrintState();
 };
 
 #endif

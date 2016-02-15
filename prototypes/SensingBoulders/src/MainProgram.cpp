@@ -23,11 +23,11 @@ private:
 	void AutonomousPeriodic()
 	{
 		if (sensingBoulders->IsDone()) {
-			printf("center boulder angle: %f\n", sensingBoulders->GetCenterBoulderAngle());
-			printf("center boulder distance: %f\n", sensingBoulders->GetCenterBoulderDistance());
+//			printf("center boulder angle: %f\n", sensingBoulders->GetCenterBoulderAngle());
+//			printf("center boulder distance: %f\n", sensingBoulders->GetCenterBoulderDistance());
 		} else {
 			sensingBoulders->Update();
-			printf("update\n");
+//			printf("update\n");
 		}
 	}
 
