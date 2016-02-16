@@ -8,8 +8,7 @@ RobotModel::RobotModel() {
 }
 
 void RobotModel::InitServo(double angle) {
-	servoAngle = angle;
-	servo->SetAngle(servoAngle);
+	servo->SetAngle(angle);
 }
 
 void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle) {
@@ -29,5 +28,6 @@ void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle)
 }
 
 double RobotModel::GetServoAngle() {
+	servoAngle = servo->GetAngle();
 	return servoAngle;
 }

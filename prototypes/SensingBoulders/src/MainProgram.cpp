@@ -9,10 +9,19 @@ private:
 	RobotModel* robot;
 	SensingBoulders* sensingBoulders;
 
+public:
 	void RobotInit()
 	{
+//		printf("Initializing Robot \n");
 		robot = new RobotModel();
+//		printf ("About to create sensingBoulders \n");
 		sensingBoulders = new SensingBoulders(robot);
+//		printf("Finished creating sensingBoulders \n");
+	}
+
+	void DisabledInit()
+	{
+//		printf("Calling disabledInit \n");
 	}
 
 	void AutonomousInit()
@@ -46,6 +55,7 @@ private:
 
 	void TestPeriodic()
 	{
+		SmartDashboard::PutNumber("Sonic Reading", sensingBoulders->GetDistanceInches());
 	}
 };
 

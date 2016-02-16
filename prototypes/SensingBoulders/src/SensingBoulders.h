@@ -13,14 +13,16 @@ public:
 	bool IsDone();
 	double GetCenterBoulderAngle();
 	double GetCenterBoulderDistance();
+	double GetDistanceInches();
 	virtual ~SensingBoulders();
 private:
 	UltrasonicSensor* ultrasonicSensor;
 	double startServoAngle, endServoAngle, deltaServoAngle;
-	double thresholdBoulderDistance;
+	double thresholdDistance;
 	double startBoulderAngle, endBoulderAngle, centerBoulderAngle;
 	double startBoulderDistance, endBoulderDistance, centerBoulderDistance;
 	double currAngle, currDistance;
+	double servoAccuracy;
 	bool isDone;
 	RobotModel* robot;
 
