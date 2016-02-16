@@ -90,17 +90,11 @@ private:
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
-
-		Logger::LogState(robot, humanControl);
-		LOG(robot, "kInit", 1);
 	}
 
 	void TestPeriodic() {
-		//robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
-//		printf("fleft encoder: %f\n", robot->GetFrontLeftEncoderVal());
-//		printf("fright encoder: %f\n", robot->GetFrontRightEncoderVal());
-//		printf("rleft encoder: %f\n", robot->GetRearLeftEncoderVal());
-//		printf("rright encoder: %f\n", robot->GetRearRightEncoderVal());
+		printf("fleft encoder: %f\n", robot->GetLeftEncoderVal());
+		printf("fright encoder: %f\n", robot->GetRightEncoderVal());
 	}
 
 	void DisabledInit() {

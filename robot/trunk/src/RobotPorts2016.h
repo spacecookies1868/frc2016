@@ -3,29 +3,19 @@
 #include "Debugging.h"
 
 // ***************** PWM PORTS *****************
-//static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 0;
-//static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 1;
-//static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 2;
-//static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 5;
 
 static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 7;
-static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 9;
+static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 8;
 static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 1;
 static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 2;
 
 // ***************** DIGITAL I/O PORTS *****************
 
-//static const int LEFT_ENCODER_A_PWM_PORT 				= -1;
-//static const int LEFT_ENCODER_B_PWM_PORT				= -1;
-//
-//static const int RIGHT_ENCODER_A_PWM_PORT				= -1;
-//static const int RIGHT_ENCODER_B_PWM_PORT				= -1;
-//
-//static const int REAR_LEFT_ENCODER_A_PORT				= -1;
-//static const int REAR_LEFT_ENCODER_B_PORT				= -1;
-//
-//static const int REAR_RIGHT_ENCODER_A_PORT			= -1;
-//static const int REAR_RIGHT_ENCODER_B_PORT			= -1;
+static const int LEFT_ENCODER_A_PWM_PORT 				= 0;
+static const int LEFT_ENCODER_B_PWM_PORT				= 1;
+
+static const int RIGHT_ENCODER_A_PWM_PORT				= 2;
+static const int RIGHT_ENCODER_B_PWM_PORT				= 3;
 
 
 // ***************** MISC *****************

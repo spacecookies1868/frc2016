@@ -25,23 +25,22 @@ RobotModel::RobotModel() {
 	isLowGear = false;
 	gearShiftSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, GEAR_SHIFT_SOLENOID_PORT);
 
-	/**
-	frontLeftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
-	frontRightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
-	rearLeftEncoder = new Encoder(REAR_LEFT_ENCODER_A_PORT, REAR_LEFT_ENCODER_B_PORT, true);
-	rearRightEncoder = new Encoder(REAR_RIGHT_ENCODER_A_PORT, REAR_RIGHT_ENCODER_B_PORT, true);
 
-	// 6 inch wheels (1/2 ft), 256 tics per rotation
-	frontLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
-	frontRightEncoder->SetDistancePerPulse((PI / 2.0) / 256.0);
-	rearLeftEncoder->SetDistancePerPulse(-(PI / 2.0) / 256.0);
-	rearRightEncoder->SetDistancePerPulse((PI / 2.0) / 256.0);
-	**/
+	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
+	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
+
+	// 8 inch wheels (2/3 ft), 256 tics per rotation
+	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+
 	compressor = new Compressor(COMPRESSOR_PORT);
 	serialPort = new SerialPort(57600, SerialPort::kMXP);
+	navx = new AHRS(SPI::Port::kMXP);
 
 	timer = new Timer();
 	timer->Start();
+
+	pini = new Ini("/home/lvuser/robot.ini");
 }
 
 void RobotModel::Reset() {
@@ -109,32 +108,20 @@ double RobotModel::GetTime() {
 	return timer->Get();
 }
 
-/**
-double RobotModel::GetFrontLeftEncoderVal() {
-	return frontLeftEncoder->GetDistance();
+double RobotModel::GetLeftEncoderVal() {
+	return leftEncoder->GetDistance();
 }
 
-double RobotModel::GetFrontRightEncoderVal() {
-	return frontRightEncoder->GetDistance();
-}
-
-double RobotModel::GetRearLeftEncoderVal() {
-	return -rearLeftEncoder->GetDistance();
-}
-
-double RobotModel::GetRearRightEncoderVal() {
-	return -rearRightEncoder->GetDistance();
+double RobotModel::GetRightEncoderVal() {
+	return rightEncoder->GetDistance();
 }
 
 void RobotModel::ResetDriveEncoders() {
-	frontLeftEncoder->Reset();
-	frontRightEncoder->Reset();
-	rearLeftEncoder->Reset();
-	rearRightEncoder->Reset();
+	leftEncoder->Reset();
+	rightEncoder->Reset();
 }
-*/
 
 void RobotModel::RefreshIni() {
-	/*delete pini;
-	pini = new Ini("/home/lvuser/robot.ini");*/
+	delete pini;
+	pini = new Ini("/home/lvuser/robot.ini");
 }

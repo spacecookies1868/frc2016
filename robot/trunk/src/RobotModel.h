@@ -7,6 +7,7 @@
 #include "Debugging.h"
 #include <iostream>
 #include <fstream>
+#include "navx/AHRS.h"
 
 class RobotModel {
 public:
@@ -22,13 +23,9 @@ public:
 
 	double GetVoltage();
 
-	/*
-	double GetFrontLeftEncoderVal();
-	double GetFrontRightEncoderVal();
-	double GetRearLeftEncoderVal();
-	double GetRearRightEncoderVal();
+	double GetLeftEncoderVal();
+	double GetRightEncoderVal();
 	void ResetDriveEncoders();
-	*/
 
 	void RefreshIni();
 	void ResetTimer();
@@ -39,7 +36,7 @@ public:
 
 	double GetTime();
 
-//	Ini* pini;
+	Ini* pini;
 
 private:
 	bool isLowGear;
@@ -56,10 +53,11 @@ private:
 	Solenoid *gearShiftSolenoid;
 
 	//Sensors
-//	Encoder *frontLeftEncoder, *rearLeftEncoder, *frontRightEncoder, *rearRightEncoder;
+	Encoder *leftEncoder, *rightEncoder;
 
 	//Port the NavX plugs into
 	SerialPort *serialPort;
+	AHRS *navx;
 };
 
 #endif
