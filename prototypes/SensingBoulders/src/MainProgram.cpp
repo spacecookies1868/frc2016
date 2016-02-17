@@ -2,21 +2,33 @@
 #include "RobotModel.h"
 #include "SensingBoulders.h"
 #include "UltrasonicSensor.h"
+#include "AutoPivot.h"
 
 class MainProgram: public IterativeRobot
 {
 private:
 	RobotModel* robot;
 	SensingBoulders* sensingBoulders;
+	AutoPivot* autoPivotCommand;
+	Timer* timer;
+	double currTimeSec, lastTimeSec, deltaTimeSec;
+
+	bool isPivotInitialized;
 
 public:
 	void RobotInit()
 	{
-//		printf("Initializing Robot \n");
+		printf("Initializing Robot \n");
 		robot = new RobotModel();
-//		printf ("About to create sensingBoulders \n");
+		printf ("About to create sensingBoulders \n");
 		sensingBoulders = new SensingBoulders(robot);
-//		printf("Finished creating sensingBoulders \n");
+		printf("Finished creating sensingBoulders \n");
+
+		currTimeSec = 0.0;
+		lastTimeSec = 0.0;
+		deltaTimeSec = 0.0;
+		timer->Start();
+		printf("Set times & start timer");
 	}
 
 	void DisabledInit()
@@ -27,6 +39,8 @@ public:
 	void AutonomousInit()
 	{
 		sensingBoulders->Init();
+
+		isPivotInitialized = false;
 	}
 
 	void AutonomousPeriodic()
@@ -34,6 +48,23 @@ public:
 		if (sensingBoulders->IsDone()) {
 //			printf("center boulder angle: %f\n", sensingBoulders->GetCenterBoulderAngle());
 //			printf("center boulder distance: %f\n", sensingBoulders->GetCenterBoulderDistance());
+			if (isPivotInitialized){
+				lastTimeSec = currTimeSec;
+				currTimeSec = timer->Get();
+				deltaTimeSec = currTimeSec - lastTimeSec;
+				if (autoPivotCommand->IsDone(deltaTimeSec)) {
+					robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+				} else {
+					autoPivotCommand->Update(currTimeSec, deltaTimeSec);
+				}
+			} else {
+				robot->ZeroYaw();
+ 				double myDesiredAngle = sensingBoulders->GetCenterBoulderAngle() - 90;
+				autoPivotCommand = new AutoPivot(robot, myDesiredAngle);
+				autoPivotCommand->Init();
+
+				isPivotInitialized = true;
+			}
 		} else {
 			sensingBoulders->Update();
 //			printf("update\n");

@@ -23,6 +23,7 @@ private:
 	double startBoulderDistance, endBoulderDistance, centerBoulderDistance;
 	double currAngle, currDistance;
 	double servoAccuracy;
+	bool endBoulderFound;
 	bool isDone;
 	RobotModel* robot;
 

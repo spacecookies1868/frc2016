@@ -10,12 +10,12 @@ void SensingBoulders::Init() {
 
 	startServoAngle = 40;
 	endServoAngle = 135;
-	deltaServoAngle = 1.0;
+	deltaServoAngle = 2.0;
 	servoAccuracy = 1;
 
 	robot->InitServo(startServoAngle);
 
-	Wait(0.5);
+	Wait(0.3);
 
 	currAngle = robot->GetServoAngle();
 	startBoulderAngle = currAngle;
