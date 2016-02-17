@@ -51,8 +51,9 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		break;
 	case (kIdle):
 		nextState = kIdle;
-		if (false /*defense manipulator button -- button 5 -- was just pressed*/) {
+		if (humanControl->GetDefenseManipDesired()) {
 			//defense manipulator piston change state
+			DO_PERIODIC(1, printf("Defense manipulator piston change desired\n"));
 		}
 
 		if (autoDefenseManipUp) {
@@ -63,8 +64,9 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			autoDefenseManipDown = false;
 		}
 
-		if (false /*intake piston button -- button 1 -- was just pressed*/) {
+		if (humanControl->GetIntakePistonDesired()) {
 			//intake piston change state
+			DO_PERIODIC(1, printf("Intake piston change desired\n"));
 		}
 
 		if (autoIntakeUp) {
@@ -75,17 +77,20 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			autoIntakeDown = false;
 		}
 
-		if (false /*intake motor button -- button 4 -- is forward*/ || autoIntakeMotorForward) {
+		if (humanControl->GetIntakeMotorForwardDesired() || autoIntakeMotorForward) {
 			//set intake motor speed to intake
 			//set outtake piston to in state
-		} else if (false /*intake motor button -- button 3 -- is backward*/ || autoIntakeMotorBackward) {
+			DO_PERIODIC(20, printf("Intake motor forward desired\n"));
+		} else if (humanControl->GetIntakeMotorReverseDesired() || autoIntakeMotorBackward) {
 			//set intake motor speed to outtake
 			//set outtake piston to in state
+			DO_PERIODIC(20, printf("Intake motor reverse desired\n"));
 		} else {
 			//set intake motor speed to zero
 		}
 
-		if (false /*outtake piston button -- button 9 -- was just pressed*/ || autoOuttakeIn || autoOuttakeOut) {
+		if (humanControl->GetOuttakeDesired() || autoOuttakeIn || autoOuttakeOut) {
+			DO_PERIODIC(1, printf("Outtake state change desired\n"));
 			if (false /*outtake piston at in state*/ || autoOuttakeOut) {
 				if (false /*defense manipulator piston in correct state*/) {
 					//set the outtake piston to out state

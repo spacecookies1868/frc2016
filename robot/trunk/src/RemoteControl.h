@@ -8,10 +8,19 @@ public:
 
 	virtual void ReadControls() = 0;
 
+	//Drive joystick accessors
 	virtual double GetJoystickValue(Joysticks j, Axes a) = 0;
 
+	//Drive controller button accessors
 	virtual bool GetReverseDriveDesired() = 0;
 	virtual bool GetLowGearDesired() = 0;
+
+	//Superstructure controller button accessors
+	virtual bool GetDefenseManipDesired() = 0;
+	virtual bool GetIntakePistonDesired() = 0;
+	virtual bool GetIntakeMotorForwardDesired() = 0;
+	virtual bool GetIntakeMotorReverseDesired() = 0;
+	virtual bool GetOuttakeDesired() = 0;
 
 	virtual ~RemoteControl() {}
 };

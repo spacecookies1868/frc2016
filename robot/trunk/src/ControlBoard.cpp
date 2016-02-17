@@ -12,13 +12,24 @@ ControlBoard::ControlBoard() {
 
 	driveDirectionButton = new ButtonReader(rightJoy, DRIVE_DIRECTION_BUTTON_PORT);
 	gearShiftButton = new ButtonReader(leftJoy, HIGH_LOW_GEAR_BUTTON_PORT);
+	defenseManipButton = new ButtonReader(operatorJoy, DEFENSE_MANIP_BUTTON_PORT);
+	intakePistonButton = new ButtonReader(operatorJoy, INTAKE_PISTON_BUTTON_PORT);
+	intakeMotorForwardButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_FORWARD_BUTTON_PORT);
+	intakeMotorReverseButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_REVERSE_BUTTON_PORT);
+	outtakeButton = new ButtonReader(operatorJoy, OUTTAKE_BUTTON_PORT);
 
 	leftJoyX = 0.0;
 	leftJoyY = 0.0;
 	rightJoyX = 0.0;
 	rightJoyY = 0.0;
+
 	reverseDriveDesired = false;
 	lowGearDesired = false;
+	defenseManipDesired = false;
+	intakePistonDesired = false;
+	intakeMotorForwardDesired = false;
+	intakeMotorReverseDesired = false;
+	outtakeDesired = false;
 };
 
 void ControlBoard::ReadControls() {
@@ -29,8 +40,13 @@ void ControlBoard::ReadControls() {
 	rightJoyY = rightJoy->GetY();
 
 	reverseDriveDesired = driveDirectionButton->IsDown();
-
 	lowGearDesired = gearShiftButton->IsDown();
+
+	defenseManipDesired = defenseManipButton->WasJustPressed();
+	intakePistonDesired = intakePistonButton->WasJustPressed();
+	intakeMotorForwardDesired = intakeMotorForwardButton->IsDown();
+	intakeMotorReverseDesired = intakeMotorReverseButton->IsDown();
+	outtakeDesired = outtakeButton->WasJustPressed();
 }
 
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
@@ -64,7 +80,32 @@ bool ControlBoard::GetLowGearDesired() {
 	return lowGearDesired;
 }
 
+bool ControlBoard::GetDefenseManipDesired() {
+	return defenseManipDesired;
+}
+
+bool ControlBoard::GetIntakePistonDesired() {
+	return intakePistonDesired;
+}
+
+bool ControlBoard::GetIntakeMotorForwardDesired() {
+	return intakeMotorForwardDesired;
+}
+
+bool ControlBoard::GetIntakeMotorReverseDesired() {
+	return intakeMotorReverseDesired;
+}
+
+bool ControlBoard::GetOuttakeDesired() {
+	return outtakeDesired;
+}
+
 void ControlBoard::ReadAllButtons() {
 	driveDirectionButton->ReadValue();
 	gearShiftButton->ReadValue();
+	defenseManipButton->ReadValue();
+	intakePistonButton ->ReadValue();
+	intakeMotorForwardButton->ReadValue();
+	intakeMotorReverseButton->ReadValue();
+	outtakeButton->ReadValue();
 }

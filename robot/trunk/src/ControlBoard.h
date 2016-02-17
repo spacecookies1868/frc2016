@@ -16,16 +16,27 @@ public:
 
 	virtual void ReadControls();
 
+	//Drive joystick accessors
 	double GetJoystickValue(Joysticks j, Axes a);
 
+	//Drive controller button accessors
 	bool GetReverseDriveDesired();
 	bool GetLowGearDesired();
 
+	//Superstructure controller button accessors
+	bool GetDefenseManipDesired();
+	bool GetIntakePistonDesired();
+	bool GetIntakeMotorForwardDesired();
+	bool GetIntakeMotorReverseDesired();
+	bool GetOuttakeDesired();
+
 private:
-	bool reverseDriveDesired, lowGearDesired;
+	bool reverseDriveDesired, lowGearDesired, defenseManipDesired, intakePistonDesired, intakeMotorForwardDesired,
+		 intakeMotorReverseDesired, outtakeDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 	Joystick *leftJoy, *rightJoy, *operatorJoy;
-	ButtonReader *driveDirectionButton, *gearShiftButton;
+	ButtonReader *driveDirectionButton, *gearShiftButton, *defenseManipButton, *intakePistonButton, *intakeMotorForwardButton,
+				 *intakeMotorReverseButton, *outtakeButton;
 	void ReadAllButtons();
 };
 

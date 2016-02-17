@@ -31,7 +31,15 @@ static const int RIGHT_JOY_USB_PORT						= 1;
 static const int OPERATOR_JOY_USB_PORT					= 2;
 
 // ***************** BUTTON PORTS *****************
+//Drive controller button ports
 static const int DRIVE_DIRECTION_BUTTON_PORT			= 3;
 static const int HIGH_LOW_GEAR_BUTTON_PORT				= 3;
+
+//Superstructure controller button ports
+static const int DEFENSE_MANIP_BUTTON_PORT				= 5;
+static const int INTAKE_PISTON_BUTTON_PORT				= 1;
+static const int INTAKE_MOTOR_FORWARD_BUTTON_PORT		= 4;
+static const int INTAKE_MOTOR_REVERSE_BUTTON_PORT		= 3;
+static const int OUTTAKE_BUTTON_PORT					= 9;
 
 #endif
