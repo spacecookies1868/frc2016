@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include "navx/AHRS.h"
+#include "TableReader.h"
 
 class RobotModel {
 public:
@@ -35,9 +36,12 @@ public:
 	void ShiftToHighGear();
 
 	double GetTime();
+#if USE_NAVX
+	double GetYaw();
+#endif
 
 	Ini* pini;
-
+	TableReader* gripLines;
 private:
 	bool isLowGear;
 	Compressor *compressor;
@@ -55,9 +59,12 @@ private:
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
 
+
+#if USE_NAVX
 	//Port the NavX plugs into
 	SerialPort *serialPort;
 	AHRS *navx;
+#endif
 };
 
 #endif

@@ -34,17 +34,21 @@ RobotModel::RobotModel() {
 	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
 
 	compressor = new Compressor(COMPRESSOR_PORT);
+#if USE_NAVX
 	serialPort = new SerialPort(57600, SerialPort::kMXP);
 	navx = new AHRS(SPI::Port::kMXP);
+#endif
 
 	timer = new Timer();
 	timer->Start();
 
 	pini = new Ini("/home/lvuser/robot.ini");
+	gripLines = new TableReader("GRIP/myLinesReport");
 }
 
 void RobotModel::Reset() {
 	isLowGear = !gearShiftSolenoid->Get();
+	gripLines->Reset();
 }
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
@@ -115,6 +119,12 @@ double RobotModel::GetLeftEncoderVal() {
 double RobotModel::GetRightEncoderVal() {
 	return rightEncoder->GetDistance();
 }
+
+#if USE_NAVX
+double RobotModel::GetYaw() {
+	return navx->GetYaw();
+}
+#endif
 
 void RobotModel::ResetDriveEncoders() {
 	leftEncoder->Reset();

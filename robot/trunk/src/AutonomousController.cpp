@@ -2,7 +2,7 @@
 #include "AutoCommand.h"
 #include "Debugging.h"
 
-AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure) {
+AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure, CameraController* myCamera) {
 	robot = myRobot;
 	firstCommand = NULL;
 	nextCommand = NULL;
@@ -11,6 +11,7 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	autoStart = 0;
 	drive = myDrive;
 	superstructure = mySuperstructure;
+	camera = myCamera;
 	timeFinished = 0.0;
 }
 
@@ -62,7 +63,23 @@ void AutonomousController::Reset() {
 }
 
 void AutonomousController::RefreshIni() {
+	autoMode = robot->pini->geti("AUTONOMOUS","AUTOMODE",0);
 
+#if USE_NAVX
+	/*
+	 * Setting all defaults to 0, should change when actually tune
+	 */
+	PivotCommand::rPFac = robot->pini->getf("PIVOTCOMMAND", "PFac", 0.0);
+	PivotCommand::rIFac = robot->pini->getf("PIVOTCOMMAND", "IFac", 0.0);
+	PivotCommand::rDFac = robot->pini->getf("PIVOTCOMMAND", "DFac", 0.0);
+	PivotCommand::rDesiredAccuracy = robot->pini->getf("PIVOTCOMMAND", "DesiredAccuracy", 0.0);
+	PivotCommand::rMaxAbsOutput = robot->pini->getf("PIVOTCOMMAND", "MaxAbsOutput", 0.0);
+	PivotCommand::rMaxAbsError = robot->pini->getf("PIVOTCOMMAND", "MaxAbsError", 0.0);
+	PivotCommand::rMaxAbsDiffError = robot->pini->getf("PIVOTCOMMAND", "MaxAbsDiffError", 0.0);
+	PivotCommand::rMaxAbsITerm = robot->pini->getf("PIVOTCOMMAND", "MaxAbsITerm", 0.0);
+	PivotCommand::rTimeLimit = robot->pini->getf("PIVOTCOMMAND", "TimeLimit", 0.0);
+
+#endif
 }
 
 /**
@@ -83,6 +100,29 @@ void AutonomousController::CreateQueue() {
 	printf("AutoMode: %i \n", autoMode);
 
 	switch (autoMode) {
-
+	case (kTestAuto): {
+		printf("kTestAuto ------------------\n");
+		break;
+	}
+	case (kBlankAuto): {
+		printf("kBlankAuto ----------------------\n");
+		break;
+	}
+	case (kReachAuto): {
+		printf("kReachAuto ------------------------\n");
+		break;
+	}
+	case (kCrossAuto): {
+		printf("kCrossAuto -----------------------------\n");
+		break;
+	}
+	case (kShootAuto): {
+		printf("kShootAuto --------------------------------\n");
+		break;
+	}
+	case (kHoardingAuto): {
+		printf("kHoardingAuto ------------------------------\n");
+		break;
+	}
 	}
 }

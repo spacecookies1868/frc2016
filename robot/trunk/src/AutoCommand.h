@@ -13,6 +13,7 @@
 #include <iostream>
 #include "PIDControlLoop.h"
 #include "DriveController.h"
+#include "CameraController.h"
 
 using namespace std;
 
@@ -122,6 +123,7 @@ private:
 class WaitingCommand: public SimpleAutoCommand {
 public:
 	WaitingCommand(double myWaitTimeSec);
+	~WaitingCommand() {}
 	virtual void Init();
 	virtual void Update(double currTimeSec, double deltaTimeSec);
 	virtual bool IsDone();
@@ -129,6 +131,86 @@ public:
 private:
 	double waitTimeSec;
 	Timer *timer;
+	bool isDone;
 };
 
+/*
+ * DRIVING COMMANDS YAY!
+ */
+
+/*
+ * Pivot Command WARNING: Do not use unless USE_NAVX is true
+ */
+class PivotCommand : public SimpleAutoCommand {
+public:
+	PivotCommand(RobotModel* myRobot, double myDesiredR);
+	~PivotCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+	static double rPFac, rIFac, rDFac, rDesiredAccuracy, rMaxAbsOutput, rMaxAbsDiffError,
+			rMaxAbsError, rMaxAbsITerm, rTimeLimit;
+private:
+	PIDConfig* CreateRPIDConfig();
+	double GetAccumulatedYaw();
+	RobotModel* robot;
+	PIDConfig* rPIDConfig;
+	PIDControlLoop* rPID;
+	bool isDone;
+
+	double desiredR;
+	double initialR;
+
+	double lastYaw;
+	double currYaw;
+	double deltaYaw;
+	double accumulatedYaw;
+};
+
+
+/*
+ * NOT DONE NOT DONE NOT DONE NOT DONE NOT DONE
+ */
+class DriveFromCameraCommand : public SimpleAutoCommand {
+public:
+	DriveFromCameraCommand(RobotModel* myRobot, CameraController* myCamera);
+	~DriveFromCameraCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+private:
+	RobotModel* robot;
+	CameraController* camera;
+	bool isDone;
+};
+
+/*
+ * CAMERA COMMANDS YAY!
+ */
+
+class CameraCommand : public SimpleAutoCommand {
+public:
+	CameraCommand(CameraController* myCamera);
+	~CameraCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+
+private:
+	CameraController* camera;
+	double x;
+	double y;
+	bool isDone;
+
+	double sumx;
+	double sumy;
+	int iterationCounter;
+	int numIterations;
+	double waitTime;
+	double lastReadTime;
+};
+
+/*
+ * ULTRASONIC COMMANDS YAY!
+ */
 #endif

@@ -4,6 +4,7 @@
 #include "DriveController.h"
 #include "SuperstructureController.h"
 #include "AutonomousController.h"
+#include "CameraController.h"
 #include "Debugging.h"
 #include "Logger.h"
 #include <string.h>
@@ -15,6 +16,7 @@ class MainProgram : public IterativeRobot {
 	DriveController *driveController;
 	SuperstructureController *superstructureController;
 	AutonomousController *autonomousController;
+	CameraController *cameraController;
 
 	double currTimeSec;
 	double lastTimeSec;
@@ -27,7 +29,8 @@ public:
 		humanControl = new ControlBoard();
 		driveController = new DriveController(robot, humanControl);
 		superstructureController = new SuperstructureController(robot, humanControl);
-		autonomousController = new AutonomousController(robot, driveController, superstructureController);
+		cameraController = new CameraController(robot);
+		autonomousController = new AutonomousController(robot, driveController, superstructureController, cameraController);
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -48,6 +51,7 @@ private:
 		robot->Reset();
 		driveController->Reset();
 		superstructureController->Reset();
+		cameraController->Reset();
 		autonomousController->Reset();
 
 		currTimeSec = 0.0;
@@ -71,6 +75,7 @@ private:
 		robot->Reset();
 		driveController->Reset();
 		superstructureController->Reset();
+		cameraController->Reset();
 		autonomousController->Reset();
 
 		currTimeSec = 0.0;
@@ -102,6 +107,7 @@ private:
 		driveController->Reset();
 		superstructureController->Reset();
 		autonomousController->Reset();
+		cameraController->Reset();
 	}
 
 	void DisabledPeriodic() {

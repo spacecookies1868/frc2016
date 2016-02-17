@@ -2,6 +2,7 @@
 #define AUTONOMOUSCONTROLLER_H
 
 #include "AutoCommand.h"
+#include "CameraController.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -10,9 +11,14 @@
 
 class AutonomousController {
 public:
-	enum AutoMode {};
+	enum AutoMode { kTestAuto = 0,
+					kBlankAuto = 1,
+					kReachAuto = 2,
+					kCrossAuto = 3,
+					kShootAuto = 4,
+					kHoardingAuto = 5};
 
-	AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure); //add controllers as we create them as parameters of the constructor
+	AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure, CameraController* myCamera); //add controllers as we create them as parameters of the constructor
 	~AutonomousController() {}
 
 	void StartAutonomous();
@@ -31,6 +37,7 @@ private:
 	RobotModel* robot;
 	DriveController* drive;
 	SuperstructureController* superstructure;
+	CameraController* camera;
 	unsigned int autoStart;
 	double timeFinished;
 };
