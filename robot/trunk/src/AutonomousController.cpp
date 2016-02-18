@@ -79,7 +79,24 @@ void AutonomousController::RefreshIni() {
 	PivotCommand::rMaxAbsITerm = robot->pini->getf("PIVOTCOMMAND", "MaxAbsITerm", 0.0);
 	PivotCommand::rTimeLimit = robot->pini->getf("PIVOTCOMMAND", "TimeLimit", 0.0);
 
+	PivotToAngleCommand::rPFac = robot->pini->getf("PIVOTTOANGLE", "PFac", 0.0);
+	PivotToAngleCommand::rIFac = robot->pini->getf("PIVOTTOANGLE", "IFac", 0.0);
+	PivotToAngleCommand::rDFac = robot->pini->getf("PIVOTTOANGLE", "DFac", 0.0);
+	PivotToAngleCommand::rDesiredAccuracy = robot->pini->getf("PIVOTTOANGLE",
+			"DesiredAccuracy", 0.0);
+	PivotToAngleCommand::rMaxAbsOutput = robot->pini->getf("PIVOTTOANGLE",
+			"MaxAbsOutput", 0.0);
+	PivotToAngleCommand::rMaxAbsError = robot->pini->getf("PIVOTTOANGLE",
+			"MaxAbsError", 0.0);
+	PivotToAngleCommand::rMaxAbsDiffError = robot->pini->getf("PIVOTTOANGLE",
+			"MaxAbsDiffError", 0.0);
+	PivotToAngleCommand::rMaxAbsITerm = robot->pini->getf("PIVOTTOANGLE",
+			"MaxAbsITerm", 0.0);
+	PivotToAngleCommand::rTimeLimit = robot->pini->getf("PIVOTTOANGLE", "TimeLimit",
+			0.0);
 #endif
+
+
 }
 
 /**
@@ -102,6 +119,8 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
+		PivotCommand* p = new PivotCommand(robot, 90.0);
+		firstCommand = p;
 		break;
 	}
 	case (kBlankAuto): {

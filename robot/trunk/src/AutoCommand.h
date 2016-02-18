@@ -167,6 +167,37 @@ private:
 	double accumulatedYaw;
 };
 
+/*
+ * WARNING: Do not use unless USE_NAVX is true
+ */
+
+class PivotToAngleCommand : public SimpleAutoCommand {
+public:
+	PivotToAngleCommand(RobotModel* myRobot, double myDesiredR);
+	~PivotToAngleCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+	static double rPFac, rIFac, rDFac, rDesiredAccuracy, rMaxAbsOutput, rMaxAbsDiffError,
+			rMaxAbsError, rMaxAbsITerm, rTimeLimit;
+private:
+	PIDConfig* CreateRPIDConfig();
+	double GetAccumulatedYaw();
+	double CalculateDesiredYaw(double myDesired);
+	RobotModel* robot;
+	PIDConfig* rPIDConfig;
+	PIDControlLoop* rPID;
+	bool isDone;
+
+	double desiredR;
+	double initialR;
+
+	double lastYaw;
+	double currYaw;
+	double deltaYaw;
+	double accumulatedYaw;
+};
+
 
 /*
  * NOT DONE NOT DONE NOT DONE NOT DONE NOT DONE

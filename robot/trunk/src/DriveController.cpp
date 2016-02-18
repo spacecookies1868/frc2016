@@ -3,6 +3,7 @@
 #include "RobotPorts2016.h"
 #include "WPILib.h"
 #include <math.h>
+#include "Debugging.h"
 
 DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanControl){
 	robot = myRobot;
@@ -21,10 +22,12 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		if(humanControl->GetLowGearDesired()){
 			if (!(robot->IsLowGear())){
 				robot->ShiftToLowGear();
+				DO_PERIODIC(1, printf("Shifting to Low Gear\n"));
 			}
 		} else {
 			if (robot->IsLowGear()) {
 				robot->ShiftToHighGear();
+				DO_PERIODIC(1, printf("Shifting to High Gear\n"));
 			}
 		}
 
@@ -80,6 +83,11 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 		leftMotorOutput = -leftMotorOutput/rightMotorOutput;
 		rightMotorOutput = -1.0;
 	}
+	DO_PERIODIC(20, printf("Left encoder value: %f\n", robot->GetLeftEncoderVal()));
+	DO_PERIODIC(20, printf("Right encoder value: %f\n", robot->GetRightEncoderVal()));
+#if USE_NAVX
+	DO_PERIODIC(20, printf("Angle: %f\n", robot->GetNavXYaw()));
+#endif
 
 	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
