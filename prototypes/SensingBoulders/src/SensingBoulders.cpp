@@ -2,6 +2,7 @@
 
 SensingBoulders::SensingBoulders(RobotModel* myRobot) {
 	robot = myRobot;
+	printf("Creating ultrasonic sensor \n");
 	ultrasonicSensor = new UltrasonicSensor(0);
 }
 
@@ -31,42 +32,113 @@ void SensingBoulders::Init() {
 	isDone = false;
 	endBoulderFound = false;
 
+	currState = kSensingBoulder;
+	nextState = kInitPivot;
+
+	desiredAngle = 0.0;
+
 	PrintState();
 }
 
-void SensingBoulders::Update() {
+void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 	currAngle = robot->GetServoAngle();
 	currDistance = ultrasonicSensor->GetRangeInInches();
+	currTimeSec = myCurrTimeSec;
+	lastTimeSec = myLastTimeSec;
+	deltaTimeSec = currTimeSec - lastTimeSec;
 
-	if (currDistance * thresholdDistance < startBoulderDistance) {
-		startBoulderDistance = currDistance;
-		startBoulderAngle = currAngle;
-		endBoulderFound = false;
-		endBoulderAngle = startBoulderAngle;
-		endBoulderDistance = startBoulderDistance;
-		printf("changed start boulder\n");
-		printf("currDistance: %f\n", currDistance);
-		printf("currAngle: %f\n", currAngle);
-		PrintState();
+	switch(currState){
+	case(kSensingBoulder):
+		if (currDistance * thresholdDistance < startBoulderDistance) {
+			startBoulderDistance = currDistance;
+			startBoulderAngle = currAngle;
+			endBoulderFound = false;
+			endBoulderAngle = startBoulderAngle;
+			endBoulderDistance = startBoulderDistance;
+			printf("changed start boulder\n");
+			printf("currDistance: %f\n", currDistance);
+			printf("currAngle: %f\n", currAngle);
+			PrintState();
+		}
+	//	printf("startBoulderDistance: %f\n", startBoulderDistance);
+
+		if (currDistance > thresholdDistance * startBoulderDistance && !endBoulderFound) {
+			endBoulderFound = true;
+			endBoulderDistance = currDistance;
+			endBoulderAngle = currAngle;
+	//		centerBoulderAngle = (startBoulderAngle + endBoulderAngle) / 2;
+	//		centerBoulderDistance = (startBoulderDistance + endBoulderDistance) / 2;
+			printf("Changed end boulder \n");
+			PrintState();
+		}
+
+		SmartDashboard::PutNumber("currDistance: \n", currDistance);
+		SmartDashboard::PutNumber("servoAngle: \n", currAngle);
+
+		robot->SetServo(startServoAngle, endServoAngle, deltaServoAngle);
+
+		if (IsDone()){
+			nextState = kInitPivot;
+		} else {
+			nextState = kSensingBoulder;
+		}
+		break;
+	case(kInitPivot):
+		robot->ZeroYaw();
+		desiredAngle = centerBoulderAngle - 90;
+		autoPivotCommand = new AutoPivot(robot, desiredAngle);
+		autoPivotCommand->Init();
+		nextState = kPivot;
+		break;
+	case (kPivot):
+		if (autoPivotCommand->IsDone(deltaTimeSec)) {
+			nextState = kDone;
+		} else {
+			autoPivotCommand->Update(currTimeSec, deltaTimeSec);
+			nextState = kPivot;
+		}
+		break;
+	case (kDone):
+		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 	}
-//	printf("startBoulderDistance: %f\n", startBoulderDistance);
-
-	if (currDistance > thresholdDistance * startBoulderDistance && !endBoulderFound) {
-		endBoulderFound = true;
-		endBoulderDistance = currDistance;
-		endBoulderAngle = currAngle;
-//		centerBoulderAngle = (startBoulderAngle + endBoulderAngle) / 2;
-//		centerBoulderDistance = (startBoulderDistance + endBoulderDistance) / 2;
-		printf("Changed end boulder \n");
-		PrintState();
-	}
-
-	SmartDashboard::PutNumber("currDistance: \n", currDistance);
-	SmartDashboard::PutNumber("servoAngle: \n", currAngle);
-
-	robot->SetServo(startServoAngle, endServoAngle, deltaServoAngle);
+	currState = nextState;
 
 }
+
+//void SensingBoulders::Update() {
+//	currAngle = robot->GetServoAngle();
+//	currDistance = ultrasonicSensor->GetRangeInInches();
+//
+//	if (currDistance * thresholdDistance < startBoulderDistance) {
+//		startBoulderDistance = currDistance;
+//		startBoulderAngle = currAngle;
+//		endBoulderFound = false;
+//		endBoulderAngle = startBoulderAngle;
+//		endBoulderDistance = startBoulderDistance;
+//		printf("changed start boulder\n");
+//		printf("currDistance: %f\n", currDistance);
+//		printf("currAngle: %f\n", currAngle);
+//		PrintState();
+//	}
+////	printf("startBoulderDistance: %f\n", startBoulderDistance);
+//
+//	if (currDistance > thresholdDistance * startBoulderDistance && !endBoulderFound) {
+//		endBoulderFound = true;
+//		endBoulderDistance = currDistance;
+//		endBoulderAngle = currAngle;
+////		centerBoulderAngle = (startBoulderAngle + endBoulderAngle) / 2;
+////		centerBoulderDistance = (startBoulderDistance + endBoulderDistance) / 2;
+//		printf("Changed end boulder \n");
+//		PrintState();
+//	}
+//
+//	SmartDashboard::PutNumber("currDistance: \n", currDistance);
+//	SmartDashboard::PutNumber("servoAngle: \n", currAngle);
+//
+//	robot->SetServo(startServoAngle, endServoAngle, deltaServoAngle);
+//
+//}
+
 
 bool SensingBoulders::IsDone() {		// may have to change if endServoAngle is not actually end
 	if (currAngle > endServoAngle) {
@@ -97,6 +169,10 @@ double SensingBoulders::GetCenterBoulderDistance() {
 double SensingBoulders::GetDistanceInches(){
 	return ultrasonicSensor->GetRangeInInches();
 }
+
+/*void SensingBoulders::Pivot(){
+
+}*/
 
 SensingBoulders::~SensingBoulders() {
 

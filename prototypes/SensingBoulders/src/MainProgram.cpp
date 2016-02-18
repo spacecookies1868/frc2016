@@ -12,17 +12,23 @@ private:
 	AutoPivot* autoPivotCommand;
 	Timer* timer;
 	double currTimeSec, lastTimeSec, deltaTimeSec;
-
 	bool isPivotInitialized;
 
+
 public:
+	MainProgram()
+	{
+//		printf("Initializing Robot\n");
+		robot = new RobotModel();
+//		printf("Finished creating robot\n");
+	}
 	void RobotInit()
 	{
-		printf("Initializing Robot \n");
-		robot = new RobotModel();
-		printf ("About to create sensingBoulders \n");
+//		printf ("About to create sensingBoulders \n");
 		sensingBoulders = new SensingBoulders(robot);
-		printf("Finished creating sensingBoulders \n");
+//		printf("Finished creating sensingBoulders \n");
+		timer = new Timer();
+//		printf("Finished creating timer\n");
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -45,30 +51,31 @@ public:
 
 	void AutonomousPeriodic()
 	{
-		if (sensingBoulders->IsDone()) {
-//			printf("center boulder angle: %f\n", sensingBoulders->GetCenterBoulderAngle());
-//			printf("center boulder distance: %f\n", sensingBoulders->GetCenterBoulderDistance());
-			if (isPivotInitialized){
-				lastTimeSec = currTimeSec;
-				currTimeSec = timer->Get();
-				deltaTimeSec = currTimeSec - lastTimeSec;
-				if (autoPivotCommand->IsDone(deltaTimeSec)) {
-					robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
-				} else {
-					autoPivotCommand->Update(currTimeSec, deltaTimeSec);
-				}
-			} else {
-				robot->ZeroYaw();
- 				double myDesiredAngle = sensingBoulders->GetCenterBoulderAngle() - 90;
-				autoPivotCommand = new AutoPivot(robot, myDesiredAngle);
-				autoPivotCommand->Init();
-
-				isPivotInitialized = true;
-			}
-		} else {
-			sensingBoulders->Update();
-//			printf("update\n");
-		}
+//		if (sensingBoulders->IsDone()) {
+////			printf("center boulder angle: %f\n", sensingBoulders->GetCenterBoulderAngle());
+////			printf("center boulder distance: %f\n", sensingBoulders->GetCenterBoulderDistance());
+//			if (isPivotInitialized){
+//				lastTimeSec = currTimeSec;
+//				currTimeSec = timer->Get();
+//				deltaTimeSec = currTimeSec - lastTimeSec;
+//				if (autoPivotCommand->IsDone(deltaTimeSec)) {
+//					robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+//				} else {
+//					autoPivotCommand->Update(currTimeSec, deltaTimeSec);
+//				}
+//			} else {
+//				robot->ZeroYaw();
+// 				double myDesiredAngle = sensingBoulders->GetCenterBoulderAngle() - 90;
+//				autoPivotCommand = new AutoPivot(robot, myDesiredAngle);
+//				autoPivotCommand->Init();
+//
+//				isPivotInitialized = true;
+//			}
+//		} else {
+//			sensingBoulders->Update();
+////			printf("update\n");
+//		}
+		sensingBoulders->Update(currTimeSec,lastTimeSec);
 	}
 
 	void TeleopInit()

@@ -6,9 +6,11 @@ RobotModel::RobotModel() {
 	servoAngle = servo->GetAngle();
 	servoDirection = true;
 
-	uint8_t update_rate_hz = 50;
-	navx = new AHRS(SerialPort::Port::kMXP, AHRS::SerialDataType::kProcessedData, update_rate_hz);
+//	printf("Creating navx\n");
+	navx = new AHRS(SPI::Port::kMXP);
+//	printf("Finished creating navx\n");
 	navx->ZeroYaw();
+//	printf("Zeroed the yaw\n");
 
 	leftA = new Talon(1);
 	leftB = new Talon(0);
