@@ -10,8 +10,10 @@ ControlBoard::ControlBoard() {
 	rightJoy = new Joystick(RIGHT_JOY_USB_PORT);
 	operatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
 
-	driveDirectionButton = new ButtonReader(rightJoy, DRIVE_DIRECTION_BUTTON_PORT);
+	driveDirectionButton = new ButtonReader(operatorJoy, DRIVE_DIRECTION_BUTTON_PORT);
 	gearShiftButton = new ButtonReader(leftJoy, HIGH_LOW_GEAR_BUTTON_PORT);
+	arcadeDriveButton = new ButtonReader(rightJoy, ARCADE_DRIVE_BUTTON_PORT);
+	quickTurnButton = new ButtonReader(rightJoy, QUICK_TURN_BUTTON_PORT);
 	defenseManipButton = new ButtonReader(operatorJoy, DEFENSE_MANIP_BUTTON_PORT);
 	intakePistonButton = new ButtonReader(operatorJoy, INTAKE_PISTON_BUTTON_PORT);
 	intakeMotorForwardButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_FORWARD_BUTTON_PORT);
@@ -25,6 +27,8 @@ ControlBoard::ControlBoard() {
 
 	reverseDriveDesired = false;
 	lowGearDesired = false;
+	arcadeDriveDesired = false;
+	quickTurnDesired = false;
 	defenseManipDesired = false;
 	intakePistonDesired = false;
 	intakeMotorForwardDesired = false;
@@ -41,6 +45,8 @@ void ControlBoard::ReadControls() {
 
 	reverseDriveDesired = driveDirectionButton->IsDown();
 	lowGearDesired = gearShiftButton->IsDown();
+	arcadeDriveDesired = arcadeDriveButton->IsDown();
+	quickTurnDesired = quickTurnButton->IsDown();
 
 	defenseManipDesired = defenseManipButton->WasJustPressed();
 	intakePistonDesired = intakePistonButton->WasJustPressed();
@@ -80,6 +86,14 @@ bool ControlBoard::GetLowGearDesired() {
 	return lowGearDesired;
 }
 
+bool ControlBoard::GetArcadeDriveDesired() {
+	return arcadeDriveDesired;
+}
+
+bool ControlBoard::GetQuickTurnDesired() {
+	return quickTurnDesired;
+}
+
 bool ControlBoard::GetDefenseManipDesired() {
 	return defenseManipDesired;
 }
@@ -103,6 +117,8 @@ bool ControlBoard::GetOuttakeDesired() {
 void ControlBoard::ReadAllButtons() {
 	driveDirectionButton->ReadValue();
 	gearShiftButton->ReadValue();
+	arcadeDriveButton->ReadValue();
+	quickTurnButton->ReadValue();
 	defenseManipButton->ReadValue();
 	intakePistonButton ->ReadValue();
 	intakeMotorForwardButton->ReadValue();

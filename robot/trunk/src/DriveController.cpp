@@ -28,10 +28,17 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		double joyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
-		double joyY = DriveDirection() * humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
+		double rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		double rightJoyY = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY);
+		double leftJoyY = humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
-		ArcadeDrive(joyX, joyY);
+		if(humanControl->GetQuickTurnDesired()) {
+			QuickTurn(rightJoyX);
+		} else if(humanControl->GetArcadeDriveDesired()) {
+			ArcadeDrive(rightJoyX, DriveDirection() * leftJoyY);
+		} else {
+			TankDrive(leftJoyY, rightJoyY);
+		}
 
 		nextState = kTeleopDrive;
 		break;
@@ -44,9 +51,15 @@ void DriveController::Reset() {
 	m_stateVal = kInitialize;
 }
 
+void DriveController::QuickTurn(double myRight) {
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, -myRight);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, myRight);
+}
+
 void DriveController::ArcadeDrive(double myX, double myY) {
+
 	float moveValue = myY;
-	float rotateValue = myX;
+	float rotateValue = myX * myY;
 
 	float leftMotorOutput = moveValue;
 	float rightMotorOutput = moveValue;
@@ -70,6 +83,11 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 
 	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
+}
+
+void DriveController::TankDrive(double myLeft, double myRight) {
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, myLeft);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, myRight);
 }
 
 int DriveController::DriveDirection(){

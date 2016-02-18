@@ -86,6 +86,36 @@ float RobotModel::GetWheelSpeed(Wheels w) {
 	}
 }
 
+double RobotModel::GetNavXYaw() {
+#if USE_NAVX
+	return navx->GetYaw();
+#else
+	return 0.0;
+#endif
+}
+
+double RobotModel::GetNavXRoll() {
+#if USE_NAVX
+	return navx->GetRoll();
+#else
+	return 0.0;
+#endif
+}
+
+double RobotModel::GetNavXPitch() {
+#if USE_NAVX
+	return navx->GetPitch();
+#else
+	return 0.0;
+#endif
+}
+
+void RobotModel::ZeroNavXYaw() {
+#if USE_NAVX
+	navx->ZeroYaw();
+#endif
+}
+
 bool RobotModel::IsLowGear() {
 	return isLowGear;
 }
@@ -119,12 +149,6 @@ double RobotModel::GetLeftEncoderVal() {
 double RobotModel::GetRightEncoderVal() {
 	return rightEncoder->GetDistance();
 }
-
-#if USE_NAVX
-double RobotModel::GetYaw() {
-	return navx->GetYaw();
-}
-#endif
 
 void RobotModel::ResetDriveEncoders() {
 	leftEncoder->Reset();

@@ -28,6 +28,6 @@ extern int enableDoPeriodic;
 #define MATCH_PERIODIC( period_count, stmt ) do { static int __count__ = 0; if (( __count__++ % ( period_count )) == 0 ) { stmt; }} while(0)
 // MATCH_PERIODIC used for periodic functions that always need to occur
 
-#define USE_NAVX false
+#define USE_NAVX true
 
 #endif

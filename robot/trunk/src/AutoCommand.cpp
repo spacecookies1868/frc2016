@@ -81,7 +81,7 @@ PIDConfig* PivotCommand::CreateRPIDConfig(){
 
 double PivotCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
-	currYaw = robot->GetYaw();;
+	currYaw = robot->GetNavXYaw();
 	deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)

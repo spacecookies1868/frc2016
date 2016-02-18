@@ -14,6 +14,8 @@ public:
 	//Drive controller button accessors
 	virtual bool GetReverseDriveDesired() = 0;
 	virtual bool GetLowGearDesired() = 0;
+	virtual bool GetArcadeDriveDesired() = 0;
+	virtual bool GetQuickTurnDesired() = 0;
 
 	//Superstructure controller button accessors
 	virtual bool GetDefenseManipDesired() = 0;

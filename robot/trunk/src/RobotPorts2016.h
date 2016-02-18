@@ -32,8 +32,10 @@ static const int OPERATOR_JOY_USB_PORT					= 2;
 
 // ***************** BUTTON PORTS *****************
 //Drive controller button ports
-static const int DRIVE_DIRECTION_BUTTON_PORT			= 3;
+static const int DRIVE_DIRECTION_BUTTON_PORT			= 12;
 static const int HIGH_LOW_GEAR_BUTTON_PORT				= 3;
+static const int ARCADE_DRIVE_BUTTON_PORT				= 3;
+static const int QUICK_TURN_BUTTON_PORT					= 1;
 
 //Superstructure controller button ports
 static const int DEFENSE_MANIP_BUTTON_PORT				= 5;

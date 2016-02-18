@@ -20,6 +20,11 @@ public:
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetWheelSpeed(Wheels w);
 
+	double GetNavXYaw();
+	double GetNavXRoll();
+	double GetNavXPitch();
+	void ZeroNavXYaw();
+
 	void Reset();
 
 	double GetVoltage();
@@ -36,9 +41,6 @@ public:
 	void ShiftToHighGear();
 
 	double GetTime();
-#if USE_NAVX
-	double GetYaw();
-#endif
 
 	Ini* pini;
 	TableReader* gripLines;

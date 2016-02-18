@@ -22,6 +22,8 @@ public:
 	//Drive controller button accessors
 	bool GetReverseDriveDesired();
 	bool GetLowGearDesired();
+	bool GetArcadeDriveDesired();
+	bool GetQuickTurnDesired();
 
 	//Superstructure controller button accessors
 	bool GetDefenseManipDesired();
@@ -31,11 +33,11 @@ public:
 	bool GetOuttakeDesired();
 
 private:
-	bool reverseDriveDesired, lowGearDesired, defenseManipDesired, intakePistonDesired, intakeMotorForwardDesired,
+	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipDesired, intakePistonDesired, intakeMotorForwardDesired,
 		 intakeMotorReverseDesired, outtakeDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 	Joystick *leftJoy, *rightJoy, *operatorJoy;
-	ButtonReader *driveDirectionButton, *gearShiftButton, *defenseManipButton, *intakePistonButton, *intakeMotorForwardButton,
+	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton, *intakeMotorForwardButton,
 				 *intakeMotorReverseButton, *outtakeButton;
 	void ReadAllButtons();
 };
