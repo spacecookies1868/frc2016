@@ -13,12 +13,15 @@ std::ofstream Logger::logAction;
 void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 	if (!logData.is_open()) {
 		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
-		//<< "# Time   LeftWheelSpeed   RightWheelSpeed   IsLowGear   Voltage ";
+		logData << "Time, leftencoder, rightencoder, LeftWheelSpeed, RightWheelSpeed, yaw, roll, pitch, Voltage, leftjoyx, leftjoyy, rightjoyx, rightjoyy, reverse, lowgear \r\n";
 	}
 	logData << myRobot->GetTime() <<", " <<
+			myRobot->GetLeftEncoderVal() << ", " <<
+			myRobot->GetRightEncoderVal() << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kRightWheels) << ", " <<
-			myRobot->IsLowGear() << ", " << myRobot->GetVoltage() << ", " <<
+			myRobot->GetNavXYaw() << ", " << myRobot->GetNavXRoll() << ", " <<
+			myRobot->GetNavXPitch() << ", " << myRobot->GetVoltage() << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kX) << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY) << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX) << ", " <<
@@ -61,7 +64,7 @@ void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int lin
 void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
 			bool state) {
 	if (!logAction.is_open()) {
-			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();
@@ -69,7 +72,7 @@ void Logger::LogAction(const std::string& fileName, int line, const std::string&
 void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
 			double state) {
 	if (!logAction.is_open()) {
-				logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();
@@ -77,13 +80,11 @@ void Logger::LogAction(const std::string& fileName, int line, const std::string&
 void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
 			const std::string& state) {
 	if (!logAction.is_open()) {
-				logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();
 }
-
-
 
 std::string Logger::GetTimeStamp(const char* fileName) {
 /*	struct timespec tp;
