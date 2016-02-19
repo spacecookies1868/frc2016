@@ -100,6 +100,7 @@ private:
 	void TestPeriodic() {
 		printf("fleft encoder: %f\n", robot->GetLeftEncoderVal());
 		printf("fright encoder: %f\n", robot->GetRightEncoderVal());
+		LOG(robot, "Yaw values: ", robot->GetNavXYaw());
 	}
 
 	void DisabledInit() {

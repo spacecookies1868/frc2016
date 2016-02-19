@@ -1,6 +1,7 @@
 #include "AutonomousController.h"
 #include "AutoCommand.h"
 #include "Debugging.h"
+#include "Logger.h"
 
 AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure, CameraController* myCamera) {
 	robot = myRobot;
@@ -119,7 +120,7 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
-		PivotCommand* p = new PivotCommand(robot, 90.0);
+		PivotToAngleCommand* p = new PivotToAngleCommand(robot, 0.0);
 		firstCommand = p;
 		break;
 	}

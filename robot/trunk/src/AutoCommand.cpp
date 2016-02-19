@@ -44,6 +44,9 @@ PivotCommand::PivotCommand(RobotModel* myRobot, double myDesiredR) {
 	robot = myRobot;
 	desiredR = myDesiredR;
 	isDone = false;
+	accumulatedYaw = 0;
+	lastYaw = 0;
+	currYaw = 0;
 }
 
 void PivotCommand::Init() {
@@ -51,6 +54,7 @@ void PivotCommand::Init() {
 	initialR = GetAccumulatedYaw();
 	rPID = new PIDControlLoop(rPIDConfig);
 	rPID->Init(initialR, initialR + desiredR);
+	LOG(robot, "START YAW", robot->GetNavXYaw());
 }
 
 double PivotCommand::rPFac = 0.0;
@@ -98,12 +102,14 @@ void PivotCommand::Update(double currTimeSec, double deltaTimeSec) {
 	if (pidDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		LOG(robot, "END YAW", robot->GetNavXYaw());
 	} else {
 		double output = rPID->Update(GetAccumulatedYaw());
 		DO_PERIODIC(5, printf("My Yaw: %f\n", GetAccumulatedYaw()));
 		DO_PERIODIC(5, printf("Desired Yaw: %f\n", desiredR));
 		DO_PERIODIC(5, printf("Output: %f\n", output));
-		DO_PERIODIC(1, LOG(robot, "Yaw", GetAccumulatedYaw()));
+		DO_PERIODIC(1, LOG(robot, "Accumulated Yaw", GetAccumulatedYaw()));
+		DO_PERIODIC(1, LOG(robot, "Yaw", robot->GetNavXYaw()));
 		DO_PERIODIC(1, LOG(robot, "Desired Yaw", desiredR));
 		DO_PERIODIC(1, LOG(robot, "Output", output));
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, -output);
@@ -138,6 +144,7 @@ void PivotToAngleCommand::Init() {
 	initialR = GetAccumulatedYaw();
 	desiredR = CalculateDesiredYaw(desiredR);
 	rPID->Init(initialR, desiredR);
+	LOG(robot, "START YAW", robot->GetNavXYaw());
 }
 
 double PivotToAngleCommand::rPFac = 0.0;
@@ -185,6 +192,7 @@ void PivotToAngleCommand::Update(double currTimeSec, double deltaTimeSec) {
 	if (pidDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		LOG(robot, "END YAW", robot->GetNavXYaw());
 	} else {
 		double output = rPID->Update(GetAccumulatedYaw());
 		DO_PERIODIC(5, printf("My Yaw: %f\n", GetAccumulatedYaw()));
