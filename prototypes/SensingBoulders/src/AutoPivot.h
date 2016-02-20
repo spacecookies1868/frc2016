@@ -8,11 +8,12 @@
 
 class AutoPivot {
 public:
-	AutoPivot(RobotModel* myRobot, double desiredAngle);
+	AutoPivot(RobotModel* myRobot, double myDesiredR);
 	void Init();
 	void Update(double currTimeSec, double deltaTimeSec);
-	bool IsDone(double deltaTimeSec);
+	bool IsDone();
 	double GetAccumulatedYaw();
+	double CalculateDesiredYaw(double myDesired);
 	virtual ~AutoPivot();
 private:
 	RobotModel* robot;
@@ -20,6 +21,7 @@ private:
 	PIDConfig* rPIDConfig;
 	PIDControlLoop* rPID;
 	double initialR, desiredR, accumulatedYaw, lastYaw, currYaw, deltaYaw;
+	bool isDone;
 };
 
 #endif

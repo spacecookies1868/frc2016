@@ -85,13 +85,19 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 		break;
 	case(kInitPivot):
 		robot->ZeroYaw();
-		desiredAngle = centerBoulderAngle - 90;
+		if (centerBoulderAngle <= 90) {
+			desiredAngle = centerBoulderAngle - 90;
+		} else if (centerBoulderAngle > 90) {
+			desiredAngle = centerBoulderAngle + 90;
+		} else {
+
+		}
 		autoPivotCommand = new AutoPivot(robot, desiredAngle);
 		autoPivotCommand->Init();
 		nextState = kPivot;
 		break;
 	case (kPivot):
-		if (autoPivotCommand->IsDone(deltaTimeSec)) {
+		if (autoPivotCommand->IsDone()) {
 			nextState = kDone;
 		} else {
 			autoPivotCommand->Update(currTimeSec, deltaTimeSec);

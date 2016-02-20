@@ -85,6 +85,7 @@ public:
 
 	void TeleopPeriodic()
 	{
+		printf("Yaw Value %f\n", robot->GetYaw());
 	}
 
 	void DisableTeleop() {
