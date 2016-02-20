@@ -59,6 +59,7 @@ void RobotModel::Reset() {
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 	//IMPORTANT: Check which motors need to be inverted.
+
 	switch (w) {
 	case (kLeftWheels):
 		leftDriveMotorA->Set(speed);

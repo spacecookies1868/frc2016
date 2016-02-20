@@ -32,9 +32,9 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		double rightJoyX = -humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
-		double rightJoyY = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY);
-		double leftJoyY = humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
+		double rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		double rightJoyY = -humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY);
+		double leftJoyY = -humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		if(humanControl->GetQuickTurnDesired()) {
 			QuickTurn(rightJoyX);
@@ -56,16 +56,19 @@ void DriveController::Reset() {
 }
 
 void DriveController::QuickTurn(double myRight) {
-	robot->SetWheelSpeed(RobotModel::kLeftWheels, -myRight);
-	robot->SetWheelSpeed(RobotModel::kRightWheels, myRight);
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, myRight);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, -myRight);
 }
 
 void DriveController::ArcadeDrive(double myX, double myY) {
 
 	float moveValue = myY;
-	float rotateValue = myX * myY;
+	float rotateValue = myX;
 	if (fabs(moveValue) < 0.1) {
 		rotateValue = 0.0;
+	}
+	if (moveValue < 0.0) {
+		rotateValue =-rotateValue;
 	}
 
 

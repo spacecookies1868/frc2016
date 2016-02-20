@@ -39,6 +39,7 @@ public:
 
 private:
 	void RobotInit() {
+		LOG(robot, "Initing", 0.0);
 		robot->ResetTimer();
 		//robot->ResetDriveEncoders();
 		RefreshAllIni();
@@ -90,6 +91,7 @@ private:
 
 		humanControl->ReadControls();
 		driveController->Update(currTimeSec, deltaTimeSec);
+		LOG(robot, "Updating driveController", 0.0);
 		superstructureController->Update(currTimeSec, deltaTimeSec);
 
 		if (robot->GetVoltage() < 9.5) {
@@ -109,9 +111,11 @@ private:
 		superstructureController->Reset();
 		autonomousController->Reset();
 		cameraController->Reset();
+		//LOG(robot, "Finished disabled init", 0.0);
 	}
 
 	void DisabledPeriodic() {
+		//LOG(robot, "I'm disabled!", 0.0);
 	}
 
 	void RefreshAllIni() {
