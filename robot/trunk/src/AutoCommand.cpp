@@ -112,8 +112,8 @@ void PivotCommand::Update(double currTimeSec, double deltaTimeSec) {
 		DO_PERIODIC(1, LOG(robot, "Yaw", robot->GetNavXYaw()));
 		DO_PERIODIC(1, LOG(robot, "Desired Yaw", desiredR));
 		DO_PERIODIC(1, LOG(robot, "Output", output));
-		robot->SetWheelSpeed(RobotModel::kLeftWheels, -output);
-		robot->SetWheelSpeed(RobotModel::kRightWheels, output);
+		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
+		robot->SetWheelSpeed(RobotModel::kRightWheels, -output);
 	}
 }
 
@@ -174,7 +174,7 @@ PIDConfig* PivotToAngleCommand::CreateRPIDConfig(){
 
 double PivotToAngleCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
-	currYaw = robot->GetNavXYaw();;
+	currYaw = robot->GetNavXYaw();
 	deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
@@ -198,8 +198,8 @@ void PivotToAngleCommand::Update(double currTimeSec, double deltaTimeSec) {
 		DO_PERIODIC(5, printf("My Yaw: %f\n", GetAccumulatedYaw()));
 		DO_PERIODIC(5, printf("Desired Yaw: %f\n", desiredR));
 		DO_PERIODIC(5, printf("Output: %f\n", output));
-		robot->SetWheelSpeed(RobotModel::kLeftWheels, -output);
-		robot->SetWheelSpeed(RobotModel::kRightWheels, output);
+		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
+		robot->SetWheelSpeed(RobotModel::kRightWheels, -output);
 	}
 }
 
@@ -228,6 +228,137 @@ double PivotToAngleCommand::CalculateDesiredYaw(double myDesired) {
 }
 
 #endif
+
+/*
+ * DriveStraight Command
+ * basic driving forward command with rPID.
+ */
+
+DriveStraightCommand::DriveStraightCommand(RobotModel* myRobot, double myDesiredDis) {
+	robot = myRobot;
+	desiredDis = myDesiredDis;
+	isDone = false;
+	accumulatedYaw = 0.0;
+	lastYaw = 0.0;
+	currYaw = 0.0;
+	deltaYaw = 0.0;
+	initialR = 0.0;
+	initialDis = 0.0;
+}
+
+void DriveStraightCommand::Init() {
+	disPIDConfig = CreateDisPIDConfig();
+	rPIDConfig = CreateRPIDConfig();
+	initialDis = (robot->GetLeftEncoderVal() + robot->GetRightEncoderVal()) / 2.0;
+	initialR = GetAccumulatedYaw();
+	desiredR = 0.0;
+	disPID = new PIDControlLoop(disPIDConfig);
+	rPID = new PIDControlLoop(rPIDConfig);
+	disPID->Init(initialDis, initialDis + desiredDis);
+	rPID->Init(initialR, initialR + desiredR);
+	LOG(robot, "START DIS", initialDis);
+	LOG(robot, "START YAW", initialR);
+}
+
+double DriveStraightCommand::disPFac = 0.0;
+double DriveStraightCommand::disIFac = 0.0;
+double DriveStraightCommand::disDFac = 0.0;
+double DriveStraightCommand::disDesiredAccuracy = 0.0;
+double DriveStraightCommand::disMaxAbsOutput = 0.0;
+double DriveStraightCommand::disMaxAbsError = 0.0;
+double DriveStraightCommand::disMaxAbsDiffError = 0.0;
+double DriveStraightCommand::disMaxAbsITerm = 0.0;
+double DriveStraightCommand::disTimeLimit = 0.0;
+
+double DriveStraightCommand::rPFac = 0.0;
+double DriveStraightCommand::rIFac = 0.0;
+double DriveStraightCommand::rDFac = 0.0;
+double DriveStraightCommand::rDesiredAccuracy = 0.0;
+double DriveStraightCommand::rMaxAbsOutput = 0.0;
+double DriveStraightCommand::rMaxAbsError = 0.0;
+double DriveStraightCommand::rMaxAbsDiffError = 0.0;
+double DriveStraightCommand::rMaxAbsITerm = 0.0;
+double DriveStraightCommand::rTimeLimit = 0.0;
+
+PIDConfig* DriveStraightCommand::CreateDisPIDConfig() {
+	PIDConfig* dPIDConfig = new PIDConfig();
+	dPIDConfig->pFac = disPFac;
+	dPIDConfig->iFac = disIFac;
+	dPIDConfig->dFac = disDFac;
+	dPIDConfig->desiredAccuracy = disDesiredAccuracy;
+	dPIDConfig->maxAbsOutput = disMaxAbsOutput;
+	dPIDConfig->maxAbsError = disMaxAbsError;
+	dPIDConfig->maxAbsDiffError = disMaxAbsDiffError;
+	dPIDConfig->maxAbsITerm = disMaxAbsITerm;
+	dPIDConfig->timeLimit = disTimeLimit;
+	return dPIDConfig;
+}
+
+PIDConfig* DriveStraightCommand::CreateRPIDConfig() {
+	PIDConfig* rPIDConfig = new PIDConfig();
+	rPIDConfig->pFac = rPFac;
+	rPIDConfig->iFac = rIFac;
+	rPIDConfig->dFac = rDFac;
+	rPIDConfig->desiredAccuracy = rDesiredAccuracy;
+	rPIDConfig->maxAbsOutput = rMaxAbsOutput;
+	rPIDConfig->maxAbsError = rMaxAbsError;
+	rPIDConfig->maxAbsDiffError = rMaxAbsDiffError;
+	rPIDConfig->maxAbsITerm = rMaxAbsITerm;
+	rPIDConfig->timeLimit = rTimeLimit;
+	return rPIDConfig;
+}
+
+double DriveStraightCommand::GetAccumulatedYaw() {
+	lastYaw = currYaw;
+	currYaw = robot->GetNavXYaw();
+	deltaYaw = currYaw - lastYaw;
+
+	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
+		accumulatedYaw += (180 - lastYaw) + (180 + currYaw);
+	} else if (deltaYaw > 180) {	// going counterclockwise (from -180 to 180)
+		accumulatedYaw -= (180 + lastYaw) + (180 - currYaw);
+	} else {
+		accumulatedYaw += deltaYaw;
+	}
+	return accumulatedYaw;
+
+}
+
+void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
+	double currDis = (robot->GetLeftEncoderVal() + robot->GetRightEncoderVal()) / 2.0;
+	bool disPIDDone = disPID->ControlLoopDone(currDis);
+	if (disPIDDone) {
+		isDone = true;
+		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		LOG(robot, "END DIS", currDis);
+		LOG(robot, "END YAW", GetAccumulatedYaw());
+	} else {
+		double disOutput = disPID->Update(currDis);
+		double rOutput = rPID->Update(GetAccumulatedYaw());
+		LOG(robot, "Current Distance", currDis);
+		LOG(robot, "Current Yaw", GetAccumulatedYaw());
+		LOG(robot, "Distance Output", disOutput);
+		LOG(robot, "R Output", rOutput);
+
+		double leftOutput = disOutput + rOutput;
+		double rightOutput = disOutput - rOutput;
+
+		if (fmax(fabs(leftOutput), fabs(rightOutput)) > 1.0) {
+			leftOutput = leftOutput / (fmax(fabs(leftOutput), fabs(rOutput)));
+			rightOutput = rightOutput / (fmax(fabs(leftOutput), fabs(rOutput)));
+		}
+
+		LOG(robot, "Left Output", leftOutput);
+		LOG(robot, "Right Output", rightOutput);
+
+		robot->SetWheelSpeed(RobotModel::kLeftWheels, leftOutput);
+		robot->SetWheelSpeed(RobotModel::kRightWheels, rightOutput);
+	}
+}
+
+bool DriveStraightCommand::IsDone() {
+	return isDone;
+}
 
 /*
  * DriveFromCamera Command

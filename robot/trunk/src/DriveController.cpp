@@ -4,6 +4,7 @@
 #include "WPILib.h"
 #include <math.h>
 #include "Debugging.h"
+#include "Logger.h"
 
 DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanControl){
 	robot = myRobot;
@@ -31,7 +32,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		double rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		double rightJoyX = -humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
 		double rightJoyY = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY);
 		double leftJoyY = humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
@@ -63,12 +64,16 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 
 	float moveValue = myY;
 	float rotateValue = myX * myY;
+	if (fabs(moveValue) < 0.1) {
+		rotateValue = 0.0;
+	}
+
 
 	float leftMotorOutput = moveValue;
 	float rightMotorOutput = moveValue;
 
-	leftMotorOutput -= rotateValue;
-	rightMotorOutput += rotateValue;
+	leftMotorOutput += rotateValue;
+	rightMotorOutput -= rotateValue;
 
 	if (leftMotorOutput > 1.0) {
 		rightMotorOutput = rightMotorOutput / leftMotorOutput;
@@ -83,11 +88,11 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 		leftMotorOutput = -leftMotorOutput/rightMotorOutput;
 		rightMotorOutput = -1.0;
 	}
-	DO_PERIODIC(20, printf("Left encoder value: %f\n", robot->GetLeftEncoderVal()));
-	DO_PERIODIC(20, printf("Right encoder value: %f\n", robot->GetRightEncoderVal()));
-#if USE_NAVX
-	DO_PERIODIC(20, printf("Angle: %f\n", robot->GetNavXYaw()));
-#endif
+
+	LOG(robot, "MoveValue", moveValue);
+	LOG(robot, "RotateValue", rotateValue);
+	LOG(robot, "Left Motor Output", leftMotorOutput);
+	LOG(robot, "Right Motor Output", rightMotorOutput);
 
 	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);

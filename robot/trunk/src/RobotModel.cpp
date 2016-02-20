@@ -30,8 +30,14 @@ RobotModel::RobotModel() {
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
 
 	// 8 inch wheels (2/3 ft), 256 tics per rotation
-	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
-	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+//	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+//	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+
+	/*
+	 * SKETCH VALUES
+	 */
+	leftEncoder->SetDistancePerPulse(0.0104);
+	rightEncoder->SetDistancePerPulse(0.0104);
 
 	compressor = new Compressor(COMPRESSOR_PORT);
 #if USE_NAVX
@@ -55,18 +61,18 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 	//IMPORTANT: Check which motors need to be inverted.
 	switch (w) {
 	case (kLeftWheels):
-		leftDriveMotorA->Set(-speed);
-		leftDriveMotorB->Set(-speed);
+		leftDriveMotorA->Set(speed);
+		leftDriveMotorB->Set(speed);
 		break;
 	case (kRightWheels):
-		rightDriveMotorA->Set(speed);
-		rightDriveMotorB->Set(speed);
+		rightDriveMotorA->Set(-speed);
+		rightDriveMotorB->Set(-speed);
 		break;
 	case (kAllWheels):
-		leftDriveMotorA->Set(-speed);
-		leftDriveMotorB->Set(-speed);
-		rightDriveMotorA->Set(speed);
-		rightDriveMotorB->Set(speed);
+		leftDriveMotorA->Set(speed);
+		leftDriveMotorB->Set(speed);
+		rightDriveMotorA->Set(-speed);
+		rightDriveMotorB->Set(-speed);
 		break;
 	}
 }
@@ -147,7 +153,10 @@ double RobotModel::GetLeftEncoderVal() {
 }
 
 double RobotModel::GetRightEncoderVal() {
-	return rightEncoder->GetDistance();
+	/*
+	 * inverted
+	 */
+	return -rightEncoder->GetDistance();
 }
 
 void RobotModel::ResetDriveEncoders() {

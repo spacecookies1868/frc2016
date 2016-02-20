@@ -97,6 +97,25 @@ void AutonomousController::RefreshIni() {
 			0.0);
 #endif
 
+	DriveStraightCommand::disPFac = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disPFac", 0.0);
+	DriveStraightCommand::disIFac = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disIFac", 0.0);
+	DriveStraightCommand::disDFac = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disDFac", 0.0);
+	DriveStraightCommand::disDesiredAccuracy = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disDesiredAccuracy", 0.0);
+	DriveStraightCommand::disMaxAbsOutput = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disMaxAbsOutput", 0.0);
+	DriveStraightCommand::disMaxAbsError = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disMaxAbsError", 0.0);
+	DriveStraightCommand::disMaxAbsDiffError = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disMaxAbsDiffError", 0.0);
+	DriveStraightCommand::disMaxAbsITerm = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disMaxAbsITerm", 0.0);
+	DriveStraightCommand::disTimeLimit = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "disTimeLimit", 0.0);
+
+	DriveStraightCommand::rPFac = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rPFac", 0.0);
+	DriveStraightCommand::rIFac = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rIFac", 0.0);
+	DriveStraightCommand::rDFac = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rDFac", 0.0);
+	DriveStraightCommand::rDesiredAccuracy = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rDesiredAccuracy", 0.0);
+	DriveStraightCommand::rMaxAbsOutput = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsOutput", 0.0);
+	DriveStraightCommand::rMaxAbsError = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsError", 0.0);
+	DriveStraightCommand::rMaxAbsDiffError = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsDiffError", 0.0);
+	DriveStraightCommand::rMaxAbsITerm = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsITerm", 0.0);
+	DriveStraightCommand::rTimeLimit = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rTimeLimit", 0.0);
 
 }
 
@@ -120,8 +139,12 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
-		PivotToAngleCommand* p = new PivotToAngleCommand(robot, 0.0);
+		PivotCommand* p = new PivotCommand(robot, 90.0);
 		firstCommand = p;
+//		PivotToAngleCommand* p2 = new PivotToAngleCommand(robot, 0.0);
+//		firstCommand = p2;
+//		DriveStraightCommand* ds = new DriveStraightCommand(robot, 5.0);
+//		firstCommand = ds;
 		break;
 	}
 	case (kBlankAuto): {
