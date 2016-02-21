@@ -37,45 +37,16 @@ public:
 		printf("Set times & start timer");
 	}
 
-	void DisabledInit()
-	{
-//		printf("Calling disabledInit \n");
-	}
-
 	void AutonomousInit()
 	{
 		sensingBoulders->Init();
-
-		isPivotInitialized = false;
-	}
+		robot->ZeroYaw();	}
 
 	void AutonomousPeriodic()
 	{
-//		if (sensingBoulders->IsDone()) {
-////			printf("center boulder angle: %f\n", sensingBoulders->GetCenterBoulderAngle());
-////			printf("center boulder distance: %f\n", sensingBoulders->GetCenterBoulderDistance());
-//			if (isPivotInitialized){
-//				lastTimeSec = currTimeSec;
-//				currTimeSec = timer->Get();
-//				deltaTimeSec = currTimeSec - lastTimeSec;
-//				if (autoPivotCommand->IsDone(deltaTimeSec)) {
-//					robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
-//				} else {
-//					autoPivotCommand->Update(currTimeSec, deltaTimeSec);
-//				}
-//			} else {
-//				robot->ZeroYaw();
-// 				double myDesiredAngle = sensingBoulders->GetCenterBoulderAngle() - 90;
-//				autoPivotCommand = new AutoPivot(robot, myDesiredAngle);
-//				autoPivotCommand->Init();
-//
-//				isPivotInitialized = true;
-//			}
-//		} else {
-//			sensingBoulders->Update();
-////			printf("update\n");
-//		}
-		sensingBoulders->Update(currTimeSec,lastTimeSec);
+		currTimeSec = timer->Get();
+		sensingBoulders->Update(currTimeSec, lastTimeSec);
+		lastTimeSec = currTimeSec;
 	}
 
 	void TeleopInit()
@@ -87,9 +58,9 @@ public:
 	{
 		printf("Yaw Value %f\n", robot->GetYaw());
 	}
-
-	void DisableTeleop() {
-
+	void DisabledInit() {
+	}
+	void DisabledPeriodic() {
 	}
 
 	void TestPeriodic()

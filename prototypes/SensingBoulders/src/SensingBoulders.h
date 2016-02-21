@@ -11,7 +11,8 @@ public:
 	SensingBoulders(RobotModel* myRobot);
 	void Init();
 	void Update(double myCurrTimeSec, double myLastTimeSec);
-	bool IsDone();
+//	void Update();
+	void IsSensingDone();
 	double GetCenterBoulderAngle();
 	double GetCenterBoulderDistance();
 	double GetDistanceInches();
@@ -36,8 +37,9 @@ private:
 	double currAngle, currDistance;
 	double servoAccuracy;
 	double currTimeSec, lastTimeSec, deltaTimeSec;
-	double desiredAngle;
+	double desiredDeltaAngle;
 	bool endBoulderFound;
+	bool isSensingDone;
 	bool isDone;
 
 	RobotModel* robot;
