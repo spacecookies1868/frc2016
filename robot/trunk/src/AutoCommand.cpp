@@ -326,7 +326,7 @@ double DriveStraightCommand::GetAccumulatedYaw() {
 
 void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
 	double currDis = (robot->GetLeftEncoderVal() + robot->GetRightEncoderVal()) / 2.0;
-	bool disPIDDone = disPID->ControlLoopDone(currDis);
+	bool disPIDDone = disPID->ControlLoopDone(currDis,deltaTimeSec);
 	if (disPIDDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);

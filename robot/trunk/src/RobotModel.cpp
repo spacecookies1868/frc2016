@@ -29,19 +29,19 @@ RobotModel::RobotModel() {
 	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
 
-	// 8 inch wheels (2/3 ft), 256 tics per rotation
-//	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
-//	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
-
+//	// 8 inch wheels (2/3 ft), 256 tics per rotation
+	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+//
 	/*
 	 * SKETCH VALUES
 	 */
-	leftEncoder->SetDistancePerPulse(0.0104);
-	rightEncoder->SetDistancePerPulse(0.0104);
+//	leftEncoder->SetDistancePerPulse(0.0104);
+//	rightEncoder->SetDistancePerPulse(0.0104);
 
 	compressor = new Compressor(COMPRESSOR_PORT);
 #if USE_NAVX
-	serialPort = new SerialPort(57600, SerialPort::kMXP);
+	//serialPort = new SerialPort(57600, SerialPort::kMXP);
 	navx = new AHRS(SPI::Port::kMXP);
 #endif
 
@@ -150,14 +150,14 @@ double RobotModel::GetTime() {
 }
 
 double RobotModel::GetLeftEncoderVal() {
-	return leftEncoder->GetDistance();
+	return -leftEncoder->GetDistance();
 }
 
 double RobotModel::GetRightEncoderVal() {
 	/*
 	 * inverted
 	 */
-	return -rightEncoder->GetDistance();
+	return rightEncoder->GetDistance();
 }
 
 void RobotModel::ResetDriveEncoders() {

@@ -76,7 +76,7 @@ void TableReader::ReadValues() {
 }
 
 void TableReader::Reset() {
-	printf("Resetting \n");
+	//printf("Resetting \n");
 	topRightX = 0;
 	topRightY = 480;
 	topLeftX = 640;

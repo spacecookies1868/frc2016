@@ -64,7 +64,7 @@ private:
 
 #if USE_NAVX
 	//Port the NavX plugs into
-	SerialPort *serialPort;
+//	SerialPort *serialPort;
 	AHRS *navx;
 #endif
 };
