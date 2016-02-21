@@ -66,6 +66,7 @@ void AutonomousController::Reset() {
 void AutonomousController::RefreshIni() {
 	autoMode = robot->pini->geti("AUTONOMOUS","AUTOMODE",0);
 
+
 #if USE_NAVX
 	/*
 	 * Setting all defaults to 0, should change when actually tune
@@ -117,6 +118,26 @@ void AutonomousController::RefreshIni() {
 	DriveStraightCommand::rMaxAbsITerm = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsITerm", 0.0);
 	DriveStraightCommand::rTimeLimit = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rTimeLimit", 0.0);
 
+	CurveCommand::radiusPFac = robot->pini->getf("CURVECOMMAND", "radiusPFac", 0.0);
+	CurveCommand::radiusIFac = robot->pini->getf("CURVECOMMAND", "radiusIFac", 0.0);
+	CurveCommand::radiusDFac = robot->pini->getf("CURVECOMMAND", "radiusDFac", 0.0);
+	CurveCommand::radiusDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "radiusDesiredAccuracy", 0.0);
+	CurveCommand::radiusMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsOutput", 0.0);
+	CurveCommand::radiusMaxAbsError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsError", 0.0);
+	CurveCommand::radiusMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsDiffError", 0.0);
+	CurveCommand::radiusMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsITerm", 0.0);
+	CurveCommand::radiusTimeLimit = robot->pini->getf("CURVECOMMAND", "radiusTimeLimit", 0.0);
+
+	CurveCommand::anglePFac = robot->pini->getf("CURVECOMMAND", "anglePFac", 0.0);
+	CurveCommand::angleIFac = robot->pini->getf("CURVECOMMAND", "angleIFac", 0.0);
+	CurveCommand::angleDFac = robot->pini->getf("CURVECOMMAND", "angleDFac", 0.0);
+	CurveCommand::angleDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "angleDesiredAccuracy", 0.0);
+	CurveCommand::angleMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "angleMaxAbsOutput", 0.0);
+	CurveCommand::angleMaxAbsError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsError", 0.0);
+	CurveCommand::angleMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsDiffError", 0.0);
+	CurveCommand::angleMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "angleMaxAbsITerm", 0.0);
+	CurveCommand::angleTimeLimit = robot->pini->getf("CURVECOMMAND","angleTimeLimit", 0.0);
+
 }
 
 /**
@@ -139,12 +160,10 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
-//		PivotCommand* p = new PivotCommand(robot, 90.0);
-//		firstCommand = p;
-//		PivotToAngleCommand* p2 = new PivotToAngleCommand(robot, 0.0);
-//		firstCommand = p2;
 		DriveStraightCommand* ds = new DriveStraightCommand(robot, 8.0);
 		firstCommand = ds;
+		PivotCommand* p = new PivotCommand(robot, 90.0);
+		ds->SetNextCommand(p);
 		break;
 	}
 	case (kBlankAuto): {
@@ -152,15 +171,38 @@ void AutonomousController::CreateQueue() {
 		break;
 	}
 	case (kReachAuto): {
+		/*
+		 * Assumption: starting position is back of robot on auto line
+		 * Length of robot is 2.823ft
+		 * Distance from auto line to outerworks is 6.167;
+		 */
+		DriveStraightCommand* reachDrive = new DriveStraightCommand(robot, 3.35);
+		firstCommand = reachDrive;
 		printf("kReachAuto ------------------------\n");
 		break;
 	}
 	case (kCrossAuto): {
 		printf("kCrossAuto -----------------------------\n");
+		/*
+		 * Assumption: starting position is back of robot on auto line
+		 * Length of robot is 2.823 ft
+		 * Distance from auto line to end of autoworks is
+		 * Added clearance of 3 ft
+		 */
+		DriveStraightCommand* crossDrive = new DriveStraightCommand(robot, 10.0);
+		firstCommand = crossDrive;
 		break;
 	}
 	case (kShootAuto): {
 		printf("kShootAuto --------------------------------\n");
+		/*
+		 * Assumption: starting position is back of robot on auto line
+		 * GOING THROUGH LOW BAR IN THESE CALCULATIONS
+		 * Length of robot is 2.823 ft
+		 * Distance from auto line to end of autoworks is
+		 *
+		 */
+
 		break;
 	}
 	case (kHoardingAuto): {
