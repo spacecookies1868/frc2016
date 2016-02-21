@@ -33,6 +33,8 @@ public:
 	double GetRightEncoderVal();
 	void ResetDriveEncoders();
 
+	double GetPressureSensorVal();
+
 	void RefreshIni();
 	void ResetTimer();
 
@@ -80,6 +82,7 @@ private:
 
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
+	AnalogInput *pressureSensor;
 
 #if USE_NAVX
 	//Port the NavX plugs into

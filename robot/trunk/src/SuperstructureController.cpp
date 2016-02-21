@@ -58,6 +58,7 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		break;
 	case (kIdle):
 		nextState = kIdle;
+
 		//Change the position of the defense manipulator in teleop
 		if (humanControl->GetDefenseManipDesired()) {
 			robot->ChangeDefenseManipState();

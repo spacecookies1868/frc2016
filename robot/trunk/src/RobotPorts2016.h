@@ -17,6 +17,9 @@ static const int LEFT_ENCODER_B_PWM_PORT				= 1;
 static const int RIGHT_ENCODER_A_PWM_PORT				= 2;
 static const int RIGHT_ENCODER_B_PWM_PORT				= 3;
 
+//******************* ANALOG IN PORTS*******************
+
+static const int PRESSURE_SENSOR_PORT					= 3;
 
 // ***************** MISC *****************
 static const int COMPRESSOR_PORT						= 1;

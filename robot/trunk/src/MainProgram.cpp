@@ -102,8 +102,9 @@ private:
 	}
 
 	void TestPeriodic() {
-		printf("fleft encoder: %f\n", robot->GetLeftEncoderVal());
-		printf("fright encoder: %f\n", robot->GetRightEncoderVal());
+		//printf("left encoder: %f\n", robot->GetLeftEncoderVal());
+		//printf("right encoder: %f\n", robot->GetRightEncoderVal());
+		//printf("Pressure sensor value %f\n", robot->GetPressureSensorVal());
 		LOG(robot, "Yaw values: ", robot->GetNavXYaw());
 	}
 

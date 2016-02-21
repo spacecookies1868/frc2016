@@ -30,6 +30,9 @@ RobotModel::RobotModel() {
 	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
 
+	pressureSensor = new AnalogInput(PRESSURE_SENSOR_PORT);
+	pressureSensor->SetAverageBits(2);
+
 //	// 8 inch wheels (2/3 ft), 256 tics per rotation
 	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
 	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
@@ -166,6 +169,10 @@ double RobotModel::GetRightEncoderVal() {
 void RobotModel::ResetDriveEncoders() {
 	leftEncoder->Reset();
 	rightEncoder->Reset();
+}
+
+double RobotModel::GetPressureSensorVal() {
+	return 250 * (pressureSensor->GetAverageVoltage() / 5) - 25;
 }
 
 void RobotModel::RefreshIni() {
