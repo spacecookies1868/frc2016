@@ -41,7 +41,7 @@ private:
 	void RobotInit() {
 		LOG(robot, "Initing", 0.0);
 		robot->ResetTimer();
-		//robot->ResetDriveEncoders();
+		robot->Reset();
 		RefreshAllIni();
 	}
 
@@ -58,7 +58,6 @@ private:
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
-//		robot->ResetDriveEncoders();
 		autonomousController->StartAutonomous();
 	}
 

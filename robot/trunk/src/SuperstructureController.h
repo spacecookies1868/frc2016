@@ -19,11 +19,10 @@ public:
 	void SetAutoIntakeDown(bool desired);
 	void SetAutoIntakeMotorForward(bool desired);
 	void SetAutoIntakeMotorBackward(bool desired);
-	void SetAutoOuttakeIn(bool desired);
-	void SetAutoOuttakeOut(bool desired);
+	void SetAutoOuttake(bool desired);
 
 	enum SuperstructureState {
-		kInit, kIdle, kPrepAndOuttake
+		kInit, kIdle, kPrepToOuttake, kOuttake
 	};
 
 private:
@@ -33,10 +32,15 @@ private:
 	uint32_t m_stateVal;
 	uint32_t nextState;
 
-	//PAO = prep and outtake
-	bool startedPAO;
-	double startTimePAO;
-	double deltaTimePAO;
+	//PTO = prep to outtake
+	bool startedPTO;
+	double startTimePTO;
+	double deltaTimePTO;
+
+	//OT = outtake
+	bool startedOT;
+	double startEncoderValOT;
+	double deltaEncoderValOT;
 
 	//auto booleans
 	bool autoDefenseManipUp;
@@ -45,8 +49,11 @@ private:
 	bool autoIntakeDown;
 	bool autoIntakeMotorForward;
 	bool autoIntakeMotorBackward;
-	bool autoOuttakeIn;
-	bool autoOuttakeOut;
+	bool autoOuttake;
+
+	//motor speeds
+	double intakeSpeed;
+	double outtakeSpeed;
 
 };
 

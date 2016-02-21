@@ -42,6 +42,26 @@ public:
 
 	double GetTime();
 
+	//Superstructure accessor and mutator methods for RobotModel
+	bool IsIntakeArmDown();
+	void MoveIntakeArmUp();
+	void MoveIntakeArmDown();
+	void ChangeIntakeArmState();
+
+	double GetIntakeMotorSpeed();
+	void SetIntakeMotorSpeed(double speed);
+
+	bool IsDefenseManipDown();
+	void MoveDefenseManipUp();
+	void MoveDefenseManipDown();
+	void ChangeDefenseManipState();
+
+	double GetOuttakeMotorSpeed();
+	void SetOuttakeMotorSpeed(double speed);
+
+	double GetOuttakeEncoderVal();
+	void ResetOuttakeEncoders();
+
 	Ini* pini;
 	TableReader* gripLines;
 private:
@@ -60,7 +80,6 @@ private:
 
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
-
 
 #if USE_NAVX
 	//Port the NavX plugs into

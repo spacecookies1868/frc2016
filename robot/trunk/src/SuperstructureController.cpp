@@ -8,9 +8,13 @@ SuperstructureController::SuperstructureController(RobotModel* myRobot, RemoteCo
 	m_stateVal = kInit;
 	nextState = kInit;
 
-	startedPAO = false;
-	startTimePAO = 0.0;
-	deltaTimePAO = 0.0;
+	startedPTO = false;
+	startTimePTO = 0.0;
+	deltaTimePTO = 0.0;
+
+	startedOT = false;
+	startEncoderValOT = 0.0;
+	deltaEncoderValOT = 0.0;
 
 	autoDefenseManipUp = false;
 	autoDefenseManipDown = false;
@@ -18,17 +22,23 @@ SuperstructureController::SuperstructureController(RobotModel* myRobot, RemoteCo
 	autoIntakeDown = false;
 	autoIntakeMotorForward = false;
 	autoIntakeMotorBackward = false;
-	autoOuttakeIn = false;
-	autoOuttakeOut = false;
+	autoOuttake = false;
+
+	intakeSpeed = 0.0;
+	outtakeSpeed = 0.0;
 }
 
 void SuperstructureController::Reset() {
 	//Zero all necessary variables
+	//NOTE: some variables are not set to zero here because their values are set in the ini file
 	m_stateVal = kInit;
 	nextState = kInit;
 
-	startedPAO = false;
-	startTimePAO = 0.0;
+	startedPTO = false;
+	startTimePTO = 0.0;
+
+	startedOT = false;
+	startEncoderValOT = 0.0;
 
 	autoDefenseManipUp = false;
 	autoDefenseManipDown = false;
@@ -36,86 +46,94 @@ void SuperstructureController::Reset() {
 	autoIntakeDown = false;
 	autoIntakeMotorForward = false;
 	autoIntakeMotorBackward = false;
-	autoOuttakeIn = false;
-	autoOuttakeOut = false;
+	autoOuttake = false;
 }
 
-//correct state for defense manipulator piston is the state that allows the robot to outtake
 void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 	switch(m_stateVal) {
 	case (kInit):
-		//check position of all pistons
-		//maybe set outtake piston to in?
-		//set intake motor speed to zero
+		//maybe set all single solenoids to their base positions so that they don't move when you enable
+		robot->SetIntakeMotorSpeed(0.0);
 		nextState = kIdle;
 		break;
 	case (kIdle):
 		nextState = kIdle;
+		//Change the position of the defense manipulator in teleop
 		if (humanControl->GetDefenseManipDesired()) {
-			//defense manipulator piston change state
-			DO_PERIODIC(1, printf("Defense manipulator piston change desired\n"));
+			robot->ChangeDefenseManipState();
 		}
 
+		//Change the position of the defense manipulator in auto
 		if (autoDefenseManipUp) {
-			//defense manipulator piston up
+			robot->MoveDefenseManipUp();
 			autoDefenseManipUp = false;
 		} else if (autoDefenseManipDown) {
-			//defense manipulator piston down
+			robot->MoveDefenseManipDown();
 			autoDefenseManipDown = false;
 		}
 
+		//Change the position of the intake in teleop
 		if (humanControl->GetIntakePistonDesired()) {
-			//intake piston change state
-			DO_PERIODIC(1, printf("Intake piston change desired\n"));
+			robot->ChangeIntakeArmState();
 		}
 
+		//Change the position of the intake in auto
 		if (autoIntakeUp) {
-			//intake piston up
+			robot->MoveIntakeArmUp();
 			autoIntakeUp = false;
 		} else if (autoIntakeDown) {
-			//intake piston down
+			robot->MoveIntakeArmDown();
 			autoIntakeDown = false;
 		}
 
+		//Move the intake motor forward or backward
 		if (humanControl->GetIntakeMotorForwardDesired() || autoIntakeMotorForward) {
-			//set intake motor speed to intake
-			//set outtake piston to in state
-			DO_PERIODIC(20, printf("Intake motor forward desired\n"));
+			robot->SetIntakeMotorSpeed(intakeSpeed);
 		} else if (humanControl->GetIntakeMotorReverseDesired() || autoIntakeMotorBackward) {
-			//set intake motor speed to outtake
-			//set outtake piston to in state
-			DO_PERIODIC(20, printf("Intake motor reverse desired\n"));
+			robot->SetIntakeMotorSpeed(-intakeSpeed);
 		} else {
-			//set intake motor speed to zero
+			robot->SetIntakeMotorSpeed(0.0);
 		}
 
-		if (humanControl->GetOuttakeDesired() || autoOuttakeIn || autoOuttakeOut) {
-			DO_PERIODIC(1, printf("Outtake state change desired\n"));
-			if (false /*outtake piston at in state*/ || autoOuttakeOut) {
-				if (false /*defense manipulator piston in correct state*/) {
-					//set the outtake piston to out state
-				} else {
-					nextState = kPrepAndOuttake;
-				}
-				autoOuttakeOut = false;
+		//Makes sure that the defense manipulator is down first (must be in that position to outtake) and then outtakes
+		//If already down, goes straight to outtake
+		if (humanControl->GetOuttakeDesired() || autoOuttake) {
+			if (robot->IsDefenseManipDown()) {
+				nextState = kOuttake;
 			} else {
-				//set outtake piston to in state
-				autoOuttakeIn = false;
+				nextState = kPrepToOuttake;
 			}
+			autoOuttake = false;
 		}
 
 		break;
-	case (kPrepAndOuttake):
-		if(!startedPAO) {
-			//set defense manipulator piston to correct state
-			startTimePAO = currTimeSec;
-			startedPAO = true;
-			nextState = kPrepAndOuttake;
-		} else if (currTimeSec - startTimePAO < deltaTimePAO){
-			nextState = kPrepAndOuttake;
+	case (kPrepToOuttake):
+		//Moves the defense manipulator down, so that it can outtake and waits
+		if(!startedPTO) {
+			startTimePTO = currTimeSec;
+			robot->MoveDefenseManipDown();
+			startedPTO = true;
+			nextState = kPrepToOuttake;
+		} else if (currTimeSec - startTimePTO < deltaTimePTO){
+			nextState = kPrepToOuttake;
 		} else {
-			//set outtake piston to out state
-			startedPAO = false;
+			startedPTO = false;
+			nextState = kOuttake;
+		}
+		break;
+	case (kOuttake):
+		//Runs the outtake motors for a certain amount of time to ensure that they have outtaken
+		if (!startedOT) {
+			startEncoderValOT = robot->GetOuttakeEncoderVal();
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			startedOT = true;
+			nextState = kOuttake;
+		} else if (robot->GetOuttakeEncoderVal() - startEncoderValOT < deltaEncoderValOT) {
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			nextState = kOuttake;
+		} else {
+			robot->SetOuttakeMotorSpeed(0.0);
+			startedOT = false;
 			nextState = kIdle;
 		}
 		break;
@@ -127,8 +145,13 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 }
 
 void SuperstructureController::RefreshIni() {
-	//TODO Figure out actual time it takes to deploy the defense manipulator
-	deltaTimePAO = 1.0;
+	//TODO Figure out actual values to go in the ini file
+	deltaTimePTO = 1.0;
+	deltaEncoderValOT = 10.0;
+
+	intakeSpeed = 0.4;
+	outtakeSpeed = 0.4;
+
 }
 
 void SuperstructureController::SetAutoDefenseManipUp(bool desired) {
@@ -155,10 +178,6 @@ void SuperstructureController::SetAutoIntakeMotorBackward(bool desired) {
 	autoIntakeMotorBackward = desired;
 }
 
-void SuperstructureController::SetAutoOuttakeIn(bool desired) {
-	autoOuttakeIn = desired;
-}
-
-void SuperstructureController::SetAutoOuttakeOut(bool desired) {
-	autoOuttakeOut = desired;
+void SuperstructureController::SetAutoOuttake(bool desired) {
+	autoOuttake = desired;
 }

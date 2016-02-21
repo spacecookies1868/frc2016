@@ -23,6 +23,7 @@ RobotModel::RobotModel() {
 	rightDriveMotorB->SetSafetyEnabled(false);
 
 	isLowGear = false;
+
 	gearShiftSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, GEAR_SHIFT_SOLENOID_PORT);
 
 
@@ -55,6 +56,8 @@ RobotModel::RobotModel() {
 void RobotModel::Reset() {
 	isLowGear = !gearShiftSolenoid->Get();
 	gripLines->Reset();
+	ResetDriveEncoders();
+	ResetOuttakeEncoders();
 }
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
@@ -169,3 +172,69 @@ void RobotModel::RefreshIni() {
 	delete pini;
 	pini = new Ini("/home/lvuser/robot.ini");
 }
+
+//TODO Fill in all of these methods
+bool RobotModel::IsIntakeArmDown() {
+	return false;
+}
+
+void RobotModel::MoveIntakeArmUp() {
+	DO_PERIODIC(1, printf("Move intake arm up\n"));
+}
+
+void RobotModel::MoveIntakeArmDown() {
+	DO_PERIODIC(1, printf("Move intake arm down\n"));
+}
+
+void RobotModel::ChangeIntakeArmState() {
+	if (IsIntakeArmDown()) {
+		MoveIntakeArmUp();
+	} else {
+		MoveIntakeArmDown();
+	}
+}
+
+double RobotModel::GetIntakeMotorSpeed() {
+	return 0.0;
+}
+
+void RobotModel::SetIntakeMotorSpeed(double speed) {
+	DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
+}
+
+bool RobotModel::IsDefenseManipDown() {
+	return false;
+}
+
+void RobotModel::MoveDefenseManipUp() {
+	DO_PERIODIC(1, printf("Move defense arm up\n"));
+}
+
+void RobotModel::MoveDefenseManipDown() {
+	DO_PERIODIC(1, printf("Move defense arm down\n"));
+}
+
+void RobotModel::ChangeDefenseManipState() {
+	if (IsDefenseManipDown()) {
+		MoveDefenseManipUp();
+	} else {
+		MoveDefenseManipDown();
+	}
+}
+
+double RobotModel::GetOuttakeMotorSpeed() {
+	return 0.0;
+}
+
+void RobotModel::SetOuttakeMotorSpeed(double speed) {
+	DO_PERIODIC(1, printf("Set outtake speed to %f\n", speed));
+}
+
+double RobotModel::GetOuttakeEncoderVal() {
+	return 0.0;
+}
+
+void RobotModel::ResetOuttakeEncoders() {
+
+}
+
