@@ -106,19 +106,7 @@ double PIDControlLoop::Saturate(double value, double maxAbsValue) {
 
 bool PIDControlLoop::ControlLoopDone(double currentSensorValue) {
 	//when the value returned is close enough to what we want
-	if (initialSensorValue <= desiredSensorValue &&
-		currentSensorValue >= desiredSensorValue) {
-		return true;
-	} else if (initialSensorValue >= desiredSensorValue &&
-			   currentSensorValue <= desiredSensorValue) {
-		return true;
-	} else if (pidConfig->desiredAccuracy > 0.0 &&
-			   fabs(desiredSensorValue - currentSensorValue)
-				 <= pidConfig->desiredAccuracy) {
-		return true;
-	} else {
-		return false;
-	}
+	return ControlLoopDone(currentSensorValue, 0.02);
 }
 
 /** when the value returned is close enough to what we want for a certain length of time.
