@@ -1,28 +1,30 @@
 #include <ControlBoard.h>
 
 ControlBoard::ControlBoard() {
-	mOperatorJoy = new Joystick(2);
-	dialPivotButton = new ButtonReader(mOperatorJoy, 1); //Don't know what port it is
+	mOperatorJoy = new Joystick(1);//port 2 on real driver station
+	dialPivotButton = new ButtonReader(mOperatorJoy, 2); //port 7 on real driver station
 
-	dialPivotDesired = false;
-	dialPivotAngleValue = 0.0;
+	pivotDesired = false;
+	desiredAngle = 0.0;
 }
 
 void ControlBoard::ReadControls(){
 	ReadAllButtons();
 	if (dialPivotButton->WasJustPressed()) {
-		dialPivotDesired = true;
+		pivotDesired = true;
+	} else {
+		pivotDesired = false;
 	}
 
-	dialPivotAngleValue = mOperatorJoy->GetY(); // Not sure of port
+	desiredAngle = mOperatorJoy->GetZ() * 180.0; // Not sure of port
 }
 
-bool ControlBoard::DialPivotDesired() {
-	return dialPivotDesired;
+bool ControlBoard::GetPivotDesired() {
+	return pivotDesired;
 }
 
-double ControlBoard::GetDialPivotValue() {
-	return dialPivotAngleValue;
+double ControlBoard::GetDesiredAngle() {
+	return desiredAngle;
 }
 
 void ControlBoard::ReadAllButtons(){

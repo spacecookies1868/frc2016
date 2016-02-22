@@ -1,20 +1,44 @@
 #include "AutoPivot.h"
 
-AutoPivot::AutoPivot(RobotModel* myRobot, double desiredAngle) {
+AutoPivot::AutoPivot(RobotModel* myRobot) {
 	robot = myRobot;
-	desiredR = desiredAngle;
+	desiredDeltaYaw = 0.0;
+	isDone = false;
+	currYaw = 0.0;
+	lastYaw = 0.0;
+	accumulatedYaw = 0.0;
+	rPIDConfig = NULL;
+	rPID = NULL;
+}
+
+void AutoPivot::SetDesiredDeltaYaw(double myDesiredDeltaYaw) {
+	desiredDeltaYaw = myDesiredDeltaYaw;
+}
+
+void AutoPivot::SetDesiredYaw(double myDesiredYaw) {
+	double yaw = robot->GetYaw();
+	while (myDesiredYaw > 180.0) {
+		myDesiredYaw -= 360;
+	}
+	while (myDesiredYaw < -180.0) {
+		myDesiredYaw += 360;
+	}
+	desiredDeltaYaw = myDesiredYaw - yaw;
+	if (desiredDeltaYaw > 180.0) {
+		desiredDeltaYaw -= 360;
+	} else if (desiredDeltaYaw < -180.0) {
+		desiredDeltaYaw += 360;
+	}
 }
 
 void AutoPivot::Init() {
-	rPIDConfig = CreatePIDConfig();
-	initialR = robot->GetYaw();
-	rPID = new PIDControlLoop(rPIDConfig);
-	rPID->Init(initialR, initialR + desiredR);
+	isDone = false;
+	currYaw = robot->GetYaw();
+	accumulatedYaw = 0.0;
 
-	accumulatedYaw = GetAccumulatedYaw();
-	lastYaw = GetAccumulatedYaw();
-	currYaw = GetAccumulatedYaw();
-	deltaYaw = 0.0;
+	rPIDConfig = CreatePIDConfig();
+	rPID = new PIDControlLoop(rPIDConfig);
+	rPID->Init(accumulatedYaw, desiredDeltaYaw);
 }
 
 PIDConfig* AutoPivot::CreatePIDConfig() {
@@ -22,7 +46,7 @@ PIDConfig* AutoPivot::CreatePIDConfig() {
 	pidConfig->pFac = 0.09;
 	pidConfig->iFac = 0.0;
 	pidConfig->dFac = 0.0;
-	pidConfig->maxAbsOutput = 0.6;
+	pidConfig->maxAbsOutput = 0.3;
 	pidConfig->maxAbsError = 10.0;
 	pidConfig->maxAbsDiffError = 10.0;
 	pidConfig->desiredAccuracy = 0.3;
@@ -32,27 +56,26 @@ PIDConfig* AutoPivot::CreatePIDConfig() {
 }
 
 void AutoPivot::Update(double currTimeSec, double deltaTimeSec) {
-	accumulatedYaw = GetAccumulatedYaw();
-	double outputR = rPID->Update(accumulatedYaw);
-	double leftWheels = outputR;
-	double rightWheels = -outputR;
-
-	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftWheels);
-	robot->SetWheelSpeed(RobotModel::kRightWheels, rightWheels);
-	printf("Yaw: %f\n", accumulatedYaw);
-}
-
-bool AutoPivot::IsDone(double deltaTimeSec) {
-	if (rPID->ControlLoopDone(accumulatedYaw, deltaTimeSec)) {
-		printf("DONE, yaw: %f\n", accumulatedYaw);
+	if (isDone) {
+		return;
 	}
-	return rPID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
+	UpdateAccumulatedYaw();
+	bool pidDone = rPID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
+	if (pidDone) {
+		isDone = true;
+		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+
+	} else {
+		double output = rPID->Update(accumulatedYaw);
+		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
+		robot->SetWheelSpeed(RobotModel::kRightWheels, -output);
+	}
 }
 
-double AutoPivot::GetAccumulatedYaw() {
+void AutoPivot::UpdateAccumulatedYaw() {
 	lastYaw = currYaw;
 	currYaw = robot->GetYaw();
-	deltaYaw = currYaw - lastYaw;
+	double deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
 		accumulatedYaw += (180 - lastYaw) + (180 + currYaw);
@@ -61,7 +84,10 @@ double AutoPivot::GetAccumulatedYaw() {
 	} else {
 		accumulatedYaw += deltaYaw;
 	}
-	return accumulatedYaw;
+}
+
+bool AutoPivot::IsDone() {
+	return isDone;
 }
 
 AutoPivot::~AutoPivot() {

@@ -10,9 +10,8 @@ public:
 	virtual ~ControlBoard();
 	virtual void ReadControls();
 
-	bool DialPivotDesired();
-//	void SetDialPivotAngleValue(double pivotAngle);
-	double GetDialPivotValue();
+	bool GetPivotDesired();
+	double GetDesiredAngle();
 
 	void ReadAllButtons();
 
@@ -20,8 +19,9 @@ private:
 	Joystick* mOperatorJoy;
 	ButtonReader* dialPivotButton;
 
-	double dialPivotAngleValue;
-	bool dialPivotDesired;
+	double desiredAngle;
+	bool pivotDesired;
+	bool pivotButtonWasJustPressed;
 };
 
 #endif /* SRC_CONTROLBOARD_H_ */
