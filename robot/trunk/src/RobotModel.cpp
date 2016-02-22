@@ -156,13 +156,23 @@ double RobotModel::GetTime() {
 }
 
 double RobotModel::GetLeftEncoderVal() {
-	return -leftEncoder->GetDistance();
+	// IF PRACTICE return -leftEncoder->GetDistance();
+	//IF COMP
+	printf("Left 2 Stuff %i\n", leftEncoder->CheckDigitalChannel(2));
+	printf("Left 3 Stuff %i\n", leftEncoder->CheckDigitalChannel(3));
+	printf("Left raw %i\n", leftEncoder->GetRaw());
+	return leftEncoder->GetDistance();
 }
 
 double RobotModel::GetRightEncoderVal() {
 	/*
 	 * inverted
 	 */
+
+	//IF PRACTICE return rightEncoder->GetDistance();
+	printf("Right 0 Stuff %i\n", rightEncoder->CheckDigitalChannel(0));
+	printf("Right 1 Stuff %i\n", rightEncoder->CheckDigitalChannel(1));
+	printf("Right raw %i\n", rightEncoder->GetRaw());
 	return rightEncoder->GetDistance();
 }
 

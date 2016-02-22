@@ -160,10 +160,9 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
-		DriveStraightCommand* ds = new DriveStraightCommand(robot, 8.0);
-		firstCommand = ds;
-		PivotCommand* p = new PivotCommand(robot, 90.0);
-		ds->SetNextCommand(p);
+//		CurveCommand* c = new CurveCommand(robot, 0.0, 6.0);
+//		firstCommand = c;
+		DriveStraightCommand * ds = new DriveStraightCommand(robot, 6.0);
 		break;
 	}
 	case (kBlankAuto): {

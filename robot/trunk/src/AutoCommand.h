@@ -346,23 +346,55 @@ private:
 	double initialR;
 };
 
-/*
- *
- */
 
-//class CurveCommand : public SimpleAutoCommand {
-//public:
-//	CurveCommand(RobotModel* myRobot, double myDesiredX, double myDesiredY, double myDesiredR);
-//	~CurveCommand() {}
-//	virtual void Init();
-//	virtual void Update(double currTimeSec, double deltaTimeSec);
-//	virtual bool IsDone();
-//private:
-//	RobotModel* robot;
-//	double desiredX;
-//	double desiredY;
-//	double desiredR;
-//};
+class CurveCommand : public SimpleAutoCommand {
+public:
+	CurveCommand(RobotModel* myRobot, double myDesiredX, double myDesiredY);
+	~CurveCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+
+	static double radiusPFac, radiusIFac, radiusDFac, radiusDesiredAccuracy, radiusMaxAbsOutput,
+		radiusMaxAbsError, radiusMaxAbsDiffError, radiusMaxAbsITerm, radiusTimeLimit;
+	static double anglePFac, angleIFac, angleDFac, angleDesiredAccuracy, angleMaxAbsOutput,
+		angleMaxAbsError, angleMaxAbsDiffError, angleMaxAbsITerm, angleTimeLimit;
+
+private:
+	PIDConfig* CreateRadiusPIDConfig();
+	PIDConfig* CreateAnglePIDConfig();
+	double CalculateX();
+	double CalculateY();
+	double GetAccumulatedYaw();
+	RobotModel* robot;
+	PIDConfig* radiusPIDConfig;
+	PIDConfig* anglePIDConfig;
+	PIDControlLoop* radiusPID;
+	PIDControlLoop* anglePID;
+	bool isDone;
+	double desiredX;
+	double desiredY;
+	double initialX;
+	double initialY;
+
+	double lastX;
+	double lastY;
+	double lastLeft;
+	double lastRight;
+	double lastAccumulatedYaw;
+	double initialYaw;
+
+	double desiredRadius;
+	double initialRadius;
+	double desiredAngle;
+	double initialAngle;
+
+	double lastYaw;
+	double currYaw;
+	double deltaYaw;
+	double accumulatedYaw;
+
+};
 
 
 /*
