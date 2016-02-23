@@ -35,17 +35,23 @@ public:
 		deltaTimeSec = 0.0;
 		timer->Start();
 		printf("Set times & start timer");
+
+		robot->ZeroYaw();
 	}
 
 	void AutonomousInit()
 	{
 		sensingBoulders->Init();
-		robot->ZeroYaw();	}
+	}
 
 	void AutonomousPeriodic()
 	{
 		currTimeSec = timer->Get();
-		sensingBoulders->Update(currTimeSec, lastTimeSec);
+		if (sensingBoulders->IsDone()) {
+			return;
+		} else {
+			sensingBoulders->Update(currTimeSec, lastTimeSec);
+		}
 		lastTimeSec = currTimeSec;
 	}
 

@@ -2,7 +2,7 @@
 
 AutoPivot::AutoPivot(RobotModel* myRobot) {
 	robot = myRobot;
-	desiredDeltaYaw = 0,0;
+	desiredDeltaYaw = 0.0;
 	isDone = false;
 	currYaw = 0.0;
 	lastYaw = 0.0;
@@ -60,6 +60,7 @@ void AutoPivot::Update(double currTimeSec, double deltaTimeSec) {
 		return;
 	}
 	UpdateAccumulatedYaw();
+	SmartDashboard::PutNumber("Accumulated Yaw: ", accumulatedYaw);
 	bool pidDone = rPID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
 	if (pidDone) {
 		isDone = true;
@@ -67,6 +68,7 @@ void AutoPivot::Update(double currTimeSec, double deltaTimeSec) {
 
 	} else {
 		double output = rPID->Update(accumulatedYaw);
+		SmartDashboard::PutNumber("Output: ", output);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, -output);
 	}

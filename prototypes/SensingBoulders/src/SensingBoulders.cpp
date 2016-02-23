@@ -1,9 +1,16 @@
 #include <SensingBoulders.h>
+#include "Math.h"
+
+#define PI 3.14159265359
 
 SensingBoulders::SensingBoulders(RobotModel* myRobot) {
 	robot = myRobot;
 	printf("Creating ultrasonic sensor \n");
 	ultrasonicSensor = new UltrasonicSensor(0);
+
+	centerToBoulder = 0.0;
+	xDistanceToCenterRobot = 12.2; //the number should be changed for comp bot, should ask mechanical for this
+	yDistanceToCenterRobot = 12.0; // the number should be changed for comp bot, should ask mechanical for this
 }
 
 void SensingBoulders::Init() {
@@ -34,53 +41,61 @@ void SensingBoulders::Init() {
 	endBoulderFound = false;
 
 	currState = kSensingBoulder;
-	nextState = kInitPivot;
+	nextState = currState;
 
 	desiredDeltaAngle = 0.0;
 
 	PrintState();
 }
 
-//void SensingBoulders::Update() {
-//	currAngle = robot->GetServoAngle();
-//	currDistance = ultrasonicSensor->GetRangeInInches();
-//
-//	if (currDistance * thresholdDistance < startBoulderDistance) {
-//		startBoulderDistance = currDistance;
-//		startBoulderAngle = currAngle;
-//		endBoulderFound = false;
-//		endBoulderAngle = startBoulderAngle;
-//		endBoulderDistance = startBoulderDistance;
-//		printf("changed start boulder\n");
-//		printf("currDistance: %f\n", currDistance);
-//		printf("currAngle: %f\n", currAngle);
-//		PrintState();
-//	}
-////	printf("startBoulderDistance: %f\n", startBoulderDistance);
-//
-//	if (currDistance > thresholdDistance * startBoulderDistance && !endBoulderFound) {
-//		endBoulderFound = true;
-//		endBoulderDistance = currDistance;
-//		endBoulderAngle = currAngle;
-////		centerBoulderAngle = (startBoulderAngle + endBoulderAngle) / 2;
-////		centerBoulderDistance = (startBoulderDistance + endBoulderDistance) / 2;
-//		printf("Changed end boulder \n");
-//		PrintState();
-//	}
-//
-//	SmartDashboard::PutNumber("currDistance: \n", currDistance);
-//	SmartDashboard::PutNumber("servoAngle: \n", currAngle);
-//
-//	robot->SetServo(startServoAngle, endServoAngle, deltaServoAngle);
-//
-//}
+/*void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
+	currAngle = robot->GetServoAngle();
+	currDistance = ultrasonicSensor->GetRangeInInches();
 
+	if (isSensingDone){
+		CalculateDesiredDeltaAngle();
 
-void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
-	if (isDone){
+		printf("Center Boulder Angle: %f \n", centerBoulderAngle);
+		printf("Center Boulder Distance: %f\n", centerBoulderDistance);
+		printf("Desired Angle: %f\n", desiredDeltaAngle);
+
+		robot->InitServo(centerBoulderAngle);
 		return;
 	}
 
+	if (currDistance * thresholdDistance < startBoulderDistance) {
+		startBoulderDistance = currDistance;
+		startBoulderAngle = currAngle;
+		endBoulderFound = false;
+		endBoulderAngle = startBoulderAngle;
+		endBoulderDistance = startBoulderDistance;
+		printf("changed start boulder\n");
+		printf("currDistance: %f\n", currDistance);
+		printf("currAngle: %f\n", currAngle);
+		PrintState();
+	}
+//	printf("startBoulderDistance: %f\n", startBoulderDistance);
+
+	if (currDistance > thresholdDistance * startBoulderDistance && !endBoulderFound) {
+		endBoulderFound = true;
+		endBoulderDistance = currDistance;
+		endBoulderAngle = currAngle;
+//		centerBoulderAngle = (startBoulderAngle + endBoulderAngle) / 2;
+//		centerBoulderDistance = (startBoulderDistance + endBoulderDistance) / 2;
+		printf("Changed end boulder \n");
+		PrintState();
+	}
+
+	SmartDashboard::PutNumber("currDistance: \n", currDistance);
+	SmartDashboard::PutNumber("servoAngle: \n", currAngle);
+
+	robot->SetServo(startServoAngle, endServoAngle, deltaServoAngle);
+
+	IsSensingDone();
+}*/
+
+
+void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 	currAngle = robot->GetServoAngle();
 	currDistance = ultrasonicSensor->GetRangeInInches();
 	currTimeSec = myCurrTimeSec;
@@ -121,14 +136,18 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 		nextState = kSensingBoulder;
 
 		if (isSensingDone){
-			printf("Center Boulder %f \n", centerBoulderAngle);
+			CalculateDesiredDeltaAngle();
+
+			printf("Center Boulder Angle: %f \n", centerBoulderAngle);
+			printf("Center Boulder Distance: %f\n", centerBoulderDistance);
+			printf("Desired Angle: %f\n", desiredDeltaAngle);
+
 			nextState = kInitPivot;
 		}
 		break;
 	case(kInitPivot):
-		robot->ZeroYaw();
 	//setting the desiredAngle so that the robot would turn according to ultrasonic values
-		desiredDeltaAngle = centerBoulderAngle - 90;
+//		desiredDeltaAngle = centerBoulderAngle - 90;
 
 		printf("desired delta angle %f \n", desiredDeltaAngle);
 		autoPivotCommand = new AutoPivot(robot);
@@ -180,6 +199,46 @@ double SensingBoulders::GetCenterBoulderDistance() {
 
 double SensingBoulders::GetDistanceInches(){
 	return ultrasonicSensor->GetRangeInInches();
+}
+/*
+double SensingBoulders::CalculateDesiredDeltaAngle() {
+	double a = centerBoulderDistance * cos(centerBoulderAngle - 90);
+	double b = centerBoulderDistance * sin(centerBoulderAngle - 90);
+
+	printf("a %f\n", a);
+	printf("b %f\n", b);
+
+
+	if (centerBoulderAngle > 90) {
+		a = centerBoulderDistance * cos(centerBoulderAngle);
+		b = centerBoulderDistance * sin(centerBoulderAngle);
+
+		double c = a + distanceToCenterRobot;
+		desiredDeltaAngle = atan(b/c);
+	} else if (a < 12.2){
+		double c = sqrt(pow(centerBoulderDistance, 2) + pow(distanceToCenterRobot, 2) - 2 * centerBoulderDistance * distanceToCenterRobot * cos(centerBoulderAngle));
+		desiredDeltaAngle = -asin(b/c);
+	} else {
+		double c = a - distanceToCenterRobot;
+		desiredDeltaAngle = -atan(b/c);
+	}
+
+	return desiredDeltaAngle;
+}*/
+
+void SensingBoulders::CalculateDesiredDeltaAngle() {
+	double angle = centerBoulderAngle * PI / 180;
+	double x = centerBoulderDistance * cos(angle);	//the x distance from the ultrasonic sensor to the boulder
+	double y = centerBoulderDistance * sin(angle);	//the y distance from the ultrasonic sensor to the boulder
+	double x1 = x + xDistanceToCenterRobot;	//the x distance from the boulder to the center of the robot
+	double y1 = y + yDistanceToCenterRobot; //the y distance from the boulder to the center of the robot
+
+	desiredDeltaAngle = 90 - (atan2(y1, x1) * 180 / PI);
+	printf("Desired Delta Angle: %f\n", desiredDeltaAngle);
+}
+
+bool SensingBoulders::IsDone() {
+	return isDone;
 }
 
 SensingBoulders::~SensingBoulders() {

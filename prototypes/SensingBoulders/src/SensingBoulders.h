@@ -16,6 +16,8 @@ public:
 	double GetCenterBoulderAngle();
 	double GetCenterBoulderDistance();
 	double GetDistanceInches();
+	void CalculateDesiredDeltaAngle();
+	bool IsDone();
 
 	virtual ~SensingBoulders();
 private:
@@ -30,9 +32,12 @@ private:
 	uint32_t currState;
 	uint32_t nextState;
 
+	double xDistanceToCenterRobot; //the distance from the ultrasonic sensor to the front of the center of the robot
+	double yDistanceToCenterRobot; // distance from the ultrasonic sensor to the side of the center of the robot
 	double startServoAngle, endServoAngle, deltaServoAngle;
 	double thresholdDistance;
 	double startBoulderAngle, endBoulderAngle, centerBoulderAngle;
+	double centerToBoulder;
 	double startBoulderDistance, endBoulderDistance, centerBoulderDistance;
 	double currAngle, currDistance;
 	double servoAccuracy;
