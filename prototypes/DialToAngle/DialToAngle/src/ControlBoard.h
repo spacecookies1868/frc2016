@@ -18,10 +18,12 @@ public:
 private:
 	Joystick* mOperatorJoy;
 	ButtonReader* dialPivotButton;
+	ButtonReader* dialPivotSwitch;
 
 	double desiredAngle;
 	bool pivotDesired;
 	bool pivotButtonWasJustPressed;
+	double dialPivotAngleValue;
 };
 
 #endif /* SRC_CONTROLBOARD_H_ */

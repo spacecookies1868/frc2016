@@ -3,6 +3,7 @@
 ControlBoard::ControlBoard() {
 	mOperatorJoy = new Joystick(2);
 	dialPivotButton = new ButtonReader(mOperatorJoy, 7);
+	dialPivotSwitch = new ButtonReader(mOperatorJoy, 2);
 
 	pivotDesired = false;
 	desiredAngle = 0.0;
@@ -10,7 +11,7 @@ ControlBoard::ControlBoard() {
 
 void ControlBoard::ReadControls(){
 	ReadAllButtons();
-	if (dialPivotButton->WasJustPressed()) {
+	if (dialPivotButton->WasJustPressed() || dialPivotSwitch->IsDown()) {
 		pivotDesired = true;
 	} else {
 		pivotDesired = false;
@@ -29,6 +30,7 @@ double ControlBoard::GetDesiredAngle() {
 
 void ControlBoard::ReadAllButtons(){
 	dialPivotButton->ReadValue();
+	dialPivotSwitch->ReadValue();
 }
 
 ControlBoard::~ControlBoard() {

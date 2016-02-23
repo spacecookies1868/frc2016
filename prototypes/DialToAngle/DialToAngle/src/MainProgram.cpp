@@ -12,6 +12,7 @@ private:
 	Timer* timer;
 	double currTimeSec, lastTimeSec, deltaTimeSec;
 	bool isPivoting;
+	bool isSwitchPressed;
 
 	void RobotInit()
 	{
@@ -21,6 +22,7 @@ private:
 		timer = new Timer();
 		timer->Start();
 		isPivoting = false;
+		isSwitchPressed = false;
 	}
 
 
@@ -41,6 +43,7 @@ private:
 		deltaTimeSec = 0.0;
 		lastTimeSec = currTimeSec;
 		isPivoting = false;
+		isSwitchPressed = false;
 	}
 
 	void TeleopPeriodic()
@@ -51,6 +54,20 @@ private:
 		controlBoard->ReadControls();
 		SmartDashboard::PutNumber("Dial Value", controlBoard->GetDesiredAngle());
 		SmartDashboard::PutNumber("Current Yaw", robot->GetYaw());
+//		if (controlBoard->GetPivotDesired()) {
+//			autoPivotCommand->SetDesiredYaw(controlBoard->GetDesiredAngle());
+//			autoPivotCommand->Init();
+//			isPivoting = true;
+//		} else {
+//			isPivoting = false;
+//		}
+//		if (isPivoting) {
+//			autoPivotCommand->Update(currTimeSec, deltaTimeSec);
+//			if (autoPivotCommand->IsDone()) {
+//				isPivoting = false;
+//			}
+//		}
+
 		if (controlBoard->GetPivotDesired()) {
 			printf("Desired Angle: %f\n", controlBoard->GetDesiredAngle());
 			printf("Current Angle: %f\n", robot->GetYaw());

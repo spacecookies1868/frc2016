@@ -46,7 +46,7 @@ PIDConfig* AutoPivot::CreatePIDConfig() {
 	pidConfig->pFac = 0.09;
 	pidConfig->iFac = 0.0;
 	pidConfig->dFac = 0.0;
-	pidConfig->maxAbsOutput = 0.3;
+	pidConfig->maxAbsOutput = 0.5;
 	pidConfig->maxAbsError = 10.0;
 	pidConfig->maxAbsDiffError = 10.0;
 	pidConfig->desiredAccuracy = 0.3;
@@ -67,6 +67,7 @@ void AutoPivot::Update(double currTimeSec, double deltaTimeSec) {
 
 	} else {
 		double output = rPID->Update(accumulatedYaw);
+		SmartDashboard::PutNumber("Motor Speed: ", output);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, -output);
 	}
