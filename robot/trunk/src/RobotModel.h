@@ -78,10 +78,10 @@ private:
 	Timer *timer;
 
 	//Actuators
-	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB;
+	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB, *intakeMotor, *outtakeMotorA, *outtakeMotorB;
 
 	// Solenoids
-	Solenoid *gearShiftSolenoid;
+	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB, *defenseManipSolenoidA, *defenseManipSolenoidB;
 
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;

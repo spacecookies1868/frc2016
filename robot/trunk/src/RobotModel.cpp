@@ -11,21 +11,25 @@ RobotModel::RobotModel() {
 	leftDriveMotorB = new Victor(LEFT_DRIVE_MOTOR_B_PWM_PORT);
 	rightDriveMotorA = new Victor(RIGHT_DRIVE_MOTOR_A_PWM_PORT);
 	rightDriveMotorB = new Victor(RIGHT_DRIVE_MOTOR_B_PWM_PORT);
-
-	leftDriveMotorA->SetExpiration(0.5);
-	leftDriveMotorB->SetExpiration(0.5);
-	rightDriveMotorA->SetExpiration(0.5);
-	rightDriveMotorB->SetExpiration(0.5);
+	intakeMotor = new Victor(INTAKE_MOTOR_PWM_PORT);
+	outtakeMotorA = new Victor(OUTTAKE_MOTOR_A_PWM_PORT);
+	outtakeMotorB = new Victor(OUTTAKE_MOTOR_B_PWM_PORT);
 
 	leftDriveMotorA->SetSafetyEnabled(false);
 	leftDriveMotorB->SetSafetyEnabled(false);
 	rightDriveMotorA->SetSafetyEnabled(false);
 	rightDriveMotorB->SetSafetyEnabled(false);
+	intakeMotor->SetSafetyEnabled(false);
+	outtakeMotorA->SetSafetyEnabled(false);
+	outtakeMotorB->SetSafetyEnabled(false);
 
 	isLowGear = false;
 
 	gearShiftSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, GEAR_SHIFT_SOLENOID_PORT);
-
+	intakeArmSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_A_PORT);
+	intakeArmSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_B_PORT);
+	defenseManipSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, DEFENSE_MANIP_SOLENOID_A_PORT);
+	defenseManipSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, DEFENSE_MANIP_SOLENOID_B_PORT);
 
 	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
@@ -194,17 +198,23 @@ void RobotModel::RefreshIni() {
 	pini = new Ini("/home/lvuser/robot.ini");
 }
 
-//TODO Fill in all of these methods
 bool RobotModel::IsIntakeArmDown() {
-	return false;
+	//TODO check that this is the correct solenoid
+	return intakeArmSolenoidA->Get();
 }
 
 void RobotModel::MoveIntakeArmUp() {
+	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move intake arm up\n"));
+	intakeArmSolenoidA->Set(false);
+	intakeArmSolenoidB->Set(true);
 }
 
 void RobotModel::MoveIntakeArmDown() {
+	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move intake arm down\n"));
+	intakeArmSolenoidA->Set(true);
+	intakeArmSolenoidB->Set(false);
 }
 
 void RobotModel::ChangeIntakeArmState() {
@@ -216,23 +226,31 @@ void RobotModel::ChangeIntakeArmState() {
 }
 
 double RobotModel::GetIntakeMotorSpeed() {
-	return 0.0;
+	return intakeMotor->Get();
 }
 
 void RobotModel::SetIntakeMotorSpeed(double speed) {
 	DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
+	intakeMotor->Set(speed);
 }
 
 bool RobotModel::IsDefenseManipDown() {
-	return false;
+	//TODO check that this is the correct solenoid
+	return defenseManipSolenoidA->Get();
 }
 
 void RobotModel::MoveDefenseManipUp() {
+	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move defense arm up\n"));
+	defenseManipSolenoidA->Set(false);
+	defenseManipSolenoidB->Set(true);
 }
 
 void RobotModel::MoveDefenseManipDown() {
+	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move defense arm down\n"));
+	defenseManipSolenoidA->Set(true);
+	defenseManipSolenoidB->Set(false);
 }
 
 void RobotModel::ChangeDefenseManipState() {
@@ -244,11 +262,14 @@ void RobotModel::ChangeDefenseManipState() {
 }
 
 double RobotModel::GetOuttakeMotorSpeed() {
-	return 0.0;
+	return outtakeMotorA->Get();
 }
 
 void RobotModel::SetOuttakeMotorSpeed(double speed) {
+	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Set outtake speed to %f\n", speed));
+	outtakeMotorA->Set(speed);
+	outtakeMotorB->Set(-speed);
 }
 
 double RobotModel::GetOuttakeEncoderVal() {
