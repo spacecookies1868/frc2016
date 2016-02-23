@@ -9,6 +9,7 @@
 #include <fstream>
 #include "navx/AHRS.h"
 #include "TableReader.h"
+#include "nivision.h"
 
 class RobotModel {
 public:
@@ -64,6 +65,8 @@ public:
 	double GetOuttakeEncoderVal();
 	void ResetOuttakeEncoders();
 
+	Image* GetCameraImage();
+
 	Ini* pini;
 	TableReader* gripLines;
 private:
@@ -83,10 +86,13 @@ private:
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
 	AnalogInput *pressureSensor;
+#if USE_CAMERA
+	AxisCamera *camera;
+	Image *frame;
+#endif
 
 #if USE_NAVX
 	//Port the NavX plugs into
-//	SerialPort *serialPort;
 	AHRS *navx;
 #endif
 };

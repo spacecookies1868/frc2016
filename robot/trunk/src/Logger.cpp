@@ -13,21 +13,43 @@ std::ofstream Logger::logAction;
 void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 	if (!logData.is_open()) {
 		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
-		logData << "Time, leftencoder, rightencoder, LeftWheelSpeed, RightWheelSpeed, yaw, roll, pitch, Voltage, leftjoyx, leftjoyy, rightjoyx, rightjoyy, reverse, lowgear \r\n";
+		logData << "Time, Left Encoder, Right Encoder, Left Wheel Speed,"
+				<< "Right Wheel Speed, Yaw, Roll, Pitch, Voltage, Pressure, "
+				<< "Outtake Encoder, Outtake Motor Speed, Intake Motor Speed, "
+				<< "Intake Down, Defense Down, Low Gear, Left Joy X, Left Joy Y, "
+				<< "Right Joy X, Right Joy Y, Reverse, Arcade, Defense Desired, "
+				<< "Intake Reverse Desired, Intake Forward Desired, Intake Piston Desired, "
+				<< "Low Gear Desired, Outtake Desired, Quick Turn Desired \r\n";
 	}
 	logData << myRobot->GetTime() <<", " <<
 			myRobot->GetLeftEncoderVal() << ", " <<
 			myRobot->GetRightEncoderVal() << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kRightWheels) << ", " <<
-			myRobot->GetNavXYaw() << ", " << myRobot->GetNavXRoll() << ", " <<
-			myRobot->GetNavXPitch() << ", " << myRobot->GetVoltage() << ", " <<
+			myRobot->GetNavXYaw() << ", " <<
+			myRobot->GetNavXRoll() << ", " <<
+			myRobot->GetNavXPitch() << ", " <<
+			myRobot->GetVoltage() << ", " <<
+			myRobot->GetPressureSensorVal() << ", " <<
+			myRobot->GetOuttakeEncoderVal() << ", " <<
+			myRobot->GetOuttakeMotorSpeed() << ", " <<
+			myRobot->GetIntakeMotorSpeed() << ", " <<
+			myRobot->IsIntakeArmDown() << ", " <<
+			myRobot->IsDefenseManipDown() << ", " <<
+			myRobot->IsLowGear() << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kX) << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY) << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX) << ", " <<
 			myHumanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY) << ", " <<
 			myHumanControl->GetReverseDriveDesired() << ", " <<
-			myHumanControl->GetLowGearDesired() << "\r\n";
+			myHumanControl->GetArcadeDriveDesired() << ", " <<
+			myHumanControl->GetDefenseManipDesired() << ", " <<
+			myHumanControl->GetIntakeMotorReverseDesired() << ", " <<
+			myHumanControl->GetIntakeMotorForwardDesired()  << ", " <<
+			myHumanControl->GetIntakePistonDesired()  << ", " <<
+			myHumanControl->GetLowGearDesired() << ", " <<
+			myHumanControl->GetOuttakeDesired()  << ", " <<
+			myHumanControl->GetQuickTurnDesired() << "\r\n";
 }
 /* format:
  * robotmodel state / controlboard state

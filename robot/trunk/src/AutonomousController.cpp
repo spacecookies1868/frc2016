@@ -118,25 +118,25 @@ void AutonomousController::RefreshIni() {
 	DriveStraightCommand::rMaxAbsITerm = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsITerm", 0.0);
 	DriveStraightCommand::rTimeLimit = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rTimeLimit", 0.0);
 
-	CurveCommand::radiusPFac = robot->pini->getf("CURVECOMMAND", "radiusPFac", 0.0);
-	CurveCommand::radiusIFac = robot->pini->getf("CURVECOMMAND", "radiusIFac", 0.0);
-	CurveCommand::radiusDFac = robot->pini->getf("CURVECOMMAND", "radiusDFac", 0.0);
-	CurveCommand::radiusDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "radiusDesiredAccuracy", 0.0);
-	CurveCommand::radiusMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsOutput", 0.0);
-	CurveCommand::radiusMaxAbsError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsError", 0.0);
-	CurveCommand::radiusMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsDiffError", 0.0);
-	CurveCommand::radiusMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsITerm", 0.0);
-	CurveCommand::radiusTimeLimit = robot->pini->getf("CURVECOMMAND", "radiusTimeLimit", 0.0);
-
-	CurveCommand::anglePFac = robot->pini->getf("CURVECOMMAND", "anglePFac", 0.0);
-	CurveCommand::angleIFac = robot->pini->getf("CURVECOMMAND", "angleIFac", 0.0);
-	CurveCommand::angleDFac = robot->pini->getf("CURVECOMMAND", "angleDFac", 0.0);
-	CurveCommand::angleDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "angleDesiredAccuracy", 0.0);
-	CurveCommand::angleMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "angleMaxAbsOutput", 0.0);
-	CurveCommand::angleMaxAbsError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsError", 0.0);
-	CurveCommand::angleMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsDiffError", 0.0);
-	CurveCommand::angleMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "angleMaxAbsITerm", 0.0);
-	CurveCommand::angleTimeLimit = robot->pini->getf("CURVECOMMAND","angleTimeLimit", 0.0);
+//	CurveCommand::radiusPFac = robot->pini->getf("CURVECOMMAND", "radiusPFac", 0.0);
+//	CurveCommand::radiusIFac = robot->pini->getf("CURVECOMMAND", "radiusIFac", 0.0);
+//	CurveCommand::radiusDFac = robot->pini->getf("CURVECOMMAND", "radiusDFac", 0.0);
+//	CurveCommand::radiusDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "radiusDesiredAccuracy", 0.0);
+//	CurveCommand::radiusMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsOutput", 0.0);
+//	CurveCommand::radiusMaxAbsError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsError", 0.0);
+//	CurveCommand::radiusMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsDiffError", 0.0);
+//	CurveCommand::radiusMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsITerm", 0.0);
+//	CurveCommand::radiusTimeLimit = robot->pini->getf("CURVECOMMAND", "radiusTimeLimit", 0.0);
+//
+//	CurveCommand::anglePFac = robot->pini->getf("CURVECOMMAND", "anglePFac", 0.0);
+//	CurveCommand::angleIFac = robot->pini->getf("CURVECOMMAND", "angleIFac", 0.0);
+//	CurveCommand::angleDFac = robot->pini->getf("CURVECOMMAND", "angleDFac", 0.0);
+//	CurveCommand::angleDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "angleDesiredAccuracy", 0.0);
+//	CurveCommand::angleMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "angleMaxAbsOutput", 0.0);
+//	CurveCommand::angleMaxAbsError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsError", 0.0);
+//	CurveCommand::angleMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsDiffError", 0.0);
+//	CurveCommand::angleMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "angleMaxAbsITerm", 0.0);
+//	CurveCommand::angleTimeLimit = robot->pini->getf("CURVECOMMAND","angleTimeLimit", 0.0);
 
 }
 
@@ -162,7 +162,7 @@ void AutonomousController::CreateQueue() {
 		printf("kTestAuto ------------------\n");
 //		CurveCommand* c = new CurveCommand(robot, 0.0, 6.0);
 //		firstCommand = c;
-		DriveStraightCommand * ds = new DriveStraightCommand(robot, 6.0);
+//		DriveStraightCommand * ds = new DriveStraightCommand(robot, 6.0);
 		break;
 	}
 	case (kBlankAuto): {

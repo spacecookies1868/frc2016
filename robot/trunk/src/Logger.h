@@ -8,7 +8,6 @@
  *
  *      todo:
  *      -severity-based logging
- *      -add header
  */
 
 #ifndef LOGGER_H_
@@ -20,8 +19,8 @@
 #include <string>
 #include <ctime>
 
-#define LOG(myRobot, stateName, state) {DO_PERIODIC(1, Logger::LogAction(myRobot, __FILE__, __LINE__, stateName, state))}
-#define DUMP(stateName, state) {DO_PERIODIC(1, Logger::LogAction(__FILE__, __LINE__, stateName, state))}
+#define LOG(myRobot, stateName, state) {MATCH_PERIODIC(10, Logger::LogAction(myRobot, __FILE__, __LINE__, stateName, state))}
+#define DUMP(stateName, state) {MATCH_PERIODIC(10, Logger::LogAction(__FILE__, __LINE__, stateName, state))}
 class Logger {
 public:
 	static void LogState(RobotModel* myRobot, RemoteControl *myHumanControl);

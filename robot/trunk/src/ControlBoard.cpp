@@ -45,7 +45,7 @@ void ControlBoard::ReadControls() {
 
 	reverseDriveDesired = driveDirectionButton->IsDown();
 	lowGearDesired = gearShiftButton->IsDown();
-	arcadeDriveDesired = arcadeDriveButton->IsDown();
+	arcadeDriveDesired = !arcadeDriveButton->IsDown();
 	quickTurnDesired = quickTurnButton->IsDown();
 
 	defenseManipDesired = defenseManipButton->WasJustPressed();

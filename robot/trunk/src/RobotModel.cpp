@@ -42,6 +42,10 @@ RobotModel::RobotModel() {
 	 */
 //	leftEncoder->SetDistancePerPulse(0.0104);
 //	rightEncoder->SetDistancePerPulse(0.0104);
+#if USE_CAMERA
+	camera = new AxisCamera("10.18.68.11");
+	frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0); // 0 bordersize
+#endif
 
 	compressor = new Compressor(COMPRESSOR_PORT);
 #if USE_NAVX
@@ -254,4 +258,9 @@ double RobotModel::GetOuttakeEncoderVal() {
 void RobotModel::ResetOuttakeEncoders() {
 
 }
-
+#if USE_CAMERA
+Image* RobotModel::GetCameraImage() {
+	camera->GetImage(frame);
+	return frame;
+}
+#endif

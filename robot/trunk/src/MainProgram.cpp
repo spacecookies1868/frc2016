@@ -24,8 +24,14 @@ class MainProgram : public IterativeRobot {
 
 public:
 	MainProgram(void) {
-		lw = LiveWindow::GetInstance();
-		robot = new RobotModel();
+		try {
+			lw = LiveWindow::GetInstance();
+			robot = new RobotModel();
+		} catch (std::exception &e) {
+			std::string err_string = "Error instantiating navX MXP:  ";
+			err_string += e.what();
+			DriverStation::ReportError(err_string.c_str());
+		}
 		humanControl = new ControlBoard();
 		driveController = new DriveController(robot, humanControl);
 		superstructureController = new SuperstructureController(robot, humanControl);
@@ -66,8 +72,7 @@ private:
 		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 		autonomousController->Update(currTimeSec, deltaTimeSec);
-		LOG(robot, "Left Encoder Val", robot->GetLeftEncoderVal());
-		LOG(robot, "Right Encoder Val", robot->GetRightEncoderVal());
+		Logger::LogState(robot, humanControl);
 	}
 
 	void TeleopInit() {
@@ -94,20 +99,23 @@ private:
 		driveController->Update(currTimeSec, deltaTimeSec);
 		//LOG(robot, "Updating driveController", 0.0);
 		superstructureController->Update(currTimeSec, deltaTimeSec);
-
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
 		printf("Navx val: %f\n", robot->GetNavXYaw());
+
+		Logger::LogState(robot, humanControl);
+
+#if USE_CAMERA
+		CameraServer::GetInstance()->SetQuality(50); // ?? what is quality?
+		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+#endif
 	}
 
 	void TestPeriodic() {
-		printf("left encoder: %f\n", robot->GetLeftEncoderVal());
-		printf("right encoder: %f\n", robot->GetRightEncoderVal());
-		LOG(robot, "Left Encoder", robot->GetLeftEncoderVal());
-		LOG(robot, "Right Encoder", robot->GetRightEncoderVal());
-		//printf("Pressure sensor value %f\n", robot->GetPressureSensorVal());
-		LOG(robot, "Yaw values: ", robot->GetNavXYaw());
+		printf("yaw: %f\n", robot->GetNavXYaw());
+		printf("roll: %f\n", robot->GetNavXRoll());
+		printf("pitch: %f\n", robot->GetNavXPitch());
 	}
 
 	void DisabledInit() {
