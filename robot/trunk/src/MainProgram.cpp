@@ -102,7 +102,7 @@ private:
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
-		printf("Navx val: %f\n", robot->GetNavXYaw());
+		//printf("Navx val: %f\n", robot->GetNavXYaw());
 
 		Logger::LogState(robot, humanControl);
 

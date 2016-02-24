@@ -166,9 +166,9 @@ double RobotModel::GetTime() {
 double RobotModel::GetLeftEncoderVal() {
 	// IF PRACTICE return -leftEncoder->GetDistance();
 	//IF COMP
-	printf("Left 2 Stuff %i\n", leftEncoder->CheckDigitalChannel(2));
-	printf("Left 3 Stuff %i\n", leftEncoder->CheckDigitalChannel(3));
-	printf("Left raw %i\n", leftEncoder->GetRaw());
+	//printf("Left 2 Stuff %i\n", leftEncoder->CheckDigitalChannel(2));
+	//printf("Left 3 Stuff %i\n", leftEncoder->CheckDigitalChannel(3));
+	//printf("Left raw %i\n", leftEncoder->GetRaw());
 	return leftEncoder->GetDistance();
 }
 
@@ -178,9 +178,9 @@ double RobotModel::GetRightEncoderVal() {
 	 */
 
 	//IF PRACTICE return rightEncoder->GetDistance();
-	printf("Right 0 Stuff %i\n", rightEncoder->CheckDigitalChannel(0));
-	printf("Right 1 Stuff %i\n", rightEncoder->CheckDigitalChannel(1));
-	printf("Right raw %i\n", rightEncoder->GetRaw());
+	//printf("Right 0 Stuff %i\n", rightEncoder->CheckDigitalChannel(0));
+	//printf("Right 1 Stuff %i\n", rightEncoder->CheckDigitalChannel(1));
+	//printf("Right raw %i\n", rightEncoder->GetRaw());
 	return rightEncoder->GetDistance();
 }
 
@@ -230,7 +230,7 @@ double RobotModel::GetIntakeMotorSpeed() {
 }
 
 void RobotModel::SetIntakeMotorSpeed(double speed) {
-	DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
+	//DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
 	intakeMotor->Set(speed);
 }
 
