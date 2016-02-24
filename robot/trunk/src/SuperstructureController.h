@@ -8,6 +8,7 @@
 class SuperstructureController {
 public:
 	SuperstructureController(RobotModel* myRobot, RemoteControl* myHumanControl);
+	~SuperstructureController() {};
 	void Reset();
 	void Update(double currTimeSec, double deltaTimeSec);
 	void RefreshIni();
@@ -20,6 +21,9 @@ public:
 	void SetAutoIntakeMotorForward(bool desired);
 	void SetAutoIntakeMotorBackward(bool desired);
 	void SetAutoOuttake(bool desired);
+
+	//auto boolean accessor methods
+	bool GetOuttakeFinished();
 
 	enum SuperstructureState {
 		kInit, kIdle, kPrepToOuttake, kOuttake
@@ -50,6 +54,7 @@ private:
 	bool autoIntakeMotorForward;
 	bool autoIntakeMotorBackward;
 	bool autoOuttake;
+	bool autoOuttakeFinished;
 
 	//motor speeds
 	double intakeSpeed;

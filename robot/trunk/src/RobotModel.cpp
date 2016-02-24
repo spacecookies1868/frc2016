@@ -199,19 +199,16 @@ void RobotModel::RefreshIni() {
 }
 
 bool RobotModel::IsIntakeArmDown() {
-	//TODO check that this is the correct solenoid
 	return intakeArmSolenoidA->Get();
 }
 
 void RobotModel::MoveIntakeArmUp() {
-	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move intake arm up\n"));
 	intakeArmSolenoidA->Set(false);
 	intakeArmSolenoidB->Set(true);
 }
 
 void RobotModel::MoveIntakeArmDown() {
-	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move intake arm down\n"));
 	intakeArmSolenoidA->Set(true);
 	intakeArmSolenoidB->Set(false);

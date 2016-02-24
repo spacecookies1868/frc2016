@@ -40,10 +40,10 @@ static const int PNEUMATICS_CONTROL_MODULE_ID			= 0;
 
 // ***************** SOLENOID PORTS *****************
 static const int GEAR_SHIFT_SOLENOID_PORT				= 7;
-static const int INTAKE_SOLENOID_A_PORT					= 0; //arbitrary value
-static const int INTAKE_SOLENOID_B_PORT					= 1; //arbitrary value
-static const int DEFENSE_MANIP_SOLENOID_A_PORT			= 2; //arbitrary value
-static const int DEFENSE_MANIP_SOLENOID_B_PORT			= 3; //arbitrary value
+static const int INTAKE_SOLENOID_A_PORT					= 0;
+static const int INTAKE_SOLENOID_B_PORT					= 1;
+static const int DEFENSE_MANIP_SOLENOID_A_PORT			= 3; //arbitrary value
+static const int DEFENSE_MANIP_SOLENOID_B_PORT			= 2; //arbitrary value
 
 // ***************** JOYSTICK USB PORTS *****************
 static const int LEFT_JOY_USB_PORT						= 0;
