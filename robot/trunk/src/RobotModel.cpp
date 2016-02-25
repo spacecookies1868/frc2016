@@ -69,6 +69,7 @@ void RobotModel::Reset() {
 	gripLines->Reset();
 	ResetDriveEncoders();
 	ResetOuttakeEncoders();
+	SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 }
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
@@ -227,7 +228,7 @@ double RobotModel::GetIntakeMotorSpeed() {
 }
 
 void RobotModel::SetIntakeMotorSpeed(double speed) {
-	//DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
+	DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
 	intakeMotor->Set(speed);
 }
 

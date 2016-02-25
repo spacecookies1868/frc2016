@@ -9,7 +9,7 @@ static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 7;
 static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 8;
 static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 2;
 static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 1;
-static const int INTAKE_MOTOR_PWM_PORT					= 3; //arbitrary value
+static const int INTAKE_MOTOR_PWM_PORT					= 0;
 static const int OUTTAKE_MOTOR_A_PWM_PORT				= 4; //arbitrary value
 static const int OUTTAKE_MOTOR_B_PWM_PORT				= 5; //arbitrary value
 

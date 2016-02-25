@@ -124,6 +124,7 @@ private:
 		superstructureController->Reset();
 		autonomousController->Reset();
 		cameraController->Reset();
+
 		//LOG(robot, "Finished disabled init", 0.0);
 	}
 

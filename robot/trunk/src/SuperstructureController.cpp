@@ -153,7 +153,7 @@ void SuperstructureController::RefreshIni() {
 	deltaTimePTO = 1.0;
 	deltaEncoderValOT = 10.0;
 
-	intakeSpeed = 0.4;
+	intakeSpeed = 0.7;
 	outtakeSpeed = 0.4;
 
 }
