@@ -5,10 +5,12 @@ RobotModel::RobotModel() {
 	navx = new AHRS(SerialPort::Port::kMXP, AHRS::SerialDataType::kProcessedData, update_rate_hz);
 	navx->ZeroYaw();
 
-	leftA = new Talon(9);
-	leftB = new Talon(7);
-	rightA = new Talon(1);
-	rightB = new Talon(2);
+	leftA = new Talon(1);
+	leftB = new Talon(0);
+	rightA = new Talon(2);
+	rightB = new Talon(5);
+	timer = new Timer();
+	timer->Start();
 }
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
@@ -30,6 +32,21 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 	}
 }
 
+float RobotModel::GetWheelSpeed(Wheels w) {
+	//IMPORTANT: Check which motors need to be inverted.
+	switch(w) {
+	case (kLeftWheels):
+		return leftA->Get();
+		break;
+	case (kRightWheels):
+		return rightA->Get();
+		break;
+	default:
+		return 0.0;
+		break;
+	}
+}
+
 float RobotModel::GetYaw() {
 	return navx->GetYaw();
 }
@@ -44,6 +61,10 @@ float RobotModel::GetRoll() {
 
 void RobotModel::ZeroYaw() {
 	navx->ZeroYaw();
+}
+
+float RobotModel::GetTime() {
+	return timer->Get();
 }
 
 RobotModel::~RobotModel() {

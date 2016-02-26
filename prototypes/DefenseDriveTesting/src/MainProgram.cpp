@@ -2,6 +2,7 @@
 #include <AHRS.h>
 #include "RobotModel.h"
 #include "DefenseDrive.h"
+#include "Logger.h"
 
 class MainProgram: public IterativeRobot
 {
@@ -9,15 +10,11 @@ class MainProgram: public IterativeRobot
 public:
 	RobotModel* robot;
 	DefenseDrive* defenseDrive;
-	Timer* timer;
-	Compressor* compressor;
 	double currTimeSec, lastTimeSec, deltaTimeSec;
 
 	MainProgram() {
 		robot = new RobotModel();
 		defenseDrive = new DefenseDrive(robot);
-		timer = new Timer();
-		compressor = new Compressor();
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
@@ -31,16 +28,14 @@ public:
 	void AutonomousInit()
 	{
 		defenseDrive->Init();
-		timer->Reset();
-		timer->Start();
 	}
 
 	void AutonomousPeriodic()
 	{
-//		lastTimeSec = currTimeSec;
-//		currTimeSec = timer->Get();
-//		deltaTimeSec = currTimeSec - lastTimeSec;
-//
+		lastTimeSec = currTimeSec;
+		currTimeSec = robot->GetTime();
+		deltaTimeSec = currTimeSec - lastTimeSec;
+
 //		if (currTimeSec < 2.1) {
 //			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.6);
 //		} else {
@@ -49,17 +44,18 @@ public:
 //		SmartDashboard::PutNumber("Yaw: \n", robot->GetYaw());
 //		SmartDashboard::PutNumber("Pitch: \n", robot->GetPitch());
 //		SmartDashboard::PutNumber("Roll: \n", robot->GetRoll());
+
 		if (defenseDrive->IsDone()) {
 			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 		} else {
 			defenseDrive->Update(currTimeSec, deltaTimeSec);
 		}
+		Logger::LogState(robot, defenseDrive);
 		SmartDashboard::PutNumber("Roll: %f\n", robot->GetRoll());
 	}
 
 	void TeleopInit()
 	{
-		compressor->Start();
 	}
 
 	void TeleopPeriodic()

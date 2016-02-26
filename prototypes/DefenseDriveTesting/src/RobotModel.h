@@ -9,14 +9,17 @@ public:
 	enum Wheels {kLeftWheels, kRightWheels, kAllWheels};
 	RobotModel();
 	float GetYaw();
-	float GetRoll();
 	float GetPitch();
+	float GetRoll();
 	void ZeroYaw();
 	void SetWheelSpeed(Wheels w, double speed);
+	float GetWheelSpeed(Wheels w);
+	float GetTime();
 	virtual ~RobotModel();
 private:
 	AHRS *navx;
 	Talon *leftA, *leftB, *rightA, *rightB;
+	Timer *timer;
 };
 
 #endif

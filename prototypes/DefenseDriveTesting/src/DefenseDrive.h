@@ -9,6 +9,7 @@ public:
 	void Init();
 	void Update(double currTimeSec, double deltaTimeSec);
 	bool IsDone();
+	int GetState();
 	virtual ~DefenseDrive();
 
 private:
@@ -20,6 +21,7 @@ private:
 	uint32_t nextState;
 	double currRoll, lastRoll, deltaRoll, startRoll, diffRoll;
 	double isFlatThreshold, onRampThreshold, slopeOfRamp, speed;
+	double startTime;
 };
 
 #endif
