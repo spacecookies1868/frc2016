@@ -21,6 +21,8 @@ public:
 	void SetAutoIntakeMotorForward(bool desired);
 	void SetAutoIntakeMotorBackward(bool desired);
 	void SetAutoOuttake(bool desired);
+	void SetAutoManualOuttakeForward(bool desired);
+	void SetAutoManualOuttakeReverse(bool desired);
 
 	//auto boolean accessor methods
 	bool GetOuttakeFinished();
@@ -56,6 +58,8 @@ private:
 	bool autoIntakeMotorBackward;
 	bool autoOuttake;
 	bool autoOuttakeFinished;
+	bool autoManualOuttakeForward;
+	bool autoManualOuttakeReverse;
 
 	//motor speeds
 	double intakeSpeed;

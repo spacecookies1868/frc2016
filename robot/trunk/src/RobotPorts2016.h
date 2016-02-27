@@ -42,13 +42,14 @@ static const int PNEUMATICS_CONTROL_MODULE_ID			= 0;
 static const int GEAR_SHIFT_SOLENOID_PORT				= 7;
 static const int INTAKE_SOLENOID_A_PORT					= 0;
 static const int INTAKE_SOLENOID_B_PORT					= 1;
-static const int DEFENSE_MANIP_SOLENOID_A_PORT			= 3; //arbitrary value
-static const int DEFENSE_MANIP_SOLENOID_B_PORT			= 2; //arbitrary value
+static const int DEFENSE_MANIP_SOLENOID_A_PORT			= 3;
+static const int DEFENSE_MANIP_SOLENOID_B_PORT			= 2;
 
 // ***************** JOYSTICK USB PORTS *****************
 static const int LEFT_JOY_USB_PORT						= 0;
 static const int RIGHT_JOY_USB_PORT						= 1;
 static const int OPERATOR_JOY_USB_PORT					= 2;
+static const int OPERATOR_JOY_B_USB_PORT				= 3;
 
 // ***************** BUTTON PORTS *****************
 //Drive controller button ports
@@ -63,5 +64,7 @@ static const int INTAKE_PISTON_BUTTON_PORT				= 1;
 static const int INTAKE_MOTOR_FORWARD_BUTTON_PORT		= 4;
 static const int INTAKE_MOTOR_REVERSE_BUTTON_PORT		= 3;
 static const int OUTTAKE_BUTTON_PORT					= 9;
+static const int MANUAL_OUTTAKE_FORWARD_BUTTON_PORT		= 4;
+static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 3;
 
 #endif

@@ -9,6 +9,7 @@ ControlBoard::ControlBoard() {
 	leftJoy  = new Joystick(LEFT_JOY_USB_PORT);
 	rightJoy = new Joystick(RIGHT_JOY_USB_PORT);
 	operatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
+	operatorJoyB = new Joystick(OPERATOR_JOY_B_USB_PORT);
 
 	driveDirectionButton = new ButtonReader(operatorJoy, DRIVE_DIRECTION_BUTTON_PORT);
 	gearShiftButton = new ButtonReader(leftJoy, HIGH_LOW_GEAR_BUTTON_PORT);
@@ -19,6 +20,8 @@ ControlBoard::ControlBoard() {
 	intakeMotorForwardButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_FORWARD_BUTTON_PORT);
 	intakeMotorReverseButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_REVERSE_BUTTON_PORT);
 	outtakeButton = new ButtonReader(operatorJoy, OUTTAKE_BUTTON_PORT);
+	manualOuttakeForwardButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_FORWARD_BUTTON_PORT);
+	manualOuttakeReverseButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
 
 	leftJoyX = 0.0;
 	leftJoyY = 0.0;
@@ -34,6 +37,8 @@ ControlBoard::ControlBoard() {
 	intakeMotorForwardDesired = false;
 	intakeMotorReverseDesired = false;
 	outtakeDesired = false;
+	manualOuttakeForwardDesired = false;
+	manualOuttakeReverseDesired = false;
 };
 
 void ControlBoard::ReadControls() {
@@ -53,6 +58,8 @@ void ControlBoard::ReadControls() {
 	intakeMotorForwardDesired = intakeMotorForwardButton->IsDown();
 	intakeMotorReverseDesired = intakeMotorReverseButton->IsDown();
 	outtakeDesired = outtakeButton->WasJustPressed();
+	manualOuttakeForwardDesired = manualOuttakeForwardButton->IsDown();
+	manualOuttakeReverseDesired = manualOuttakeReverseButton->IsDown();
 }
 
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
@@ -114,6 +121,14 @@ bool ControlBoard::GetOuttakeDesired() {
 	return outtakeDesired;
 }
 
+bool ControlBoard::GetManualOuttakeForwardDesired() {
+	return manualOuttakeForwardDesired;
+}
+
+bool ControlBoard::GetManualOuttakeReverseDesired() {
+	return manualOuttakeReverseDesired;
+}
+
 void ControlBoard::ReadAllButtons() {
 	driveDirectionButton->ReadValue();
 	gearShiftButton->ReadValue();
@@ -124,4 +139,6 @@ void ControlBoard::ReadAllButtons() {
 	intakeMotorForwardButton->ReadValue();
 	intakeMotorReverseButton->ReadValue();
 	outtakeButton->ReadValue();
+	manualOuttakeForwardButton->ReadValue();
+	manualOuttakeReverseButton->ReadValue();
 }

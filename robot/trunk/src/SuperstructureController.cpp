@@ -24,6 +24,8 @@ SuperstructureController::SuperstructureController(RobotModel* myRobot, RemoteCo
 	autoIntakeMotorBackward = false;
 	autoOuttake = false;
 	autoOuttakeFinished = false;
+	autoManualOuttakeForward = false;
+	autoManualOuttakeReverse = false;
 
 	intakeSpeed = 0.0;
 	outtakeSpeed = 0.0;
@@ -49,6 +51,8 @@ void SuperstructureController::Reset() {
 	autoIntakeMotorBackward = false;
 	autoOuttake = false;
 	autoOuttakeFinished = true; //The outtake is not going, therefore it is finished
+	autoManualOuttakeForward = false;
+	autoManualOuttakeReverse = false;
 }
 
 void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
@@ -109,6 +113,12 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 				nextState = kPrepToOuttake;
 			}
 			autoOuttake = false;
+		}
+
+		if (humanControl->GetManualOuttakeForwardDesired() || autoManualOuttakeForward) {
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+		} else if (humanControl->GetManualOuttakeReverseDesired() || autoManualOuttakeReverse) {
+			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
 		}
 
 		break;
@@ -192,3 +202,12 @@ void SuperstructureController::SetAutoOuttake(bool desired) {
 bool SuperstructureController::GetOuttakeFinished() {
 	return autoOuttakeFinished;
 }
+
+void SuperstructureController::SetAutoManualOuttakeForward(bool desired) {
+	autoManualOuttakeForward = desired;
+}
+
+void SuperstructureController::SetAutoManualOuttakeReverse(bool desired) {
+	autoManualOuttakeReverse = desired;
+}
+

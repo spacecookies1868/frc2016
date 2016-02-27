@@ -31,14 +31,17 @@ public:
 	bool GetIntakeMotorForwardDesired();
 	bool GetIntakeMotorReverseDesired();
 	bool GetOuttakeDesired();
+	bool GetManualOuttakeForwardDesired();
+	bool GetManualOuttakeReverseDesired();
 
 private:
-	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipDesired, intakePistonDesired, intakeMotorForwardDesired,
-		 intakeMotorReverseDesired, outtakeDesired;
+	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipDesired, intakePistonDesired,
+		 intakeMotorForwardDesired, intakeMotorReverseDesired, outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
-	Joystick *leftJoy, *rightJoy, *operatorJoy;
-	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton, *intakeMotorForwardButton,
-				 *intakeMotorReverseButton, *outtakeButton;
+	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
+	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
+				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton,
+				 *manualOuttakeReverseButton;
 	void ReadAllButtons();
 };
 
