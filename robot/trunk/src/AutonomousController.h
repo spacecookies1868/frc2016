@@ -2,6 +2,11 @@
 #define AUTONOMOUSCONTROLLER_H
 
 #include "AutoCommand.h"
+#include "DriveCommands.h"
+#include "SuperstructureCommands.h"
+#include "DetectionCommands.h"
+#include "DriveController.h"
+#include "SuperstructureController.h"
 #include "CameraController.h"
 #include <vector>
 #include <string>

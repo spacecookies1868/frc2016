@@ -162,7 +162,19 @@ void AutonomousController::CreateQueue() {
 		printf("kTestAuto ------------------\n");
 //		CurveCommand* c = new CurveCommand(robot, 0.0, 6.0);
 //		firstCommand = c;
-//		DriveStraightCommand * ds = new DriveStraightCommand(robot, 6.0);
+
+//		WaitingCommand* w = new WaitingCommand(5.0);
+//		firstCommand = w;
+//		PivotCommand* p = new PivotCommand(robot, 90.0);
+//		firstCommand = p;
+//		IntakePositionCommand* i = new IntakePositionCommand(superstructure, true);
+//		firstCommand = i;
+//
+//		WaitingCommand* w2 = new WaitingCommand(5.0);
+//		PivotCommand* p2 = new PivotCommand(robot, 180);
+//		ChainedCommand* c = new ChainedCommand(w2, p2);
+//		firstCommand = c;
+
 		break;
 	}
 	case (kBlankAuto): {

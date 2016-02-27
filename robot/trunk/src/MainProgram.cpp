@@ -61,18 +61,24 @@ private:
 		cameraController->Reset();
 		autonomousController->Reset();
 
+		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
+
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
 		deltaTimeSec = 0.0;
 		autonomousController->StartAutonomous();
+		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
 	}
 
 	void AutonomousPeriodic() {
+		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
 		lastTimeSec = currTimeSec;
 		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 		autonomousController->Update(currTimeSec, deltaTimeSec);
 		Logger::LogState(robot, humanControl);
+
+		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
 	}
 
 	void TeleopInit() {

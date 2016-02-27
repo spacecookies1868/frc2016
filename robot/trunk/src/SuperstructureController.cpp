@@ -61,6 +61,17 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 	case (kIdle):
 		nextState = kIdle;
 
+		//Change the position of the intake in auto
+		if (autoIntakeUp) {
+			DO_PERIODIC(1, printf("Auto Intake Up \n"));
+			robot->MoveIntakeArmUp();
+			autoIntakeUp = false;
+		} else if (autoIntakeDown) {
+			DO_PERIODIC(1, printf("Auto Intake Down \n"));
+			robot->MoveIntakeArmDown();
+			autoIntakeDown = false;
+		}
+
 		//Change the position of the defense manipulator in teleop
 		if (humanControl->GetDefenseManipDesired()) {
 			robot->ChangeDefenseManipState();
@@ -78,15 +89,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		//Change the position of the intake in teleop
 		if (humanControl->GetIntakePistonDesired()) {
 			robot->ChangeIntakeArmState();
-		}
-
-		//Change the position of the intake in auto
-		if (autoIntakeUp) {
-			robot->MoveIntakeArmUp();
-			autoIntakeUp = false;
-		} else if (autoIntakeDown) {
-			robot->MoveIntakeArmDown();
-			autoIntakeDown = false;
 		}
 
 		//Move the intake motor forward or backward
