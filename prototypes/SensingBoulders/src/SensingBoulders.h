@@ -34,6 +34,7 @@ private:
 
 	double xDistanceToCenterRobot; //the distance from the ultrasonic sensor to the front of the center of the robot
 	double yDistanceToCenterRobot; // distance from the ultrasonic sensor to the side of the center of the robot
+	double angleThreshold; 		   // in case the boulder happens to be in front of the robot already
 	double startServoAngle, endServoAngle, deltaServoAngle;
 	double thresholdDistance;
 	double startBoulderAngle, endBoulderAngle, centerBoulderAngle;

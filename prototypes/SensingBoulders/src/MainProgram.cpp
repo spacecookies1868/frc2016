@@ -42,17 +42,26 @@ public:
 	void AutonomousInit()
 	{
 		sensingBoulders->Init();
+//		autoPivotCommand = new AutoPivot(robot);
+//		autoPivotCommand->SetDesiredYaw(30);
+//		autoPivotCommand->Init();
 	}
 
 	void AutonomousPeriodic()
 	{
+		lastTimeSec = currTimeSec;
 		currTimeSec = timer->Get();
+		deltaTimeSec = currTimeSec - lastTimeSec;
 		if (sensingBoulders->IsDone()) {
-			return;
+			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 		} else {
 			sensingBoulders->Update(currTimeSec, lastTimeSec);
 		}
-		lastTimeSec = currTimeSec;
+//		if (autoPivotCommand->IsDone()){
+//			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+//		} else {
+//			autoPivotCommand->Update(currTimeSec, deltaTimeSec);
+//		}
 	}
 
 	void TeleopInit()

@@ -46,7 +46,7 @@ PIDConfig* AutoPivot::CreatePIDConfig() {
 	pidConfig->pFac = 0.09;
 	pidConfig->iFac = 0.0;
 	pidConfig->dFac = 0.0;
-	pidConfig->maxAbsOutput = 0.3;
+	pidConfig->maxAbsOutput = 0.4;
 	pidConfig->maxAbsError = 10.0;
 	pidConfig->maxAbsDiffError = 10.0;
 	pidConfig->desiredAccuracy = 0.3;
@@ -60,17 +60,19 @@ void AutoPivot::Update(double currTimeSec, double deltaTimeSec) {
 		return;
 	}
 	UpdateAccumulatedYaw();
-	SmartDashboard::PutNumber("Accumulated Yaw: ", accumulatedYaw);
+//	SmartDashboard::PutNumber("Accumulated Yaw: ", accumulatedYaw);
+	printf("Accumulated Yaw: %f\n", accumulatedYaw);
 	bool pidDone = rPID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
 	if (pidDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
-
+		printf("AutoPivot Done\n");
 	} else {
 		double output = rPID->Update(accumulatedYaw);
 		SmartDashboard::PutNumber("Output: ", output);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, -output);
+//		printf("Output: %f\n", output);
 	}
 }
 

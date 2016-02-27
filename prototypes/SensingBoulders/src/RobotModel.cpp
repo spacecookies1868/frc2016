@@ -25,9 +25,9 @@ void RobotModel::InitServo(double angle) {
 
 void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle) {
 	servoAngle = servo->GetAngle();
-	if (servoAngle > endAngle){
+	if (servoAngle >= endAngle){
 		servoDirection = false;
-	} else if (servoAngle < startAngle){
+	} else if (servoAngle <= startAngle){
 		servoDirection = true;
 	}
 
@@ -36,6 +36,10 @@ void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle)
 	} else {
 		servoAngle -= deltaAngle;
 	}
+//	printf("Start angle: %f \n", startAngle);
+//	printf("End Angle: %f \n", endAngle);
+//	printf("Delta Angle: %f \n", deltaAngle);
+//	printf("servoAnlge: %f \n", servoAngle);
 	servo->SetAngle(servoAngle);
 }
 
