@@ -13,10 +13,11 @@ std::ofstream Logger::logAction;
 void Logger::LogState(RobotModel* myRobot, DefenseDrive* myDefenseDrive) {
 	if (!logData.is_open()) {
 		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
-		logData << "Time, LeftWheelSpeed, RightWheelSpeed, Yaw, Roll, Pitch \r\n";
+		logData << "Time, DefenseDriveState, LeftWheelSpeed, RightWheelSpeed, Yaw, Roll, Pitch\r\n";
 	}
 	logData <<
-			myRobot->GetTime() <<", " <<
+			myRobot->GetTime() << ", " <<
+			myDefenseDrive->GetState() << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kRightWheels) << ", " <<
 			myRobot->GetYaw() << ", " <<

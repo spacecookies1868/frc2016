@@ -1,14 +1,27 @@
 #include "RobotModel.h"
 
+#define PI 3.141592653589
+
 RobotModel::RobotModel() {
 	uint8_t update_rate_hz = 50;
 	navx = new AHRS(SerialPort::Port::kMXP, AHRS::SerialDataType::kProcessedData, update_rate_hz);
 	navx->ZeroYaw();
 
-	leftA = new Talon(1);
-	leftB = new Talon(0);
+	leftEncoder = new Encoder(2, 3, true);
+	rightEncoder = new Encoder(0, 1, true);
+	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+
+//	leftA = new Talon(1);
+//	leftB = new Talon(0);
+//	rightA = new Talon(2);
+//	rightB = new Talon(5);
+
+	leftA = new Talon(7);
+	leftB = new Talon(8);
 	rightA = new Talon(2);
-	rightB = new Talon(5);
+	rightB = new Talon(1);
+
 	timer = new Timer();
 	timer->Start();
 }
@@ -65,6 +78,19 @@ void RobotModel::ZeroYaw() {
 
 float RobotModel::GetTime() {
 	return timer->Get();
+}
+
+double RobotModel::GetLeftEncoderVal() {
+	return leftEncoder->GetDistance();
+}
+
+double RobotModel::GetRightEncoderVal() {
+	return rightEncoder->GetDistance();
+}
+
+void RobotModel::ResetDriveEncoders() {
+	leftEncoder->Reset();
+	rightEncoder->Reset();
 }
 
 RobotModel::~RobotModel() {

@@ -36,21 +36,12 @@ public:
 		currTimeSec = robot->GetTime();
 		deltaTimeSec = currTimeSec - lastTimeSec;
 
-//		if (currTimeSec < 2.1) {
-//			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.6);
-//		} else {
-//			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
-//		}
-//		SmartDashboard::PutNumber("Yaw: \n", robot->GetYaw());
-//		SmartDashboard::PutNumber("Pitch: \n", robot->GetPitch());
-//		SmartDashboard::PutNumber("Roll: \n", robot->GetRoll());
-
 		if (defenseDrive->IsDone()) {
 			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 		} else {
 			defenseDrive->Update(currTimeSec, deltaTimeSec);
+			Logger::LogState(robot, defenseDrive);
 		}
-		Logger::LogState(robot, defenseDrive);
 		SmartDashboard::PutNumber("Roll: %f\n", robot->GetRoll());
 	}
 
