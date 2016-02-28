@@ -2,7 +2,7 @@
 #define SRC_AUTOPIVOT_H_
 
 #include <WPILib.h>
-#include <AHRS.h>
+#include "navx/AHRS.h"
 #include "RobotModel.h"
 #include "PIDControlLoop.h"
 
