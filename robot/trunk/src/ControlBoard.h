@@ -24,6 +24,7 @@ public:
 	bool GetLowGearDesired();
 	bool GetArcadeDriveDesired();
 	bool GetQuickTurnDesired();
+	uint32_t GetDefense();
 
 	//Superstructure controller button accessors
 	bool GetDefenseManipDesired();
@@ -34,10 +35,23 @@ public:
 	bool GetManualOuttakeForwardDesired();
 	bool GetManualOuttakeReverseDesired();
 
+	enum Defenses {
+		LowBar = 0,
+		Portcullis = 1,
+		ChevalDeFrise = 2,
+		Ramparts = 3,
+		Moat = 4,
+		SallyPort = 5,
+		Drawbridge = 6,
+		RockWall = 7,
+		RoughTerrain = 8
+	};
+
 private:
 	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipDesired, intakePistonDesired,
 		 intakeMotorForwardDesired, intakeMotorReverseDesired, outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
+	uint32_t defense;
 	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
 				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton,

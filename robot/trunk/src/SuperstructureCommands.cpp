@@ -35,10 +35,6 @@ void IntakePositionCommand::Init() {
 
 void IntakePositionCommand::Update(double currTimeSec, double deltaTimeSec) {
 	superstructure->Update(currTimeSec, deltaTimeSec);
-	/*if (isDone) {
-		superstructure->SetAutoIntakeDown(false);
-		superstructure->SetAutoIntakeUp(false);
-	}*/
 	superstructure->Update(currTimeSec, deltaTimeSec);
 	isDone = true;
 }
@@ -104,6 +100,7 @@ void IntakeCommand::Update(double currTimeSec, double deltaTimeSec) {
 		superstructure->SetAutoIntakeDown(true);
 		initTime = currTimeSec;
 		superstructure->SetAutoIntakeMotorForward(true);
+		superstructure->Update(currTimeSec, deltaTimeSec);
 		firstTime = false;
 	} else if((currTimeSec - initTime) < waitTime) {
 		superstructure->SetAutoIntakeMotorForward(true);
@@ -128,15 +125,15 @@ DefenseManipPosCommand::DefenseManipPosCommand(SuperstructureController* mySuper
 
 void DefenseManipPosCommand::Init() {
 	isDone = false;
+	if (desiredDown) {
+		superstructure->SetAutoDefenseManipDown(true);
+	} else {
+		superstructure->SetAutoDefenseManipUp(true);
+	}
 }
 
 void DefenseManipPosCommand::Update(double currTimeSec, double deltaTimeSec) {
-	if(desiredDown) {
-		superstructure->SetAutoDefenseManipDown(true);
-	}
-	else {
-		superstructure->SetAutoDefenseManipUp(true);
-	}
+	superstructure->Update(currTimeSec, deltaTimeSec);
 	superstructure->Update(currTimeSec, deltaTimeSec);
 	isDone = true;
 }

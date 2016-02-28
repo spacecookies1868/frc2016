@@ -36,7 +36,7 @@ public:
 		driveController = new DriveController(robot, humanControl);
 		superstructureController = new SuperstructureController(robot, humanControl);
 		cameraController = new CameraController(robot);
-		autonomousController = new AutonomousController(robot, driveController, superstructureController, cameraController);
+		autonomousController = new AutonomousController(robot, driveController, superstructureController, cameraController, humanControl);
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;

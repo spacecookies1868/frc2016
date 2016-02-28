@@ -37,6 +37,7 @@ ControlBoard::ControlBoard() {
 	intakeMotorForwardDesired = false;
 	intakeMotorReverseDesired = false;
 	outtakeDesired = false;
+	defense = LowBar;
 	manualOuttakeForwardDesired = false;
 	manualOuttakeReverseDesired = false;
 };
@@ -52,6 +53,11 @@ void ControlBoard::ReadControls() {
 	lowGearDesired = gearShiftButton->IsDown();
 	arcadeDriveDesired = !arcadeDriveButton->IsDown();
 	quickTurnDesired = quickTurnButton->IsDown();
+/*
+ * Add buttons for defense combinations and if statement on buttons here, then assign defense to
+ * the corresponding defense enum
+ */
+	defense = ChevalDeFrise;
 
 	defenseManipDesired = defenseManipButton->WasJustPressed();
 	intakePistonDesired = intakePistonButton->WasJustPressed();
@@ -99,6 +105,10 @@ bool ControlBoard::GetArcadeDriveDesired() {
 
 bool ControlBoard::GetQuickTurnDesired() {
 	return quickTurnDesired;
+}
+
+uint32_t ControlBoard::GetDefense() {
+	return defense;
 }
 
 bool ControlBoard::GetDefenseManipDesired() {

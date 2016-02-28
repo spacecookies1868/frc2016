@@ -14,7 +14,9 @@
 #include "Logger.h"
 #include "RobotModel.h"
 #include "RemoteControl.h"
+#include "ControlBoard.h"
 #include "DriveController.h"
+#include "SuperstructureController.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -284,7 +286,34 @@ private:
 
 };
 
+class DefenseCommand : public SimpleAutoCommand {
+public:
+	enum Defenses {
+		LowBar = 0,
+		Portcullis = 1,
+		ChevalDeFrise = 2,
+		Ramparts = 3,
+		Moat = 4,
+		SallyPort = 5,
+		Drawbridge = 6,
+		RockWall = 7,
+		RoughTerrain = 8
+	};
 
+	DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, Defenses myDefense);
+	~DefenseCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+	/*
+	 * Add statics for different PIDs and stuff here
+	 */
+private:
+	RobotModel* robot;
+	SuperstructureController* superstructure;
+	uint32_t defense;
+	bool isDone;
+};
 
 
 #endif /* SRC_DRIVECOMMANDS_H_ */

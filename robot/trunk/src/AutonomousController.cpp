@@ -3,7 +3,8 @@
 #include "Debugging.h"
 #include "Logger.h"
 
-AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure, CameraController* myCamera) {
+AutonomousController::AutonomousController(RobotModel* myRobot, DriveController* myDrive, SuperstructureController* mySuperstructure,
+		CameraController* myCamera,	RemoteControl* myHumanControl) {
 	robot = myRobot;
 	firstCommand = NULL;
 	nextCommand = NULL;
@@ -13,6 +14,7 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	drive = myDrive;
 	superstructure = mySuperstructure;
 	camera = myCamera;
+	humanControl = myHumanControl;
 	timeFinished = 0.0;
 }
 
@@ -55,6 +57,7 @@ void AutonomousController::Update(double currTimeSec, double deltaTimeSec) {
 void AutonomousController::Reset() {
 	firstCommand = NULL;
 	currentCommand = NULL;
+	humanControl->ReadControls();
 	/*
 	robot->SetWheelSpeed(RobotModel::kFrontLeftWheel, 0.0);
 	robot->SetWheelSpeed(RobotModel::kRearLeftWheel, 0.0);
@@ -118,25 +121,25 @@ void AutonomousController::RefreshIni() {
 	DriveStraightCommand::rMaxAbsITerm = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rMaxAbsITerm", 0.0);
 	DriveStraightCommand::rTimeLimit = robot->pini->getf("DRIVESTRAIGHTCOMMAND", "rTimeLimit", 0.0);
 
-//	CurveCommand::radiusPFac = robot->pini->getf("CURVECOMMAND", "radiusPFac", 0.0);
-//	CurveCommand::radiusIFac = robot->pini->getf("CURVECOMMAND", "radiusIFac", 0.0);
-//	CurveCommand::radiusDFac = robot->pini->getf("CURVECOMMAND", "radiusDFac", 0.0);
-//	CurveCommand::radiusDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "radiusDesiredAccuracy", 0.0);
-//	CurveCommand::radiusMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsOutput", 0.0);
-//	CurveCommand::radiusMaxAbsError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsError", 0.0);
-//	CurveCommand::radiusMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsDiffError", 0.0);
-//	CurveCommand::radiusMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsITerm", 0.0);
-//	CurveCommand::radiusTimeLimit = robot->pini->getf("CURVECOMMAND", "radiusTimeLimit", 0.0);
-//
-//	CurveCommand::anglePFac = robot->pini->getf("CURVECOMMAND", "anglePFac", 0.0);
-//	CurveCommand::angleIFac = robot->pini->getf("CURVECOMMAND", "angleIFac", 0.0);
-//	CurveCommand::angleDFac = robot->pini->getf("CURVECOMMAND", "angleDFac", 0.0);
-//	CurveCommand::angleDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "angleDesiredAccuracy", 0.0);
-//	CurveCommand::angleMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "angleMaxAbsOutput", 0.0);
-//	CurveCommand::angleMaxAbsError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsError", 0.0);
-//	CurveCommand::angleMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsDiffError", 0.0);
-//	CurveCommand::angleMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "angleMaxAbsITerm", 0.0);
-//	CurveCommand::angleTimeLimit = robot->pini->getf("CURVECOMMAND","angleTimeLimit", 0.0);
+	CurveCommand::radiusPFac = robot->pini->getf("CURVECOMMAND", "radiusPFac", 0.0);
+	CurveCommand::radiusIFac = robot->pini->getf("CURVECOMMAND", "radiusIFac", 0.0);
+	CurveCommand::radiusDFac = robot->pini->getf("CURVECOMMAND", "radiusDFac", 0.0);
+	CurveCommand::radiusDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "radiusDesiredAccuracy", 0.0);
+	CurveCommand::radiusMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsOutput", 0.0);
+	CurveCommand::radiusMaxAbsError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsError", 0.0);
+	CurveCommand::radiusMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsDiffError", 0.0);
+	CurveCommand::radiusMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "radiusMaxAbsITerm", 0.0);
+	CurveCommand::radiusTimeLimit = robot->pini->getf("CURVECOMMAND", "radiusTimeLimit", 0.0);
+
+	CurveCommand::anglePFac = robot->pini->getf("CURVECOMMAND", "anglePFac", 0.0);
+	CurveCommand::angleIFac = robot->pini->getf("CURVECOMMAND", "angleIFac", 0.0);
+	CurveCommand::angleDFac = robot->pini->getf("CURVECOMMAND", "angleDFac", 0.0);
+	CurveCommand::angleDesiredAccuracy = robot->pini->getf("CURVECOMMAND", "angleDesiredAccuracy", 0.0);
+	CurveCommand::angleMaxAbsOutput = robot->pini->getf("CURVECOMMAND", "angleMaxAbsOutput", 0.0);
+	CurveCommand::angleMaxAbsError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsError", 0.0);
+	CurveCommand::angleMaxAbsDiffError = robot->pini->getf("CURVECOMMAND", "angleMaxAbsDiffError", 0.0);
+	CurveCommand::angleMaxAbsITerm = robot->pini->getf("CURVECOMMAND", "angleMaxAbsITerm", 0.0);
+	CurveCommand::angleTimeLimit = robot->pini->getf("CURVECOMMAND","angleTimeLimit", 0.0);
 
 }
 
@@ -160,21 +163,18 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
-//		CurveCommand* c = new CurveCommand(robot, 0.0, 6.0);
-//		firstCommand = c;
 
-//		WaitingCommand* w = new WaitingCommand(5.0);
-//		firstCommand = w;
-//		PivotCommand* p = new PivotCommand(robot, 90.0);
-//		firstCommand = p;
-//		IntakePositionCommand* i = new IntakePositionCommand(superstructure, true);
-//		firstCommand = i;
-//
-//		WaitingCommand* w2 = new WaitingCommand(5.0);
-//		PivotCommand* p2 = new PivotCommand(robot, 180);
-//		ChainedCommand* c = new ChainedCommand(w2, p2);
-//		firstCommand = c;
+		IntakePositionCommand* down = new IntakePositionCommand(superstructure, true);
+		firstCommand = down;
+		IntakeRollersCommand* forward = new IntakeRollersCommand(superstructure, true, 2.0);
+		down->SetNextCommand(forward);
+		IntakePositionCommand* up = new IntakePositionCommand(superstructure, false);
+		forward->SetNextCommand(up);
+		IntakeRollersCommand* backward = new IntakeRollersCommand(superstructure, false, 2.0);
+		up->SetNextCommand(backward);
 
+//		CurveCommand* c3 = new CurveCommand(robot, 0.0, 6.0);
+//		firstCommand = c3;
 		break;
 	}
 	case (kBlankAuto): {
@@ -200,8 +200,62 @@ void AutonomousController::CreateQueue() {
 		 * Distance from auto line to end of autoworks is
 		 * Added clearance of 3 ft
 		 */
-		DriveStraightCommand* crossDrive = new DriveStraightCommand(robot, 10.0);
-		firstCommand = crossDrive;
+		switch (humanControl->GetDefense()) {
+		case (LowBar): {
+			printf("Autonomous Controller, Low Bar \n");
+			DefenseCommand* lowBarCross = new DefenseCommand(robot, superstructure, DefenseCommand::LowBar);
+			firstCommand = lowBarCross;
+			break;
+		}
+		case (Portcullis): {
+			printf("Autonomous Controller, Portcullis \n");
+			DefenseCommand* portcullisCross = new DefenseCommand(robot, superstructure, DefenseCommand::Portcullis);
+			firstCommand = portcullisCross;
+			break;
+		}
+		case (ChevalDeFrise): {
+			printf("Autonomous Controller, Cheval de Frise \n");
+			DefenseCommand* chevalDeFriseCross = new DefenseCommand(robot, superstructure, DefenseCommand::ChevalDeFrise);
+			firstCommand = chevalDeFriseCross;
+			break;
+		}
+		case (Ramparts): {
+			printf("Autonomous Controller, Ramparts \n");
+			DefenseCommand* rampartsCross = new DefenseCommand(robot, superstructure, DefenseCommand::Ramparts);
+			firstCommand = rampartsCross;
+			break;
+		}
+		case (Moat): {
+			printf("Autonomous Controller, Moat \n");
+			DefenseCommand* moatCross = new DefenseCommand(robot, superstructure, DefenseCommand::Moat);
+			firstCommand = moatCross;
+			break;
+		}
+		case (SallyPort): {
+			printf("Autonomous Controller, Sally Port \n");
+			DefenseCommand* sallyPortCross = new DefenseCommand(robot, superstructure, DefenseCommand::SallyPort);
+			firstCommand = sallyPortCross;
+			break;
+		}
+		case (Drawbridge): {
+			printf("Autonomous Controller, Drawbridge \n");
+			DefenseCommand* drawbridgeCross = new DefenseCommand(robot, superstructure, DefenseCommand::Drawbridge);
+			firstCommand = drawbridgeCross;
+			break;
+		}
+		case (RockWall): {
+			printf("Autonomous Controller, Rock Wall \n");
+			DefenseCommand* rockWallCross = new DefenseCommand(robot, superstructure, DefenseCommand::RockWall);
+			firstCommand = rockWallCross;
+			break;
+		}
+		case (RoughTerrain): {
+			printf("Autonomous Controller, Rough Terrain \n");
+			DefenseCommand* roughTerrainCross = new DefenseCommand(robot, superstructure, DefenseCommand::RoughTerrain);
+			firstCommand = roughTerrainCross;
+			break;
+		}
+		}
 		break;
 	}
 	case (kShootAuto): {

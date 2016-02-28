@@ -16,6 +16,7 @@ public:
 	virtual bool GetLowGearDesired() = 0;
 	virtual bool GetArcadeDriveDesired() = 0;
 	virtual bool GetQuickTurnDesired() = 0;
+	virtual uint32_t GetDefense() = 0;
 
 	//Superstructure controller button accessors
 	virtual bool GetDefenseManipDesired() = 0;

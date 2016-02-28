@@ -405,11 +405,17 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 			rightOutput = rightOutput / maxOutput;
 		}
 		LOG(robot, "Radius", radius);
+		LOG(robot, "Desired Radius", desiredRadius)
 		LOG(robot, "New Desired Angle", newDesiredAngle);
+		LOG(robot, "Radius Output", radiusOutput);
+		LOG(robot, "Angle Output", angleOutput);
 		LOG(robot, "Left Output", leftOutput);
 		LOG(robot, "Right Output", rightOutput);
 		printf("radius %f\n", radius);
+		printf("desired radius %f\n", desiredRadius);
 		printf("new Desired Angle %f\n", newDesiredAngle);
+		printf("Radius Output %f\n", radiusOutput);
+		printf("Angle Output %f\n", angleOutput);
 		printf("Left Output %f\n", leftOutput);
 		printf("Right Output %f\n",rightOutput);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, leftOutput);
@@ -544,6 +550,108 @@ double CurveCommand::CalculateY() {
 	return currY;
 }
 
+DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, Defenses myDefense) {
+	robot = myRobot;
+	superstructure = mySuperstructure;
+	defense = myDefense;
+	isDone = false;
+}
+
+void DefenseCommand::Init() {
+	switch (defense) {
+	case (LowBar): {
+		printf("Low Bar Init \n");
+		break;
+	}
+	case (Portcullis): {
+		printf("Portcullis Init \n");
+		break;
+	}
+	case (ChevalDeFrise): {
+		printf("Cheval de Frise Init \n");
+		break;
+	}
+	case (Ramparts): {
+		printf("Ramparts Init \n");
+		break;
+	}
+	case (Moat): {
+		printf("Moat Init \n");
+		break;
+	}
+	case (SallyPort): {
+		printf("Sally Port Init \n");
+		break;
+	}
+	case (Drawbridge): {
+		printf("Drawbridge Init \n");
+		break;
+	}
+	case (RockWall): {
+		printf("Rock Wall Init \n");
+		break;
+	}
+	case (RoughTerrain): {
+		printf("Rough Terrain Init \n");
+		break;
+	}
+	}
+}
+
+void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
+	switch (defense) {
+	case (LowBar): {
+		printf("Low Bar Update \n");
+		isDone = true;
+		break;
+	}
+	case (Portcullis): {
+		printf("Portcullis Update \n");
+		isDone = true;
+		break;
+	}
+	case (ChevalDeFrise): {
+		printf("Cheval de Frise Update \n");
+		isDone = true;
+		break;
+	}
+	case (Ramparts): {
+		printf("Ramparts Update \n");
+		isDone = true;
+		break;
+	}
+	case (Moat): {
+		printf("Moat Update \n");
+		isDone = true;
+		break;
+	}
+	case (SallyPort): {
+		printf("Sally Port Update \n");
+		isDone = true;
+		break;
+	}
+	case (Drawbridge): {
+		printf("Drawbridge Update \n");
+		isDone = true;
+		break;
+	}
+	case (RockWall): {
+		printf("Rock Wall Update \n");
+		isDone = true;
+		break;
+	}
+	case (RoughTerrain): {
+		printf("Rough Terrain Update \n");
+		isDone = true;
+		break;
+	}
+	}
+
+}
+
+bool DefenseCommand::IsDone() {
+	return isDone;
+}
 
 
 
