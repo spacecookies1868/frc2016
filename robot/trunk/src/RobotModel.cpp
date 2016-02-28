@@ -25,6 +25,8 @@ RobotModel::RobotModel() {
 
 	isLowGear = false;
 
+	servo = new Servo(9);
+
 	gearShiftSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, GEAR_SHIFT_SOLENOID_PORT);
 	intakeArmSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_A_PORT);
 	intakeArmSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_B_PORT);
@@ -36,6 +38,14 @@ RobotModel::RobotModel() {
 
 	pressureSensor = new AnalogInput(PRESSURE_SENSOR_PORT);
 	pressureSensor->SetAverageBits(2);
+
+	leftDriveACurrent = 0;
+	leftDriveBCurrent = 0;
+	rightDriveACurrent = 0;
+	rightDriveBCurrent = 0;
+	roboRIOCurrent = 0;
+	compressorCurrent = 0;
+	intakeCurrent = 0;
 
 //	// 8 inch wheels (2/3 ft), 256 tics per rotation
 	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
@@ -152,8 +162,64 @@ void RobotModel::ShiftToLowGear() {
 	isLowGear = true;
 }
 
+void RobotModel::UpdateCurrent() {
+	leftDriveACurrent = pdp->GetCurrent(LEFT_DRIVE_MOTOR_A_PDP_CHAN);
+	leftDriveBCurrent = pdp->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN);
+	rightDriveACurrent = pdp->GetCurrent(RIGHT_DRIVE_MOTOR_A_PDP_CHAN);
+	rightDriveBCurrent = pdp->GetCurrent(RIGHT_DRIVE_MOTOR_B_PDP_CHAN);
+	intakeCurrent = pdp->GetCurrent(RIGHT_DRIVE_MOTOR_B_PDP_CHAN);
+	compressorCurrent = compressor->GetCompressorCurrent();
+	roboRIOCurrent = ControllerPower::GetInputCurrent();
+}
+
 double RobotModel::GetVoltage() {
 	return pdp->GetVoltage();
+}
+
+double RobotModel::GetTotalCurrent() {
+	return pdp->GetTotalCurrent();
+}
+
+double RobotModel::GetTotalEnergy() {
+	return pdp->GetTotalEnergy();
+}
+
+double RobotModel::GetTotalPower() {
+	return pdp->GetTotalPower();
+}
+
+/**
+ * @param channel PDP channels from 0 to 15
+ * check robotports for channels
+ */
+double RobotModel::GetCurrent(int channel) {
+	switch(channel) {
+	case RIGHT_DRIVE_MOTOR_A_PDP_CHAN:
+		return rightDriveACurrent;
+		break;
+	case RIGHT_DRIVE_MOTOR_B_PDP_CHAN:
+		return rightDriveBCurrent;
+		break;
+	case LEFT_DRIVE_MOTOR_A_PDP_CHAN:
+		return leftDriveACurrent;
+		break;
+	case LEFT_DRIVE_MOTOR_B_PDP_CHAN:
+		return leftDriveBCurrent;
+		break;
+	case INTAKE_MOTOR_PDP_CHAN:
+		return intakeCurrent;
+		break;
+	default:
+		return -1;
+	}
+}
+
+double RobotModel::GetCompressorCurrent() {
+	return compressorCurrent;
+}
+
+double RobotModel::GetRIOCurrent() {
+	return roboRIOCurrent;
 }
 
 void RobotModel::ResetTimer() {

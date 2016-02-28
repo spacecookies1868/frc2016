@@ -3,6 +3,7 @@
  *
  *  Created on: Jan 21, 2016
  *      Author: chloe
+ *      todo: flush datalog in teleopinit, auto init, disabled init
  */
 
 #include "Logger.h"
@@ -14,14 +15,17 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 	if (!logData.is_open()) {
 		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
 		logData << "Time, Left Encoder, Right Encoder, Left Wheel Speed,"
-				<< "Right Wheel Speed, Yaw, Roll, Pitch, Voltage, Pressure, "
+				<< "Right Wheel Speed, Yaw, Roll, Pitch, Voltage, Total Current, "
+				<< "Left Drive A Current, Left Drive B Current, Right Drive A Current, "
+				<< "Right Drive B Current, Compressor Current, RoboRIO Current, "
+				<< "Total Power, Total Energy, Pressure, "
 				<< "Outtake Encoder, Outtake Motor Speed, Intake Motor Speed, "
 				<< "Intake Down, Defense Down, Low Gear, Left Joy X, Left Joy Y, "
 				<< "Right Joy X, Right Joy Y, Reverse, Arcade, Defense Desired, "
 				<< "Intake Reverse Desired, Intake Forward Desired, Intake Piston Desired, "
 				<< "Low Gear Desired, Outtake Desired, Quick Turn Desired \r\n";
 	}
-	logData << myRobot->GetTime() <<", " <<
+	logData << myRobot->GetTime() << ", " <<
 			myRobot->GetLeftEncoderVal() << ", " <<
 			myRobot->GetRightEncoderVal() << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
@@ -30,6 +34,15 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myRobot->GetNavXRoll() << ", " <<
 			myRobot->GetNavXPitch() << ", " <<
 			myRobot->GetVoltage() << ", " <<
+			myRobot->GetTotalCurrent() << ", " <<
+			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_A_PWM_PORT) << ", " <<
+			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_B_PWM_PORT) << ", " <<
+			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_A_PWM_PORT) << ", " <<
+			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_B_PWM_PORT) << ", " <<
+			myRobot->GetCompressorCurrent() << ", " <<
+			myRobot->GetRIOCurrent() << ", " <<
+			myRobot->GetTotalPower() << ", " <<
+			myRobot->GetTotalEnergy() << ", " <<
 			myRobot->GetPressureSensorVal() << ", " <<
 			myRobot->GetOuttakeEncoderVal() << ", " <<
 			myRobot->GetOuttakeMotorSpeed() << ", " <<

@@ -102,13 +102,13 @@ private:
 		deltaTimeSec = currTimeSec - lastTimeSec;
 
 		humanControl->ReadControls();
+		robot->UpdateCurrent();
 		driveController->Update(currTimeSec, deltaTimeSec);
 		//LOG(robot, "Updating driveController", 0.0);
 		superstructureController->Update(currTimeSec, deltaTimeSec);
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
-		//printf("Navx val: %f\n", robot->GetNavXYaw());
 
 		Logger::LogState(robot, humanControl);
 
@@ -119,9 +119,6 @@ private:
 	}
 
 	void TestPeriodic() {
-		printf("yaw: %f\n", robot->GetNavXYaw());
-		printf("roll: %f\n", robot->GetNavXRoll());
-		printf("pitch: %f\n", robot->GetNavXPitch());
 	}
 
 	void DisabledInit() {

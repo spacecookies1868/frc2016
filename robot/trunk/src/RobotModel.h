@@ -11,6 +11,8 @@
 #include "TableReader.h"
 #include "nivision.h"
 
+// todo cache current and voltage methods so theyre called only once per loop
+
 class RobotModel {
 public:
 	enum Wheels {kLeftWheels, kRightWheels, kAllWheels};
@@ -20,6 +22,7 @@ public:
 
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetWheelSpeed(Wheels w);
+	double GetMotorSpeed();
 
 	double GetNavXYaw();
 	double GetNavXRoll();
@@ -28,7 +31,15 @@ public:
 
 	void Reset();
 
+	void UpdateCurrent();
+
 	double GetVoltage();
+	double GetCurrent(int channel);
+	double GetCompressorCurrent();
+	double GetRIOCurrent();
+	double GetTotalEnergy();
+	double GetTotalCurrent();
+	double GetTotalPower();
 
 	double GetLeftEncoderVal();
 	double GetRightEncoderVal();
@@ -68,12 +79,15 @@ public:
 	Image* GetCameraImage();
 
 	Ini* pini;
+	Servo* servo;
 	TableReader* gripLines;
 private:
 	bool isLowGear;
 	Compressor *compressor;
 
 	PowerDistributionPanel* pdp;
+	double leftDriveACurrent, leftDriveBCurrent, rightDriveACurrent, rightDriveBCurrent,
+		roboRIOCurrent, compressorCurrent, intakeCurrent;
 
 	Timer *timer;
 
@@ -86,6 +100,7 @@ private:
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
 	AnalogInput *pressureSensor;
+
 #if USE_CAMERA
 	AxisCamera *camera;
 	Image *frame;
