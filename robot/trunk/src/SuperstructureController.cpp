@@ -161,13 +161,10 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 }
 
 void SuperstructureController::RefreshIni() {
-	//TODO Figure out actual values to go in the ini file
-	deltaTimePTO = 1.0;
-	deltaEncoderValOT = 10.0;
-
-	intakeSpeed = 0.4;
-	outtakeSpeed = 0.4;
-
+	intakeSpeed = robot->pini->getf("SUPERSTRUCTURE", "intakeSpeed", 0.4);
+	outtakeSpeed = robot->pini->getf("SUPERSTRUCTURE", "outtakeSpeed", 0.4);
+	deltaTimePTO = robot->pini->getf("SUPERSTRUCTURE", "deltaTimePTO", 1.0);
+	deltaEncoderValOT = robot->pini->getf("SUPERSTRUCTURE", "intakeSpeed", 0.0);
 }
 
 void SuperstructureController::SetAutoDefenseManipUp(bool desired) {
