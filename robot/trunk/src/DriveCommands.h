@@ -256,6 +256,7 @@ private:
 	double CalculateX();
 	double CalculateY();
 	double GetAccumulatedYaw();
+	double GetSign(double n);
 	RobotModel* robot;
 	PIDConfig* radiusPIDConfig;
 	PIDConfig* anglePIDConfig;
@@ -271,6 +272,8 @@ private:
 	double lastY;
 	double lastLeft;
 	double lastRight;
+	double currLeft;
+	double currRight;
 	double lastAccumulatedYaw;
 	double initialYaw;
 
@@ -278,6 +281,7 @@ private:
 	double initialRadius;
 	double desiredAngle;
 	double initialAngle;
+	double angle;
 
 	double lastYaw;
 	double currYaw;

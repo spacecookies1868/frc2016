@@ -164,17 +164,8 @@ void AutonomousController::CreateQueue() {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
 
-		IntakePositionCommand* down = new IntakePositionCommand(superstructure, true);
-		firstCommand = down;
-		IntakeRollersCommand* forward = new IntakeRollersCommand(superstructure, true, 2.0);
-		down->SetNextCommand(forward);
-		IntakePositionCommand* up = new IntakePositionCommand(superstructure, false);
-		forward->SetNextCommand(up);
-		IntakeRollersCommand* backward = new IntakeRollersCommand(superstructure, false, 2.0);
-		up->SetNextCommand(backward);
-
-//		CurveCommand* c3 = new CurveCommand(robot, 0.0, 6.0);
-//		firstCommand = c3;
+		CurveCommand* c3 = new CurveCommand(robot, 1.0, 6.0);
+		firstCommand = c3;
 		break;
 	}
 	case (kBlankAuto): {

@@ -367,33 +367,34 @@ void CurveCommand::Init() {
 	radiusPIDConfig = CreateRadiusPIDConfig();
 	anglePIDConfig = CreateAnglePIDConfig();
 	initialYaw = GetAccumulatedYaw();
-	initialX = CalculateX();
-	initialY = CalculateY();
 	initialRadius = 0.0;
-	desiredRadius = sqrt(desiredX*desiredX + desiredY*desiredY);
+	desiredRadius = GetSign(desiredY) * sqrt(desiredX*desiredX + desiredY*desiredY);
 	radiusPID = new PIDControlLoop(radiusPIDConfig);
 	radiusPID->Init(initialRadius, desiredRadius);
-	initialAngle = 0.0;
 	desiredAngle = atan(desiredX/desiredY) * 360.0 / (2 * PI);
 	anglePID = new PIDControlLoop(anglePIDConfig);
-	anglePID->Init(initialAngle, initialAngle + desiredAngle);
+	anglePID->Init(initialYaw, initialYaw + desiredAngle);
 }
 
 void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
+	currLeft = robot->GetLeftEncoderVal();
+	currRight = robot->GetRightEncoderVal();
+
+	angle = GetAccumulatedYaw();
 	double x = CalculateX();
 	double y = CalculateY();
 
-	double radius = sqrt((x - initialX)*(x - initialX) + (y - initialY) * (y - initialY));
+	double radius = GetSign(y) * sqrt((x - initialX)*(x - initialX) + (y - initialY) * (y - initialY));
 	bool radiusPIDDone = radiusPID->ControlLoopDone(radius, deltaTimeSec);
-	double angle = GetAccumulatedYaw();
-	bool anglePIDDone = anglePID->ControlLoopDone(angle, deltaTimeSec);
+
+	bool anglePIDDone = anglePID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
 
 	if (radiusPIDDone && anglePIDDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 	} else {
 		double radiusOutput = radiusPID->Update(radius);
-		double newDesiredAngle = atan((desiredX - x)/(desiredY - y) * 360.0 / (2*PI));
+		double newDesiredAngle = atan((desiredX - x)/(desiredY - y)) * 360.0 / (2*PI);
 		double angleOutput = anglePID->Update(angle, angle + newDesiredAngle);
 
 		double leftOutput = radiusOutput + angleOutput;
@@ -404,6 +405,8 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 			leftOutput = leftOutput / maxOutput;
 			rightOutput = rightOutput / maxOutput;
 		}
+		LOG(robot, "Curr X", x);
+		LOG(robot, "Curr Y", y);
 		LOG(robot, "Radius", radius);
 		LOG(robot, "Desired Radius", desiredRadius)
 		LOG(robot, "New Desired Angle", newDesiredAngle);
@@ -411,6 +414,8 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 		LOG(robot, "Angle Output", angleOutput);
 		LOG(robot, "Left Output", leftOutput);
 		LOG(robot, "Right Output", rightOutput);
+		printf("Current X %f\n", x);
+		printf("Current Y %f\n", y);
 		printf("radius %f\n", radius);
 		printf("desired radius %f\n", desiredRadius);
 		printf("new Desired Angle %f\n", newDesiredAngle);
@@ -421,6 +426,10 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, leftOutput);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, rightOutput);
 	}
+	lastAccumulatedYaw = angle;
+	lastLeft = currLeft;
+	lastRight = currRight;
+
 }
 
 bool CurveCommand::IsDone() {
@@ -493,28 +502,24 @@ double CurveCommand::GetAccumulatedYaw() {
 double CurveCommand::CalculateX() {
 	LOG(robot, "CALCULATING X -------", 0.0);
 	printf("CALCULATING X ---------------------- \n");
-	double currLeft = robot->GetLeftEncoderVal();
-	double currRight = robot->GetRightEncoderVal();
 	LOG(robot, "CurrLeft", currLeft);
 	LOG(robot, "CurrRight", currRight);
 	printf("CurrLeft %f\n", currLeft);
 	printf("CurrRight %f\n", currRight);
+	LOG(robot, "LastLeft", lastLeft);
+	LOG(robot, "LastRight", lastRight);
 	double deltaLeft = currLeft - lastLeft;
 	double deltaRight = currRight - lastRight;
 	double deltaS = (deltaLeft + deltaRight)/2.0;
 	LOG(robot, "DeltaS", deltaS);
 	printf("Delta S %f\n", deltaS);
-	double currAcYaw = GetAccumulatedYaw();
-	double deltaYaw = currAcYaw - lastAccumulatedYaw;
-	LOG(robot, "accumulateYaw", currAcYaw);
-	LOG(robot, "deltaYaw", deltaYaw);
-	printf("accumulateYaw %f\n", currAcYaw);
-	printf("deltaYaw %f\n", deltaYaw);
-	double currX = lastX + deltaS * cos(((lastAccumulatedYaw - initialYaw) + deltaYaw/2)*2*PI/360.0);
+
+
+	LOG(robot, "accumulateYaw", angle);
+	printf("accumulateYaw %f\n", angle);
+	LOG(robot, "Angle - initial", angle-initialYaw);
+	double currX = lastX + deltaS * sin(((angle - initialYaw))*2*PI/360.0);
 	lastX = currX;
-	lastLeft = currLeft;
-	lastRight = currRight;
-	lastAccumulatedYaw = currAcYaw;
 	LOG(robot, "CurrentX", currX);
 	printf("Current X %f\n", currX);
 	return currX;
@@ -523,31 +528,38 @@ double CurveCommand::CalculateX() {
 double CurveCommand::CalculateY() {
 	LOG(robot, "CALCULATING Y-------", 0.0);
 	printf("CALCULATING Y----------------------\n");
-	double currLeft = robot->GetLeftEncoderVal();
-	double currRight = robot->GetRightEncoderVal();
 	LOG(robot, "currLeft", currLeft);
 	LOG(robot, "currRight", currRight);
 	printf("CurrLeft %f\n", currLeft);
 	printf("CurrRight %f\n", currRight);
+	LOG(robot, "LastLeft", lastLeft);
+	LOG(robot, "LastRight", lastRight);
+
 	double deltaLeft = currLeft - lastLeft;
 	double deltaRight = currRight - lastRight;
 	double deltaS = (deltaLeft + deltaRight)/2.0;
 	LOG(robot, "deltaS", deltaS);
 	printf("delta S %f\n", deltaS);
-	double currAcYaw = GetAccumulatedYaw();
-	double deltaYaw = currAcYaw - lastAccumulatedYaw;
-	LOG(robot, "currentYaw", currAcYaw);
-	LOG(robot, "deltaYaw", deltaYaw);
-	printf("Current Yaw %f\n", currAcYaw);
+
+
+	LOG(robot, "currentYaw", angle);
+	LOG(robot, "Angle - initial", angle - initialYaw);
+	printf("Current Yaw %f\n", angle);
 	printf("Delta Yaw %f\n", deltaYaw);
-	double currY = lastX + deltaS * sin(((lastAccumulatedYaw - initialYaw) + deltaYaw/2)*2*PI/360.0);
-	lastX = currY;
-	lastLeft = currLeft;
-	lastRight = currRight;
-	lastAccumulatedYaw = currAcYaw;
+	double currY = lastY + deltaS * cos(((angle - initialYaw))*2*PI/360.0);
+	lastY = currY;
+	lastAccumulatedYaw = angle;
 	LOG(robot, "CurrentY", currY);
 	printf("Current Y %f\n", currY);
 	return currY;
+}
+
+double CurveCommand::GetSign(double n) {
+	if (n >= 0) {
+		return 1.0;
+	} else {
+		return -1.0;
+	}
 }
 
 DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, Defenses myDefense) {
