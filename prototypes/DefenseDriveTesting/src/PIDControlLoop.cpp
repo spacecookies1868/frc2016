@@ -38,7 +38,7 @@ void PIDControlLoop::Init(PIDConfig* myConfig, double myInitialSensorValue,
 
 // Returns the actuator value (motor speed, etc.)
 double PIDControlLoop::Update(double currentSensorValue) {
-//	DO_PERIODIC(10, printf("Current Sensor Value: %f\n", currentSensorValue));
+	//printf("Current Sensor Value: %f\n", currentSensorValue);
 	double error = desiredSensorValue - currentSensorValue;
 	error = Saturate(error, pidConfig->maxAbsError);
 	double diffError = 0.0;
@@ -50,13 +50,13 @@ double PIDControlLoop::Update(double currentSensorValue) {
 	if (pidConfig->iFac > 0.0) {
 		sumError = Saturate(sumError, (pidConfig->maxAbsITerm / pidConfig->iFac));
 	}
-//	DO_PERIODIC(10, printf("Error: %f, DiffError: %f, SumErrorL %f\n", error, diffError, sumError));
+	//printf("Error: %f, DiffError: %f, SumErrorL %f\n", error, diffError, sumError);
 	double pTerm = pidConfig->pFac * error;
 	double iTerm = pidConfig->iFac * sumError;
 	double dTerm = pidConfig->dFac * diffError;
 	double output = pTerm + iTerm + dTerm; //  PID
 	output = Saturate(output, pidConfig->maxAbsOutput);
-//	DO_PERIODIC(10, printf("PTerm: %f, ITerm: %f, DTerm: %f, Output: %f\n", pTerm, iTerm, dTerm, output));
+	//printf("PTerm: %f, ITerm: %f, DTerm: %f, Output: %f\n", pTerm, iTerm, dTerm, output);
 	oldError = error;
 	return output;
 }
@@ -74,16 +74,14 @@ double PIDControlLoop::Update(double currValue, double desiredValue) {
 		sumError = Saturate(sumError,
 				(pidConfig->maxAbsITerm / pidConfig->iFac));
 	}
-	//printf("Error: %f, DiffError: %f, SumErrorL %f\n", error, diffError,
-		//			sumError);
+	//printf("Error: %f, DiffError: %f, SumErrorL %f\n", error, diffError, sumError);
 	//printf("Pfac: %f, IFac: %f, DFac: %f\n", pidConfig->pFac, pidConfig->iFac, pidConfig->dFac);
 	double pTerm = pidConfig->pFac * error;
 	double iTerm = pidConfig->iFac * sumError;
 	double dTerm = pidConfig->dFac * diffError;
 	double output = pTerm + iTerm + dTerm; //  PID
 	output = Saturate(output, pidConfig->maxAbsOutput);
-	//printf("PTerm: %f, ITerm: %f, DTerm: %f, Output: %f\n", pTerm,
-		//			iTerm, dTerm, output);
+	//printf("PTerm: %f, ITerm: %f, DTerm: %f, Output: %f\n", pTerm, iTerm, dTerm, output);
 	if (Abs(output) < pidConfig->minAbsError) {
 		output = 0.0;
 	}

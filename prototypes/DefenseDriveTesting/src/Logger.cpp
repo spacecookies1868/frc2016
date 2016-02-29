@@ -23,6 +23,7 @@ void Logger::LogState(RobotModel* myRobot, DefenseDrive* myDefenseDrive) {
 			myRobot->GetYaw() << ", " <<
 			myRobot->GetRoll() << ", " <<
 			myRobot->GetPitch() << "\r\n";
+	logData.flush();
 }
 /* format:
  * robotmodel state / controlboard state

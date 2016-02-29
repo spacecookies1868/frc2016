@@ -1,7 +1,8 @@
 #ifndef SRC_DEFENSEDRIVE_H_
 #define SRC_DEFENSEDRIVE_H_
 
-#include <RobotModel.h>
+#include "RobotModel.h"
+#include "PivotToAngleCommand.h"
 
 class DefenseDrive {
 public:
@@ -15,13 +16,14 @@ public:
 private:
 	RobotModel* robot;
 	enum defenseDriveStates {
-		kInit, kBeforeUpRamp, kUpRamp, kMiddleRamp, kDownRamp, kDone
+		kInit, kBeforeUpRamp, kUpRamp, kMiddleRamp, kDownRamp, kWait, kStraighten, kDone
 	};
 	uint32_t currState;
 	uint32_t nextState;
-	double currRoll, lastRoll, deltaRoll, startRoll, diffRoll;
-	double isFlatThreshold, onRampThreshold, slopeOfRamp, speed;
-	double startTime;
+	double currRoll, lastRoll, startRoll, diffRoll;
+	double isFlatThreshold, onRampThreshold, speed;
+	PivotToAngleCommand* pivotToAngleCommand;
+	double startTime, startWaitTime;
 };
 
 #endif

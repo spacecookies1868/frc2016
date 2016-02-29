@@ -12,15 +12,15 @@ RobotModel::RobotModel() {
 	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
 	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
 
-//	leftA = new Talon(1);
-//	leftB = new Talon(0);
-//	rightA = new Talon(2);
-//	rightB = new Talon(5);
-
-	leftA = new Talon(7);
-	leftB = new Talon(8);
+	leftA = new Talon(1);
+	leftB = new Talon(0);
 	rightA = new Talon(2);
-	rightB = new Talon(1);
+	rightB = new Talon(5);
+
+//	leftA = new Talon(7);
+//	leftB = new Talon(8);
+//	rightA = new Talon(2);
+//	rightB = new Talon(1);
 
 	timer = new Timer();
 	timer->Start();
