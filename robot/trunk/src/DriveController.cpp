@@ -6,6 +6,8 @@
 #include "Debugging.h"
 #include "Logger.h"
 
+#define PI 3.14159
+
 DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanControl){
 	robot = myRobot;
 	humanControl = myHumanControl;
@@ -39,7 +41,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		if(humanControl->GetQuickTurnDesired()) {
 			QuickTurn(rightJoyX);
 		} else if(humanControl->GetArcadeDriveDesired()) {
-			ArcadeDrive(rightJoyX, DriveDirection() * leftJoyY);
+			ArcadeDrive(rightJoyX, leftJoyY);
 		} else {
 			TankDrive(leftJoyY, rightJoyY);
 		}
@@ -61,16 +63,12 @@ void DriveController::QuickTurn(double myRight) {
 }
 
 void DriveController::ArcadeDrive(double myX, double myY) {
-
-	float moveValue = myY;
+	float moveValue = myY * DriveDirection();
 	float rotateValue = myX;
+
 	if (fabs(moveValue) < 0.1) {
 		rotateValue = 0.0;
 	}
-	if (moveValue < 0.0) {
-		rotateValue =-rotateValue;
-	}
-
 
 	float leftMotorOutput = moveValue;
 	float rightMotorOutput = moveValue;
@@ -92,6 +90,9 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 		rightMotorOutput = -1.0;
 	}
 
+	leftMotorOutput = sin(leftMotorOutput * PI / 2);
+	rightMotorOutput = sin(rightMotorOutput * PI / 2);
+
 	LOG(robot, "MoveValue", moveValue);
 	LOG(robot, "RotateValue", rotateValue);
 	LOG(robot, "Left Motor Output", leftMotorOutput);
@@ -102,8 +103,10 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 }
 
 void DriveController::TankDrive(double myLeft, double myRight) {
-	robot->SetWheelSpeed(RobotModel::kLeftWheels, myLeft);
-	robot->SetWheelSpeed(RobotModel::kRightWheels, myRight);
+	double leftMotorOutput = sin(myLeft * PI / 2) * DriveDirection();
+	double rightMotorOutput = sin(myRight * PI / 2) * DriveDirection();
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
 }
 
 int DriveController::DriveDirection(){
