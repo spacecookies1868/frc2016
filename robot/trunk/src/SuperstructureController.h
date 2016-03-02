@@ -31,8 +31,6 @@ public:
 		kInit, kIdle, kPrepToOuttake, kOuttake
 	};
 
-	bool autoIntakeUp;
-
 private:
 	RobotModel* robot;
 	RemoteControl* humanControl;
@@ -53,6 +51,7 @@ private:
 	//auto booleans
 	bool autoDefenseManipUp;
 	bool autoDefenseManipDown;
+	bool autoIntakeUp;
 	bool autoIntakeDown;
 	bool autoIntakeMotorForward;
 	bool autoIntakeMotorBackward;

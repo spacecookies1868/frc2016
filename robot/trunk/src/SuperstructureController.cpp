@@ -115,10 +115,14 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			autoOuttake = false;
 		}
 
+		//Allows for manual control of the outtake motors
 		if (humanControl->GetManualOuttakeForwardDesired() || autoManualOuttakeForward) {
 			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			//robot->MoveDefenseManipDown();
 		} else if (humanControl->GetManualOuttakeReverseDesired() || autoManualOuttakeReverse) {
 			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
+		} else {
+			robot->SetOuttakeMotorSpeed(0.0);
 		}
 
 		break;
