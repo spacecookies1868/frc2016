@@ -17,6 +17,10 @@ public:
 	double GetCenterBoulderDistance();
 	double GetDistanceInches();
 	void CalculateDesiredDeltaAngle();
+	void CalculateBoulderRadius();
+	void CalculateAverageStartBoulderAngle();
+	void CalculateMedianStartBoulderAngle();
+	double *BubbleSort(double array[5]);
 	bool IsDone();
 
 	virtual ~SensingBoulders();
@@ -25,9 +29,8 @@ private:
 		kSensingBoulder, kInitPivot, kPivot, kDone
 	};
 
-
-	UltrasonicSensor* ultrasonicSensor;
 	AutoPivot* autoPivotCommand;
+	UltrasonicSensor* ultrasonicSensor;
 
 	uint32_t currState;
 	uint32_t nextState;
@@ -35,9 +38,16 @@ private:
 	double xDistanceToCenterRobot; //the distance from the ultrasonic sensor to the front of the center of the robot
 	double yDistanceToCenterRobot; // distance from the ultrasonic sensor to the side of the center of the robot
 	double angleThreshold; 		   // in case the boulder happens to be in front of the robot already
-	double startServoAngle, endServoAngle, deltaServoAngle;
+	double boulderRadius;		   // the radius of the boulder
+	double boulderRadiusThreshold;
 	double thresholdDistance;
+
+	int numberOfScans;
+	double calculatedRadius;
+	double startServoAngle, endServoAngle, deltaServoAngle;
 	double startBoulderAngle, endBoulderAngle, centerBoulderAngle;
+	double startBoulderAngles[5];
+	double startBoulderDistances[5];
 	double centerToBoulder;
 	double startBoulderDistance, endBoulderDistance, centerBoulderDistance;
 	double currAngle, currDistance;

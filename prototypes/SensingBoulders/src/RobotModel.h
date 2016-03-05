@@ -15,6 +15,7 @@ public:
 	void InitServo(double angle);
 	void SetServo(double startAngle, double endAngle, double deltaAngle);
 	double GetServoAngle();
+	bool GetServoDirection();
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetYaw();
 	float GetRoll();
@@ -25,10 +26,11 @@ public:
 private:
 //	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB;
 	Servo* servo;
-	double servoAngle;
-	bool servoDirection;
 	AHRS *navx;
 	Talon *leftA, *leftB, *rightA, *rightB;
+
+	double servoAngle;
+	bool servoDirection;
 
 };
 

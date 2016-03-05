@@ -3,6 +3,7 @@
 
 RobotModel::RobotModel() {
 	servo = new Servo(6);
+
 	servoAngle = servo->GetAngle();
 	servoDirection = true;
 
@@ -46,6 +47,10 @@ void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle)
 double RobotModel::GetServoAngle() {
 	servoAngle = servo->GetAngle();
 	return servoAngle;
+}
+
+bool RobotModel::GetServoDirection() {
+	return servoDirection;
 }
 
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {

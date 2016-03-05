@@ -1,10 +1,3 @@
-/*
-w * UltrasonicSensor.h
- *
- *  Created on: Feb 13, 2016
- *      Author: Space Cookies
- */
-
 #ifndef SRC_ULTRASONICSENSOR_H_
 #define SRC_ULTRASONICSENSOR_H_
 
