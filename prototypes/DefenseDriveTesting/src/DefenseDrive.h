@@ -3,6 +3,7 @@
 
 #include "RobotModel.h"
 #include "PivotToAngleCommand.h"
+#include "DriveStraightCommand.h"
 
 class DefenseDrive {
 public:
@@ -21,9 +22,10 @@ private:
 	uint32_t currState;
 	uint32_t nextState;
 	double currRoll, lastRoll, startRoll, diffRoll;
-	double isFlatThreshold, onRampThreshold, speed;
+	double isFlatThreshold, onRampThreshold, endThreshold, speed;
 	PivotToAngleCommand* pivotToAngleCommand;
 	double startTime, startWaitTime;
+	DriveStraightCommand* driveStraightCommand;
 };
 
 #endif

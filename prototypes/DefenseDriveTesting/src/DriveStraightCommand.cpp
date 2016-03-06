@@ -11,12 +11,11 @@ DriveStraightCommand::DriveStraightCommand(RobotModel* myRobot, double myDriveSt
 }
 
 void DriveStraightCommand::Init() {
-	robot->ZeroYaw();	// don't know if necessary
 	initialR = GetAccumulatedYaw();
-	desiredR = 0.0;
+	desiredR = initialR;
 	rPIDConfig = CreateRPIDConfig();
 	rPID = new PIDControlLoop(rPIDConfig);
-	rPID->Init(initialR, initialR + desiredR);
+	rPID->Init(initialR, desiredR);
 	isDone = false;
 }
 
@@ -25,7 +24,7 @@ PIDConfig* DriveStraightCommand::CreateRPIDConfig() {
 	rPIDConfig->pFac = 0.02;
 	rPIDConfig->iFac = 0.0;
 	rPIDConfig->dFac = 0.1;
-	rPIDConfig->maxAbsOutput = 0.3;
+	rPIDConfig->maxAbsOutput = 0.65;
 	rPIDConfig->maxAbsError = 0.0;
 	rPIDConfig->maxAbsDiffError = 0.0;
 	rPIDConfig->desiredAccuracy = 0.0;
@@ -35,8 +34,8 @@ PIDConfig* DriveStraightCommand::CreateRPIDConfig() {
 	return rPIDConfig;
 }
 
-void DriveStraightCommand::Update(double currTimeSec, double lastTimeSec) {
-	double rPIDOutput = rPID->Update(GetAccumulatedYaw());
+void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
+	double rPIDOutput = rPID->Update(GetAccumulatedYaw(), desiredR);
 	double leftOutput = driveStraightSpeed + rPIDOutput;
 	double rightOutput = driveStraightSpeed - rPIDOutput;
 
@@ -47,7 +46,8 @@ void DriveStraightCommand::Update(double currTimeSec, double lastTimeSec) {
 		rightOutput /= maxOutput;
 	}
 
-	robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftOutput);
+	robot->SetWheelSpeed(RobotModel::kRightWheels, rightOutput);
 }
 
 bool DriveStraightCommand::IsDone() {

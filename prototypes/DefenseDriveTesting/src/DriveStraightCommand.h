@@ -8,7 +8,7 @@ class DriveStraightCommand {
 public:
 	DriveStraightCommand(RobotModel* myRobot, double driveStraightSpeed);
 	void Init();
-	void Update(double currTimeSec, double lastTimeSec);
+	void Update(double currTimeSec, double deltaTimeSec);
 	bool IsDone();
 	virtual ~DriveStraightCommand();
 private:

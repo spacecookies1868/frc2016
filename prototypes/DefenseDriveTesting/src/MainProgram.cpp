@@ -60,6 +60,10 @@ public:
 
 	void TestPeriodic()
 	{
+		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		printf("Yaw: %f\n", robot->GetYaw());
+		printf("Roll: %f\n", robot->GetRoll());
+		printf("Pitch: %f\n", robot->GetPitch());
 		SmartDashboard::PutNumber("Roll: %f\n", robot->GetRoll());
 	}
 };

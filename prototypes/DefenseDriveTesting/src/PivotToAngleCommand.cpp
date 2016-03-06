@@ -28,7 +28,7 @@ PIDConfig* PivotToAngleCommand::CreateRPIDConfig(){
 	pidConfig->maxAbsDiffError = 5.0;
 	pidConfig->maxAbsError = 60.0;
 	pidConfig->maxAbsITerm = 5.0;
-	pidConfig->timeLimit = 0.1;
+	pidConfig->timeLimit = 0.04;
 	return pidConfig;
 }
 

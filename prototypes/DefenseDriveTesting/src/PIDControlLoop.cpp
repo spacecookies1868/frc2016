@@ -11,7 +11,6 @@ PIDConfig::PIDConfig() {
 	desiredAccuracy = 0.0;
 	maxAbsITerm = 0.1;
 	minAbsError = 0.0;
-
 	timeLimit = 1.5; // time threshold
 }
 

@@ -10,17 +10,25 @@ DefenseDrive::DefenseDrive(RobotModel* myRobot) {
 	startRoll = 0.0;
 	isFlatThreshold = 0.0;
 	onRampThreshold = 0.0;
+	endThreshold = 0.0;
 	diffRoll = 0.0;
 	startTime = 0.0;
 	startWaitTime = 0.0;
 	pivotToAngleCommand = nullptr;
+	driveStraightCommand = nullptr;
 }
 
 void DefenseDrive::Init() {
-	speed = 0.5;
+	speed = 0.65;
+
+	// rock wall and rough terrain
+//	isFlatThreshold = 2.0;
+//	onRampThreshold = 6.0;
+//	endThreshold = 4.0;
 
 	isFlatThreshold = 2.0;
-	onRampThreshold = 5.0;
+	onRampThreshold = 6.0;
+	endThreshold = 4.0;
 
 	currRoll = robot->GetRoll();
 	startRoll = currRoll;
@@ -49,12 +57,17 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 		printf("pivotToAngle yaw: %f\n", startYaw);
 		pivotToAngleCommand = new PivotToAngleCommand(robot, startYaw);
 		pivotToAngleCommand->Init();
+
+		driveStraightCommand = new DriveStraightCommand(robot, speed);
+		driveStraightCommand->Init();
+
 		nextState = kBeforeUpRamp;
 		printf("next state: kBeforeUpRamp\n");
 		startTime = currTimeSec;
 		break;
 	case (kBeforeUpRamp):
-		robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
+		//robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
+		driveStraightCommand->Update(currTimeSec, deltaTimeSec);
 		if (diffRoll > onRampThreshold) {
 			nextState = kUpRamp;
 			printf("next state: kUpRamp\n");
@@ -63,8 +76,9 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 		}
 		break;
 	case (kUpRamp):
-		robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
-		if (abs(diffRoll) < isFlatThreshold) {
+		//robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
+		driveStraightCommand->Update(currTimeSec, deltaTimeSec);
+		if (fabs(diffRoll) < isFlatThreshold) {
 			nextState = kMiddleRamp;
 			printf("next state: kMiddleRamp\n");
 		} else {
@@ -72,8 +86,8 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 		}
 		break;
 	case (kMiddleRamp):
-		robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
-		//if (diffRoll < -onRampThreshold) {
+		//robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
+		driveStraightCommand->Update(currTimeSec, deltaTimeSec);
 		if (diffRoll <= -isFlatThreshold) {
 			nextState = kDownRamp;
 			printf("next state: kDownRamp\n");
@@ -82,8 +96,10 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 		}
 		break;
 	case (kDownRamp):
-		robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
-		if (diffRoll > -isFlatThreshold){
+		driveStraightCommand->Update(currTimeSec, deltaTimeSec);
+		//robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
+		//if (diffRoll > -endThreshold){
+		if (diffRoll > -isFlatThreshold) {
 			startWaitTime = currTimeSec;
 			nextState = kWait;
 			printf("next state: kWait\n");
@@ -119,7 +135,7 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 
 	SmartDashboard::PutNumber("state: ", currState);
 
-	if (currTimeSec - startTime > 3.5) {		// safeguard to 2.5 sec
+	if (currTimeSec - startTime > 6.0) {		// safeguard to 2.5 sec
 		printf("done from timer: %f", currTimeSec - startTime);
 		SmartDashboard::PutString("Done from ", "timer");
 		currState = kDone;
