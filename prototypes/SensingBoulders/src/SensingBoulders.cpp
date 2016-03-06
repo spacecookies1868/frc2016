@@ -11,9 +11,9 @@ SensingBoulders::SensingBoulders(RobotModel* myRobot) {
 	centerToBoulder = 0.0;
 	xDistanceToCenterRobot = 12.2; // the number should be changed for comp bot, should ask mechanical for this
 	yDistanceToCenterRobot = 12.0; // the number should be changed for comp bot, should ask mechanical for this
-	angleThreshold = 2.5;
-	boulderRadius = 5.0;		   // the number should be changed if the position of the ultrasonic is changed
-	boulderRadiusThreshold = 1.0;
+	angleThreshold = 0.5;
+	boulderRadius = 0.0;		   // the number should be changed if the position of the ultrasonic is changed
+	boulderRadiusThreshold = 1.5;
 }
 
 void SensingBoulders::Init() {
@@ -39,8 +39,9 @@ void SensingBoulders::Init() {
 	endBoulderDistance = startBoulderDistance;
 	centerBoulderDistance = startBoulderDistance;
 
-	startBoulderAngles[numberOfScans] = 0;
-	startBoulderDistances[numberOfScans] = 0;
+	sumStartBoulderAngle = 0.0;
+	sumStartBoulderDistance = 0.0;
+	sumEndBoulderAngle = 0.0;
 
 	thresholdDistance = 1.2;	// 20 percent from minBoulderDistance
 	isSensingDone = false;
@@ -54,7 +55,7 @@ void SensingBoulders::Init() {
 
 	PrintState();
 }
-
+/*
 void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 	currAngle = robot->GetServoAngle();
 	currDistance = ultrasonicSensor->GetRangeInInches();
@@ -78,8 +79,8 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 
 	if (currDistance > thresholdDistance * startBoulderDistance && !endBoulderFound) {
 		endBoulderFound = true;
-		endBoulderDistance = currDistance;
-		endBoulderAngle = currAngle;
+		endBoulderDistance = lastBoulderDistance;
+		endBoulderAngle = lastBoulderAngle;
 //		centerBoulderAngle = (startBoulderAngle + endBoulderAngle) / 2;
 //		centerBoulderDistance = (startBoulderDistance + endBoulderDistance) / 2;
 //		printf("End Boulder Distance: %f\n", endBoulderDistance);
@@ -93,11 +94,12 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 //	printf("servoAngle: %f\n", currAngle);
 
 	robot->SetServo(startServoAngle, endServoAngle, deltaServoAngle);
-
+	lastBoulderAngle = currAngle;
+	lastBoulderDistance = currDistance;
 	IsSensingDone();
-}
+}*/
 
-/*
+
 void SensingBoulders::Update(double myCurrTimeSec, double myDeltaTimeSec) {
 	currAngle = robot->GetServoAngle();
 	currDistance = ultrasonicSensor->GetRangeInInches();
@@ -141,12 +143,12 @@ void SensingBoulders::Update(double myCurrTimeSec, double myDeltaTimeSec) {
 
 		if (isSensingDone){
 			CalculateDesiredDeltaAngle();
-
 			printf("Center Boulder Angle: %f \n", centerBoulderAngle);
 			printf("Center Boulder Distance: %f\n", centerBoulderDistance);
 			printf("Desired Angle: %f\n", desiredDeltaAngle);
+			printf("Found boulder: %d\n", isBoulder);
 
-			if (fabs(desiredDeltaAngle) > angleThreshold) {
+			if (fabs(desiredDeltaAngle) > angleThreshold && isBoulder) {
 				nextState = kInitPivot;
 			} else {
 				nextState = kDone;
@@ -179,43 +181,40 @@ void SensingBoulders::Update(double myCurrTimeSec, double myDeltaTimeSec) {
 		break;
 	}
 	currState = nextState;
-}*/
+}
 
 
 void SensingBoulders::IsSensingDone() {		// may have to change if endServoAngle is not actually end
 	if (currAngle > endServoAngle || currAngle < startServoAngle){
-		centerBoulderAngle = fabs(startBoulderAngle + endBoulderAngle) / 2;
-		centerBoulderDistance = fabs(startBoulderDistance + endBoulderDistance) / 2;
-
-		if (robot->GetServoDirection()) {
-			startBoulderAngles[numberOfScans] = startBoulderAngle;
-			startBoulderDistances[numberOfScans] = startBoulderDistance;
+		if (startBoulderAngle > endBoulderAngle) {
+			sumStartBoulderAngle += endBoulderAngle;
+			sumStartBoulderDistance += startBoulderDistance;
+			sumEndBoulderAngle += startBoulderAngle;
 		} else {
-			startBoulderAngles[numberOfScans] = endBoulderAngle;
-			startBoulderDistances[numberOfScans] = endBoulderDistance;
+			sumStartBoulderAngle += startBoulderAngle;
+			sumStartBoulderDistance += endBoulderDistance;
+			sumEndBoulderAngle += endBoulderAngle;
 		}
-		printf("Start Boulder Angle arr: %f\n", startBoulderAngles[numberOfScans]);
-		printf("Start Boulder Distance arr: %f\n", startBoulderDistances[numberOfScans]);
 
+		PrintState();
 		numberOfScans++;
 		startBoulderDistance = 225;
-		startBoulderAngles[numberOfScans] = 0;
-		startBoulderDistances[numberOfScans] = 0;
 
 		printf("Sensing Done Scan: %d \n", numberOfScans);
 	}
-	if (numberOfScans > 5) {
-		BubbleSort(startBoulderAngles);
-		BubbleSort(startBoulderDistances);
-
-		startBoulderAngle = startBoulderAngles[3];
-		startBoulderDistance = startBoulderDistances[3];
-
-		printf("Median Start Boulder Angle: %f\n", startBoulderAngle);
-		printf("Median Start Boulder Distance: %f\n", startBoulderDistance);
+	if (numberOfScans > 5) { // currently taking the median values of the angle and distances
+		printf("SENSING DONE!! \n");
+		startBoulderAngle = sumStartBoulderAngle / numberOfScans;
+		startBoulderDistance = sumStartBoulderDistance / numberOfScans;
+		endBoulderAngle = sumEndBoulderAngle / numberOfScans;
+		centerBoulderAngle = fabs(startBoulderAngle - endBoulderAngle) / 2 + startBoulderAngle;
+		boulderRadius = 0.3797 * startBoulderDistance + 0.3565;
 
 		CalculateBoulderRadius();
+		IsBoulder();
+		PrintState();
 		printf("Boulder Radius: %f\n", calculatedRadius);
+		printf("Expected Boulder Radius: %f\n", boulderRadius);
 
 		isSensingDone = true;
 	} else {
@@ -242,7 +241,7 @@ void SensingBoulders::CalculateDesiredDeltaAngle() {
 	double x1 = x + xDistanceToCenterRobot;	//the x distance from the boulder to the center of the robot
 	double y1 = y + yDistanceToCenterRobot; //the y distance from the boulder to the center of the robot
 
-	desiredDeltaAngle = 90 - atan2(y1, x1) * 180 / PI;
+	desiredDeltaAngle = atan2(y1, x1) * 180 / PI - 90;
 	printf("Desired Delta Angle: %f\n", desiredDeltaAngle);
 }
 
@@ -252,18 +251,16 @@ void SensingBoulders::CalculateBoulderRadius() {
 	calculatedRadius = sin(deltaAngle * PI / 2 / 180) * startBoulderDistance;
 }
 
-double *SensingBoulders::BubbleSort(double array[5]) {
-	float change;
-	for (int a = 0; a <= 5; a++) {
-		for (int b = a + 1; b <= 5; b++) {
-			if (array[a] < array[b]) {
-				change = array[a];
-				array[a] = array[b];
-				array[b] = change;
-			}
-		}
+void SensingBoulders::IsBoulder() {
+	printf("Expected Boulder Radius: %f \n", boulderRadius);
+	if (calculatedRadius < boulderRadius * boulderRadiusThreshold &&
+			calculatedRadius * boulderRadiusThreshold > boulderRadius) {
+		printf("IS BOULDER :D!!!! \n");
+		isBoulder = true;
+		printf("bool: %d", isBoulder);
+	} else {
+		isBoulder = false;
 	}
-	return array;
 }
 
 bool SensingBoulders::IsDone() {

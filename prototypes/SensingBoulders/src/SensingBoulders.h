@@ -19,8 +19,7 @@ public:
 	void CalculateDesiredDeltaAngle();
 	void CalculateBoulderRadius();
 	void CalculateAverageStartBoulderAngle();
-	void CalculateMedianStartBoulderAngle();
-	double *BubbleSort(double array[5]);
+	void IsBoulder();
 	bool IsDone();
 
 	virtual ~SensingBoulders();
@@ -46,16 +45,21 @@ private:
 	double calculatedRadius;
 	double startServoAngle, endServoAngle, deltaServoAngle;
 	double startBoulderAngle, endBoulderAngle, centerBoulderAngle;
-	double startBoulderAngles[5];
-	double startBoulderDistances[5];
+	double lastBoulderAngle;
+	double sumStartBoulderAngle;
+	double sumEndBoulderAngle;
+	double sumBoulderDistance;
+	double sumStartBoulderDistance;
 	double centerToBoulder;
 	double startBoulderDistance, endBoulderDistance, centerBoulderDistance;
+	double lastBoulderDistance;
 	double currAngle, currDistance;
 	double servoAccuracy;
 	double currTimeSec, lastTimeSec, deltaTimeSec;
 	double desiredDeltaAngle;
 	bool endBoulderFound;
 	bool isSensingDone;
+	bool isBoulder;
 	bool isDone;
 
 	RobotModel* robot;
