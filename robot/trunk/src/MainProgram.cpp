@@ -54,7 +54,7 @@ private:
 	void AutonomousInit() {
 		RefreshAllIni();
 		robot->ResetTimer();
-
+		robot->ZeroNavXYaw();
 		robot->Reset();
 		driveController->Reset();
 		superstructureController->Reset();
@@ -68,6 +68,7 @@ private:
 		deltaTimeSec = 0.0;
 		autonomousController->StartAutonomous();
 		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
+		Wait(0.5);
 	}
 
 	void AutonomousPeriodic() {
@@ -121,6 +122,17 @@ private:
 	}
 
 	void TestPeriodic() {
+		DO_PERIODIC(10, LOG(robot, "Navx angle", robot->GetNavXYaw()));
+		DO_PERIODIC(10, LOG(robot, "Navx pitch", robot->GetNavXPitch()));
+		DO_PERIODIC(10, LOG(robot, "Navx Roll", robot->GetNavXRoll()));
+		DO_PERIODIC(10, LOG(robot, "Left Encoder", robot->GetLeftEncoderVal()));
+		DO_PERIODIC(10, LOG(robot, "Right Encoder", robot->GetRightEncoderVal()));
+		DO_PERIODIC(10, printf("Navx angle %f\n", robot->GetNavXYaw()));
+		DO_PERIODIC(10, printf("Navx pitch %f\n", robot->GetNavXPitch()));
+		DO_PERIODIC(10, printf("Navx Roll %f\n", robot->GetNavXRoll()));
+		DO_PERIODIC(10, printf("Left Encoder %f\n", robot->GetLeftEncoderVal()));
+		DO_PERIODIC(10, printf("Right Encoder %f\n", robot->GetRightEncoderVal()));
+
 	}
 
 	void DisabledInit() {

@@ -16,6 +16,9 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	camera = myCamera;
 	humanControl = myHumanControl;
 	timeFinished = 0.0;
+	hardCodeShoot = true;
+	firstDefense = 0;
+	secondDefensePos = 0;
 }
 
 /**
@@ -67,8 +70,10 @@ void AutonomousController::Reset() {
 }
 
 void AutonomousController::RefreshIni() {
-	autoMode = robot->pini->geti("AUTONOMOUS","AUTOMODE",0);
-
+	autoMode = robot->pini->geti("AUTONOMOUS","AutoMode",0);
+	hardCodeShoot = robot->pini->getbool("AUTONOMOUS", "HardCodeShoot", true);
+	firstDefense = robot->pini->geti("AUTONOMOUS", "FirstDefense", 0);
+	secondDefensePos = robot->pini->geti("AUTONOMOUS", "SecondDefense", 0);
 
 #if USE_NAVX
 	/*
@@ -163,13 +168,21 @@ void AutonomousController::CreateQueue() {
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
-
-		CurveCommand* c3 = new CurveCommand(robot, 1.0, 6.0);
-		firstCommand = c3;
+		DUMP("TEST AUTO", 0.0);
+//		DefenseManipPosCommand* goDownArm = new DefenseManipPosCommand(superstructure, true);
+//		firstCommand = goDownArm;
+//		DefenseCommand* testDefense = new DefenseCommand(robot, superstructure, DefenseCommand::Portcullis);
+//		goDownArm->SetNextCommand(testDefense);
+		PivotToAngleCommand* straighten = new PivotToAngleCommand(robot, 300.0);
+		firstCommand = straighten;
+//		testDefense->SetNextCommand(straighten);
+//		CurveCommand* goToGoal = new CurveCommand(robot, 2.0, 8.0);
+//		straighten->SetNextCommand(goToGoal);
 		break;
 	}
 	case (kBlankAuto): {
 		printf("kBlankAuto ----------------------\n");
+		DUMP("BLANK AUTO", 0.0);
 		break;
 	}
 	case (kReachAuto): {
@@ -178,79 +191,30 @@ void AutonomousController::CreateQueue() {
 		 * Length of robot is 2.823ft
 		 * Distance from auto line to outerworks is 6.167;
 		 */
+		printf("kReachAuto ------------------------\n");
+		DUMP("REACH AUTO", 0.0);
 		DriveStraightCommand* reachDrive = new DriveStraightCommand(robot, 3.35);
 		firstCommand = reachDrive;
-		printf("kReachAuto ------------------------\n");
+
 		break;
 	}
 	case (kCrossAuto): {
 		printf("kCrossAuto -----------------------------\n");
+		DUMP("CROSS AUTO", 0.0);
 		/*
 		 * Assumption: starting position is back of robot on auto line
 		 * Length of robot is 2.823 ft
 		 * Distance from auto line to end of autoworks is
 		 * Added clearance of 3 ft
 		 */
-		switch (humanControl->GetDefense()) {
-		case (LowBar): {
-			printf("Autonomous Controller, Low Bar \n");
-			DefenseCommand* lowBarCross = new DefenseCommand(robot, superstructure, DefenseCommand::LowBar);
-			firstCommand = lowBarCross;
-			break;
-		}
-		case (Portcullis): {
-			printf("Autonomous Controller, Portcullis \n");
-			DefenseCommand* portcullisCross = new DefenseCommand(robot, superstructure, DefenseCommand::Portcullis);
-			firstCommand = portcullisCross;
-			break;
-		}
-		case (ChevalDeFrise): {
-			printf("Autonomous Controller, Cheval de Frise \n");
-			DefenseCommand* chevalDeFriseCross = new DefenseCommand(robot, superstructure, DefenseCommand::ChevalDeFrise);
-			firstCommand = chevalDeFriseCross;
-			break;
-		}
-		case (Ramparts): {
-			printf("Autonomous Controller, Ramparts \n");
-			DefenseCommand* rampartsCross = new DefenseCommand(robot, superstructure, DefenseCommand::Ramparts);
-			firstCommand = rampartsCross;
-			break;
-		}
-		case (Moat): {
-			printf("Autonomous Controller, Moat \n");
-			DefenseCommand* moatCross = new DefenseCommand(robot, superstructure, DefenseCommand::Moat);
-			firstCommand = moatCross;
-			break;
-		}
-		case (SallyPort): {
-			printf("Autonomous Controller, Sally Port \n");
-			DefenseCommand* sallyPortCross = new DefenseCommand(robot, superstructure, DefenseCommand::SallyPort);
-			firstCommand = sallyPortCross;
-			break;
-		}
-		case (Drawbridge): {
-			printf("Autonomous Controller, Drawbridge \n");
-			DefenseCommand* drawbridgeCross = new DefenseCommand(robot, superstructure, DefenseCommand::Drawbridge);
-			firstCommand = drawbridgeCross;
-			break;
-		}
-		case (RockWall): {
-			printf("Autonomous Controller, Rock Wall \n");
-			DefenseCommand* rockWallCross = new DefenseCommand(robot, superstructure, DefenseCommand::RockWall);
-			firstCommand = rockWallCross;
-			break;
-		}
-		case (RoughTerrain): {
-			printf("Autonomous Controller, Rough Terrain \n");
-			DefenseCommand* roughTerrainCross = new DefenseCommand(robot, superstructure, DefenseCommand::RoughTerrain);
-			firstCommand = roughTerrainCross;
-			break;
-		}
-		}
+		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+		firstCommand = cross;
 		break;
 	}
 	case (kShootAuto): {
 		printf("kShootAuto --------------------------------\n");
+		DUMP("SHOOT AUTO", 0.0);
+		DUMP("DEFENSE POSITION", (double) firstDefense);
 		/*
 		 * Assumption: starting position is back of robot on auto line
 		 * GOING THROUGH LOW BAR IN THESE CALCULATIONS
@@ -258,11 +222,90 @@ void AutonomousController::CreateQueue() {
 		 * Distance from auto line to end of autoworks is
 		 *
 		 */
+		if (hardCodeShoot) {
+			DefenseCommand* hardCodeCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+			firstCommand = hardCodeCross;
+			PivotToAngleCommand* hardCodeStraighten = new PivotToAngleCommand(robot, 0.0);
+			hardCodeCross->SetNextCommand(hardCodeStraighten);
+			CurveCommand* hardCodeDrive;
+			PivotToAngleCommand* hardCodeLineUpShoot;
+			switch(firstDefense) {
+			case (kNone): {
+				printf("UH OH ERROR ERROR EEEEEEEKKKKKKK! \n");
+				break;
+			}
+			case (kLowBar): {
+				hardCodeDrive = new CurveCommand(robot, 1.0, 8.0); //ARBITRARY VALUES
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
+				break;
+			}
+			case (kSecond): {
+				hardCodeDrive = new CurveCommand(robot, 0.0, 8.0); //ARBITRARY VALUES
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
+				break;
+			}
+			case (kThird): {
+				hardCodeDrive = new CurveCommand(robot, -3.0, 8.0); //ARBITRARY VALUES
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
+				break;
+			}
+			case (kFourth): {
+				hardCodeDrive = new CurveCommand(robot, 5.0, 8.0); //ARBITRARY VALUES
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 300.0); //ARBITRARY VALUES
+				break;
+			}
+			case (kFifth): {
+				hardCodeDrive = new CurveCommand(robot, 0.0, 9.5);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 300.0);
+				break;
+			}
+			}
+			hardCodeStraighten->SetNextCommand(hardCodeDrive);
+			hardCodeDrive->SetNextCommand(hardCodeLineUpShoot);
+
+		} else {
+			DefenseCommand* cameraCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+			firstCommand = cameraCross;
+			PivotToAngleCommand* cameraStraighten = new PivotToAngleCommand(robot, 0.0);
+			cameraCross->SetNextCommand(cameraStraighten);
+			switch (firstDefense) {
+			case (kNone): {
+				printf("UH OH ERROR ERROR EEEEEEEKKKKKKK! \n");
+				break;
+			}
+			case (kLowBar): {
+				break;
+			}
+			case (kSecond): {
+				break;
+			}
+			case (kThird): {
+				break;
+			}
+			case (kFourth): {
+				break;
+			}
+			case (kFifth): {
+				break;
+			}
+			}
+		}
 
 		break;
 	}
 	case (kHoardingAuto): {
 		printf("kHoardingAuto ------------------------------\n");
+		DUMP("HOARDING AUTO", 0.0);
+		DefenseCommand* hoardingCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+		firstCommand = hoardingCross;
+		//insert Outtake command here
+		CurveCommand* hoardingGoBack = new CurveCommand(robot, 4.0*(secondDefensePos - firstDefense), 0.0);
+		hoardingCross->SetNextCommand(hoardingGoBack);
+		PivotToAngleCommand* hoardingStraighten = new PivotToAngleCommand(robot, 0.0);
+		hoardingGoBack->SetNextCommand(hoardingStraighten);
+		DriveStraightCommand* hoardingGoAcross = new DriveStraightCommand(robot, 6.0);
+		hoardingStraighten->SetNextCommand(hoardingGoAcross);
+		//Got to find ball stuff
 		break;
 	}
 	}

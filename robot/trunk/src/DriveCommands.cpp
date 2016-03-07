@@ -7,15 +7,12 @@
 #include <iostream>
 #include <string>
 #include "Logger.h"
-#include "Debugging.h"
 
 #define PI 3.14159265358979
 
 
 /*
  * Pivot Command
- *
- * NOT TESTED because navx issues, mainly taken from prototype code
  *
  * hopefully positive desiredR makes turn counterclockwise
  */
@@ -106,7 +103,6 @@ bool PivotCommand::IsDone() {
 #if USE_NAVX
 /*
  * Pivot to Angle Command:
- * NOT TESTED because navx issues bleh
  */
 
 PivotToAngleCommand::PivotToAngleCommand(RobotModel* myRobot, double myDesiredR) {
@@ -116,14 +112,22 @@ PivotToAngleCommand::PivotToAngleCommand(RobotModel* myRobot, double myDesiredR)
 	robot = myRobot;
 	desiredR = myDesiredR;
 	isDone = false;
+	lastYaw = 0.0;
+	deltaYaw = 0.0;
+	currYaw = 0.0;
+	accumulatedYaw = 0.0;
 }
 
 void PivotToAngleCommand::Init() {
 	rPIDConfig = CreateRPIDConfig();
 	rPID = new PIDControlLoop(rPIDConfig);
+	currYaw = robot->GetNavXYaw();
 	initialR = GetAccumulatedYaw();
-	desiredR = CalculateDesiredYaw(desiredR);
-	rPID->Init(initialR, desiredR);
+	double desiredChange = CalculateDesiredChange(desiredR);
+	LOG(robot, "initialR", initialR);
+	LOG(robot, "desiredR", desiredR);
+	LOG(robot, "desiredChange", desiredChange);
+	rPID->Init(initialR, initialR + desiredChange);
 	LOG(robot, "START YAW", robot->GetNavXYaw());
 }
 
@@ -168,6 +172,7 @@ double PivotToAngleCommand::GetAccumulatedYaw() {
 }
 
 void PivotToAngleCommand::Update(double currTimeSec, double deltaTimeSec) {
+	LOG(robot, "my current angle", GetAccumulatedYaw());
 	bool pidDone = rPID->ControlLoopDone(GetAccumulatedYaw(), deltaTimeSec);
 	if (pidDone) {
 		isDone = true;
@@ -187,7 +192,7 @@ bool PivotToAngleCommand::IsDone() {
 	return isDone;
 }
 
-double PivotToAngleCommand::CalculateDesiredYaw(double myDesired) {
+double PivotToAngleCommand::CalculateDesiredChange(double myDesired) {
 	double normalizedInitial = fmod(initialR, 360.0);
 	if (normalizedInitial < 0) {
 		normalizedInitial += 360;
@@ -203,8 +208,7 @@ double PivotToAngleCommand::CalculateDesiredYaw(double myDesired) {
 	} else {
 		change = change3;
 	}
-	double desired = initialR + change;
-	return desired;
+	return change;
 }
 
 #endif
@@ -315,10 +319,14 @@ void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
 	} else {
 		double disOutput = disPID->Update(currDis);
 		double rOutput = rPID->Update(GetAccumulatedYaw());
+		printf("Current Distance %f\n", currDis);
 		LOG(robot, "Current Distance", currDis);
 		LOG(robot, "Current Yaw", GetAccumulatedYaw());
+		printf("Current Yaw %f\n", GetAccumulatedYaw());
 		LOG(robot, "Distance Output", disOutput);
+		printf("Distance Output %f\n", disOutput);
 		LOG(robot, "R Output", rOutput);
+		printf("Angle Output %f\n", rOutput);
 
 		double leftOutput = disOutput + rOutput;
 		double rightOutput = disOutput - rOutput;
@@ -331,6 +339,8 @@ void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
 
 		LOG(robot, "Left Output", leftOutput);
 		LOG(robot, "Right Output", rightOutput);
+		printf("Left Output %f\n", leftOutput);
+		printf("Right Output %f\n", rightOutput);
 
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, leftOutput);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, rightOutput);
@@ -339,6 +349,7 @@ void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
 
 bool DriveStraightCommand::IsDone() {
 	return isDone;
+
 }
 
 
@@ -352,6 +363,8 @@ CurveCommand::CurveCommand(RobotModel* myRobot, double myDesiredX, double myDesi
 	lastY = 0.0;
 	lastLeft = 0.0;
 	lastRight = 0.0;
+	initialLeft = 0.0;
+	initialRight = 0.0;
 	lastAccumulatedYaw = 0.0;
 
 	isDone = false;
@@ -368,6 +381,8 @@ void CurveCommand::Init() {
 	anglePIDConfig = CreateAnglePIDConfig();
 	initialYaw = GetAccumulatedYaw();
 	initialRadius = 0.0;
+	initialLeft = robot->GetLeftEncoderVal();
+	initialRight = robot->GetRightEncoderVal();
 	desiredRadius = GetSign(desiredY) * sqrt(desiredX*desiredX + desiredY*desiredY);
 	radiusPID = new PIDControlLoop(radiusPIDConfig);
 	radiusPID->Init(initialRadius, desiredRadius);
@@ -377,8 +392,8 @@ void CurveCommand::Init() {
 }
 
 void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
-	currLeft = robot->GetLeftEncoderVal();
-	currRight = robot->GetRightEncoderVal();
+	currLeft = robot->GetLeftEncoderVal() - initialLeft;
+	currRight = robot->GetRightEncoderVal() - initialRight;
 
 	angle = GetAccumulatedYaw();
 	double x = CalculateX();
@@ -386,7 +401,6 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 
 	double radius = GetSign(y) * sqrt((x - initialX)*(x - initialX) + (y - initialY) * (y - initialY));
 	bool radiusPIDDone = radiusPID->ControlLoopDone(radius, deltaTimeSec);
-
 	bool anglePIDDone = anglePID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
 
 	if (radiusPIDDone && anglePIDDone) {
@@ -395,7 +409,7 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 	} else {
 		double radiusOutput = radiusPID->Update(radius);
 		double newDesiredAngle = atan((desiredX - x)/(desiredY - y)) * 360.0 / (2*PI);
-		double angleOutput = anglePID->Update(angle, angle + newDesiredAngle);
+		double angleOutput = anglePID->Update(angle - initialYaw, newDesiredAngle);
 
 		double leftOutput = radiusOutput + angleOutput;
 		double rightOutput = radiusOutput - angleOutput;
@@ -405,6 +419,7 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 			leftOutput = leftOutput / maxOutput;
 			rightOutput = rightOutput / maxOutput;
 		}
+
 		LOG(robot, "Curr X", x);
 		LOG(robot, "Curr Y", y);
 		LOG(robot, "Radius", radius);
@@ -562,25 +577,68 @@ double CurveCommand::GetSign(double n) {
 	}
 }
 
-DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, Defenses myDefense) {
+DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, uint32_t myDefense) {
 	robot = myRobot;
 	superstructure = mySuperstructure;
 	defense = myDefense;
 	isDone = false;
+
+	hardCodeLowBar = new DriveStraightCommand(robot, 6.0); //NOT ACTUAL VALUE PROBABLY, SHOULD MEASURE
+
+	portcullisDriveUp = new DriveStraightCommand(robot, 5.6);
+	portcullisDriving = new DriveStraightCommand(robot, 6.0);
+//	portcullisDriving = new DriveStraightCommand(robot, 0.0);
+	portcullisDefenseUp = new DefenseManipPosCommand(superstructure, false);
+	portcullisDefenseDown = new DefenseManipPosCommand(superstructure, true);
+	portcullisWaitTimeDone = false;
+	portcullisWaiting = 0.0;
+
+	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.4);
+	chevalDeFriseDriving = new DriveStraightCommand(robot, 6.0);
+	chevalDeFriseDefenseUp = new DefenseManipPosCommand(superstructure, false);
+	chevalDeFriseDefenseDown = new DefenseManipPosCommand(superstructure, true);
+	chevalDeFriseDefenseUpInitted = false;
+	chevalDeFriseWaitTimeDone = false;
+	chevalDeFriseWaiting = 0.0;
+
+	hardCodeMoat = new DriveStraightCommand(robot, 12.0);
+
+	hardCodeRockWall = new DriveStraightCommand(robot, 10.0);
+
+	hardCodeRoughTerrain = new DriveStraightCommand(robot, 9.0);
 }
 
 void DefenseCommand::Init() {
 	switch (defense) {
 	case (LowBar): {
 		printf("Low Bar Init \n");
+		hardCodeLowBar->Init();
 		break;
 	}
 	case (Portcullis): {
 		printf("Portcullis Init \n");
+		portcullisDriveUp->Init();
+		portcullisDriveUp->disPIDConfig->pFac = 0.3;
+		portcullisDriveUp->disPIDConfig->iFac = 0.001;
+		portcullisDriveUp->disPIDConfig->dFac = 7.7;
+		portcullisDriveUp->disPIDConfig->desiredAccuracy = 0.1;
+		portcullisDriveUp->disPIDConfig->maxAbsOutput = 0.6;
+		portcullisDriveUp->disPIDConfig->maxAbsITerm = 0.5;
+		portcullisDriveUp->disPIDConfig->timeLimit = 0.125;
+		portcullisDefenseDown->Init();
 		break;
 	}
 	case (ChevalDeFrise): {
 		printf("Cheval de Frise Init \n");
+		chevalDeFriseDriveUp->Init();
+		chevalDeFriseDriveUp->disPIDConfig->pFac = 0.3;
+		chevalDeFriseDriveUp->disPIDConfig->iFac = 0.0007;
+		chevalDeFriseDriveUp->disPIDConfig->dFac = 6.7;
+		chevalDeFriseDriveUp->disPIDConfig->desiredAccuracy = 0.15;
+		chevalDeFriseDriveUp->disPIDConfig->maxAbsOutput = 0.6;
+		chevalDeFriseDriveUp->disPIDConfig->maxAbsITerm = 0.5;
+		chevalDeFriseDriveUp->disPIDConfig->timeLimit = 0.125;
+		chevalDeFriseDefenseDown->Init();
 		break;
 	}
 	case (Ramparts): {
@@ -589,6 +647,7 @@ void DefenseCommand::Init() {
 	}
 	case (Moat): {
 		printf("Moat Init \n");
+		hardCodeMoat->Init();
 		break;
 	}
 	case (SallyPort): {
@@ -601,10 +660,12 @@ void DefenseCommand::Init() {
 	}
 	case (RockWall): {
 		printf("Rock Wall Init \n");
+		hardCodeRockWall->Init();
 		break;
 	}
 	case (RoughTerrain): {
 		printf("Rough Terrain Init \n");
+		hardCodeRoughTerrain->Init();
 		break;
 	}
 	}
@@ -614,17 +675,64 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 	switch (defense) {
 	case (LowBar): {
 		printf("Low Bar Update \n");
-		isDone = true;
+		isDone = hardCodeLowBar->IsDone();
+		if (!isDone) {
+			hardCodeLowBar->Update(currTimeSec, deltaTimeSec);
+		}
 		break;
 	}
 	case (Portcullis): {
 		printf("Portcullis Update \n");
-		isDone = true;
+		isDone = false;
+		if (!portcullisDefenseDown->IsDone()) {
+			portcullisDefenseDown->Update(currTimeSec, deltaTimeSec);
+		} else if (!portcullisDriveUp->IsDone()) {
+			portcullisDriveUp->Update(currTimeSec, deltaTimeSec);
+			portcullisDefenseUp->Init();
+		} else if (!portcullisDefenseUp->IsDone()) {
+			printf("HI HI HI HI");
+			portcullisDefenseUp->Update(currTimeSec, deltaTimeSec);
+			portcullisDriving->Init();
+			portcullisDriving->disPIDConfig->maxAbsOutput = 0.5;
+		} else if (!portcullisDriving->IsDone()) {
+			if (portcullisWaitTimeDone) {
+				portcullisDriving->Update(currTimeSec, deltaTimeSec);
+			} else {
+				portcullisWaiting += deltaTimeSec;
+				portcullisWaitTimeDone = portcullisWaiting > 1.0;
+			}
+		}
+		isDone = (portcullisDriving->IsDone()) && (portcullisDefenseUp->IsDone());
 		break;
 	}
 	case (ChevalDeFrise): {
 		printf("Cheval de Frise Update \n");
-		isDone = true;
+		isDone = false;
+		if (!chevalDeFriseDriveUp->IsDone()) {
+			chevalDeFriseDriveUp->Update(currTimeSec, deltaTimeSec);
+		} else if (!chevalDeFriseDefenseDown->IsDone()) {
+			DUMP("Puttin my defense down now",0.0);
+			chevalDeFriseDriving->Init();
+			chevalDeFriseDefenseDown->Update(currTimeSec, deltaTimeSec);
+		} else if (!chevalDeFriseDriving->IsDone()) {
+			if (chevalDeFriseWaitTimeDone) {
+				chevalDeFriseDriving->Update(currTimeSec, deltaTimeSec);
+			} else {
+				chevalDeFriseWaiting += deltaTimeSec;
+				chevalDeFriseWaitTimeDone = chevalDeFriseWaiting > 1.0;
+			}
+		}
+		if ((robot->GetLeftEncoderVal() + robot->GetRightEncoderVal())/2.0 > 7.0) {
+			if (!chevalDeFriseDefenseUpInitted) {
+				chevalDeFriseDefenseUp->Init();
+				chevalDeFriseDefenseUpInitted = true;
+			} else {
+				chevalDeFriseDefenseUp->Update(currTimeSec, deltaTimeSec);
+			}
+		}
+		isDone = (chevalDeFriseDriving->IsDone())
+				&& (chevalDeFriseDefenseUp->IsDone());
+
 		break;
 	}
 	case (Ramparts): {
@@ -634,7 +742,10 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 	}
 	case (Moat): {
 		printf("Moat Update \n");
-		isDone = true;
+		isDone = hardCodeMoat->IsDone();
+		if (!isDone) {
+			hardCodeMoat->Update(currTimeSec, deltaTimeSec);
+		}
 		break;
 	}
 	case (SallyPort): {
@@ -649,12 +760,18 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 	}
 	case (RockWall): {
 		printf("Rock Wall Update \n");
-		isDone = true;
+		isDone = hardCodeRockWall->IsDone();
+		if (!isDone) {
+			hardCodeRockWall->Update(currTimeSec, deltaTimeSec);
+		}
 		break;
 	}
 	case (RoughTerrain): {
 		printf("Rough Terrain Update \n");
-		isDone = true;
+		isDone = hardCodeRoughTerrain->IsDone();
+		if (!isDone) {
+			hardCodeRoughTerrain->Update(currTimeSec, deltaTimeSec);
+		}
 		break;
 	}
 	}

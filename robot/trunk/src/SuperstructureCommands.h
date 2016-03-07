@@ -11,7 +11,6 @@
 #include "WPILib.h"
 #include "Debugging.h"
 #include "RobotModel.h"
-#include "RemoteControl.h"
 #include "SuperstructureController.h"
 #include "ControlBoard.h"
 #include <vector>

@@ -57,7 +57,7 @@ void ControlBoard::ReadControls() {
  * Add buttons for defense combinations and if statement on buttons here, then assign defense to
  * the corresponding defense enum
  */
-	defense = ChevalDeFrise;
+	defense = Portcullis;
 
 	defenseManipDesired = defenseManipButton->WasJustPressed();
 	intakePistonDesired = intakePistonButton->WasJustPressed();

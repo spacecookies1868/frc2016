@@ -91,6 +91,10 @@ double PIDControlLoop::Update(double currValue, double desiredValue) {
 	return output;
 }
 
+double PIDControlLoop::Update(PIDConfig* myConfig, double currValue, double desiredValue) {
+	pidConfig = myConfig;
+	return Update(currValue, desiredValue);
+}
 double PIDControlLoop::Saturate(double value, double maxAbsValue) {
 	//limits the value to maxAbsValue
 	if (maxAbsValue > 0.0) {

@@ -23,18 +23,14 @@ public:
 					kCrossAuto = 3,
 					kShootAuto = 4,
 					kHoardingAuto = 5};
-	enum Defenses {
-			LowBar = 0,
-			Portcullis = 1,
-			ChevalDeFrise = 2,
-			Ramparts = 3,
-			Moat = 4,
-			SallyPort = 5,
-			Drawbridge = 6,
-			RockWall = 7,
-			RoughTerrain = 8
-		};
-
+	enum FirstDefensePos {
+		kNone = 0,
+		kLowBar = 1,
+		kSecond = 2,
+		kThird = 3,
+		kFourth = 4,
+		kFifth = 5
+	};
 
 	AutonomousController(RobotModel* myRobot, DriveController* myDrive,
 			SuperstructureController* mySuperstructure,
@@ -61,6 +57,9 @@ private:
 	CameraController* camera;
 	RemoteControl* humanControl;
 	unsigned int autoStart;
+	bool hardCodeShoot;
+	unsigned int firstDefense;
+	unsigned int secondDefensePos;
 	double timeFinished;
 };
 

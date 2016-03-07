@@ -12,15 +12,10 @@
 #include "AutoCommand.h"
 #include "Debugging.h"
 #include "RobotModel.h"
-#include "RemoteControl.h"
-#include "DriveController.h"
-#include "SuperstructureController.h"
-#include "ControlBoard.h"
 #include <vector>
 #include <string>
 #include <iostream>
 #include "PIDControlLoop.h"
-#include "DriveController.h"
 #include "CameraController.h"
 
 using namespace std;

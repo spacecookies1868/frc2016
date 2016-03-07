@@ -30,6 +30,7 @@ class PIDControlLoop {
 	void Init(PIDConfig* myConfig, double myInitialSensorValue, double desiredSensorValue);
 	double Update(double currentSensorValue); // Returns the actuator value (motor speed, etc.)
 	double Update(double currValue, double desiredValue);
+	double Update(PIDConfig* myConfig, double currValue, double desiredValue);
 	bool ControlLoopDone(double currentSensorValue);
 	bool ControlLoopDone(double currentSensorValue, double deltaTime);
 
