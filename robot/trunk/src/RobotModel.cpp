@@ -343,6 +343,10 @@ double RobotModel::GetOuttakeEncoderVal() {
 void RobotModel::ResetOuttakeEncoders() {
 
 }
+
+void RobotModel::SetCompressorStop() {
+	compressor->Stop();
+}
 #if USE_CAMERA
 Image* RobotModel::GetCameraImage() {
 	camera->GetImage(frame);

@@ -76,6 +76,8 @@ public:
 	double GetOuttakeEncoderVal();
 	void ResetOuttakeEncoders();
 
+	void SetCompressorStop();
+
 	Image* GetCameraImage();
 
 	Ini* pini;

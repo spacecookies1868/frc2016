@@ -35,10 +35,10 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myRobot->GetNavXPitch() << ", " <<
 			myRobot->GetVoltage() << ", " <<
 			myRobot->GetTotalCurrent() << ", " <<
-			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_A_PWM_PORT) << ", " <<
-			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_B_PWM_PORT) << ", " <<
-			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_A_PWM_PORT) << ", " <<
-			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_B_PWM_PORT) << ", " <<
+			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_A_PDP_CHAN) << ", " <<
+			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN) << ", " <<
+			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_A_PDP_CHAN) << ", " <<
+			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_B_PDP_CHAN) << ", " <<
 			myRobot->GetCompressorCurrent() << ", " <<
 			myRobot->GetRIOCurrent() << ", " <<
 			myRobot->GetTotalPower() << ", " <<
@@ -63,6 +63,7 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myHumanControl->GetLowGearDesired() << ", " <<
 			myHumanControl->GetOuttakeDesired()  << ", " <<
 			myHumanControl->GetQuickTurnDesired() << "\r\n";
+	logData.flush();
 }
 /* format:
  * robotmodel state / controlboard state
