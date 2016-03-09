@@ -17,8 +17,8 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 		logData << "Time, Left Encoder, Right Encoder, Left Wheel Speed,"
 				<< "Right Wheel Speed, Yaw, Roll, Pitch, Voltage, Total Current, "
 				<< "Left Drive A Current, Left Drive B Current, Right Drive A Current, "
-				<< "Right Drive B Current, Compressor Current, RoboRIO Current, "
-				<< "Total Power, Total Energy, Pressure, "
+				<< "Right Drive B Current, Intake Current, Compressor Current, "
+				<< "RoboRIO Current, Total Power, Total Energy, Pressure, "
 				<< "Outtake Encoder, Outtake Motor Speed, Intake Motor Speed, "
 				<< "Intake Down, Defense Down, Low Gear, Left Joy X, Left Joy Y, "
 				<< "Right Joy X, Right Joy Y, Reverse, Arcade, Defense Desired, "
@@ -39,6 +39,7 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN) << ", " <<
 			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_A_PDP_CHAN) << ", " <<
 			myRobot->GetCurrent(RIGHT_DRIVE_MOTOR_B_PDP_CHAN) << ", " <<
+			myRobot->GetCurrent(INTAKE_MOTOR_PDP_CHAN) << ", " <<
 			myRobot->GetCompressorCurrent() << ", " <<
 			myRobot->GetRIOCurrent() << ", " <<
 			myRobot->GetTotalPower() << ", " <<
