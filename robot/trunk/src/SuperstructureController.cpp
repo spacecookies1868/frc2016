@@ -78,20 +78,24 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 
 		//Change the position of the defense manipulator in teleop
 		if (humanControl->GetDefenseManipDesired()) {
+			DO_PERIODIC(1, printf("Teleop Defense Manip Desired\n"));
 			robot->ChangeDefenseManipState();
 		}
 
 		//Change the position of the defense manipulator in auto
 		if (autoDefenseManipUp) {
+			DO_PERIODIC(1, printf("Auto Defense Manip Up\n"));
 			robot->MoveDefenseManipUp();
 			autoDefenseManipUp = false;
 		} else if (autoDefenseManipDown) {
+			DO_PERIODIC(1, printf("Teleop Defense Manip Down\n"));
 			robot->MoveDefenseManipDown();
 			autoDefenseManipDown = false;
 		}
 
 		//Change the position of the intake in teleop
 		if (humanControl->GetIntakePistonDesired()) {
+			DO_PERIODIC(1, printf("Teleop Intake Desired\n"));
 			robot->ChangeIntakeArmState();
 		}
 
@@ -129,6 +133,7 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 	case (kPrepToOuttake):
 		//Moves the defense manipulator down, so that it can outtake and waits
 		if(!startedPTO) {
+			DO_PERIODIC(1, "Starting kPrepToOuttake\n");
 			startTimePTO = currTimeSec;
 			robot->MoveDefenseManipDown();
 			startedPTO = true;
