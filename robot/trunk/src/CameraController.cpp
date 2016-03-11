@@ -27,14 +27,6 @@ void CameraController::Reset() {
 	y = 0;
 }
 
-void CameraController::SetX(double newX) {
-	x = newX;
-}
-
-void CameraController::SetY(double newY) {
-	y = newY;
-}
-
 void CameraController::CalculateDistanceWithAngles() {
 	table->ReadValues();
 	printf("Read Table Values \n");

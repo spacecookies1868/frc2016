@@ -12,8 +12,6 @@ public:
 	void Reset();
 	double GetX();
 	double GetY();
-	void SetX(double newX);
-	void SetY(double newY);
 	~CameraController() {}
 private:
 	std::vector<double> CalculateRealCoords(double imageX, double imageY);

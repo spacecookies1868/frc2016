@@ -136,6 +136,8 @@ public:
 		radiusMaxAbsError, radiusMaxAbsDiffError, radiusMaxAbsITerm, radiusTimeLimit;
 	static double anglePFac, angleIFac, angleDFac, angleDesiredAccuracy, angleMaxAbsOutput,
 		angleMaxAbsError, angleMaxAbsDiffError, angleMaxAbsITerm, angleTimeLimit;
+	PIDConfig* radiusPIDConfig;
+	PIDConfig* anglePIDConfig;
 
 private:
 	PIDConfig* CreateRadiusPIDConfig();
@@ -145,8 +147,6 @@ private:
 	double GetAccumulatedYaw();
 	double GetSign(double n);
 	RobotModel* robot;
-	PIDConfig* radiusPIDConfig;
-	PIDConfig* anglePIDConfig;
 	PIDControlLoop* radiusPID;
 	PIDControlLoop* anglePID;
 	bool isDone;
