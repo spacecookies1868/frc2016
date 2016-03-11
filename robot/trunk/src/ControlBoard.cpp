@@ -22,6 +22,7 @@ ControlBoard::ControlBoard() {
 	outtakeButton = new ButtonReader(operatorJoy, OUTTAKE_BUTTON_PORT);
 	manualOuttakeForwardButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_FORWARD_BUTTON_PORT);
 	manualOuttakeReverseButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
+	powerBudgetButton = new ButtonReader(operatorJoy, POWER_BUDGET_SWITCH);
 
 	leftJoyX = 0.0;
 	leftJoyY = 0.0;
@@ -40,6 +41,7 @@ ControlBoard::ControlBoard() {
 	defense = LowBar;
 	manualOuttakeForwardDesired = false;
 	manualOuttakeReverseDesired = false;
+	powerBudgetDesired = false;
 };
 
 void ControlBoard::ReadControls() {
@@ -66,6 +68,7 @@ void ControlBoard::ReadControls() {
 	outtakeDesired = outtakeButton->WasJustPressed();
 	manualOuttakeForwardDesired = manualOuttakeForwardButton->IsDown();
 	manualOuttakeReverseDesired = manualOuttakeReverseButton->IsDown();
+	powerBudgetDesired = powerBudgetButton->IsDown();
 }
 
 double ControlBoard::GetJoystickValue(Joysticks j, Axes a) {
@@ -139,6 +142,10 @@ bool ControlBoard::GetManualOuttakeReverseDesired() {
 	return manualOuttakeReverseDesired;
 }
 
+bool ControlBoard::GetPowerBudgetDesired() {
+	return powerBudgetDesired;
+}
+
 void ControlBoard::ReadAllButtons() {
 	driveDirectionButton->ReadValue();
 	gearShiftButton->ReadValue();
@@ -151,4 +158,5 @@ void ControlBoard::ReadAllButtons() {
 	outtakeButton->ReadValue();
 	manualOuttakeForwardButton->ReadValue();
 	manualOuttakeReverseButton->ReadValue();
+	powerBudgetButton->ReadValue();
 }

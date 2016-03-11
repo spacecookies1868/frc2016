@@ -34,6 +34,7 @@ PowerController::PowerController(RobotModel* myRobot, ControlBoard* myHumanContr
 	totalCurrentLimit = 160;
 	voltageFloor = 7; // technically 6.8V but 7 to be safe
 	pressureFloor = 60; // todo test!!!!!!!
+
 	// todo put all these suckers in the ini?????
 	driveWeight = 0.8 * (totalVoltage / 12);
 	compWeight = 0.5 * (totalVoltage / 12) * (pressureFloor / robot->GetPressureSensorVal());
@@ -69,6 +70,22 @@ void PowerController::Update(double currTimeSec, double deltaTimeSec) {
 	totalCurrent = avgCompCurr + avgLeftCurr + avgRightCurr + avgIntakeCurr
 			+ avgRioCurr;
 	totalVoltage = robot->GetVoltage();
+
+	driveWeight = 0.8 * (totalVoltage / 12);
+	compWeight = 0.5 * (totalVoltage / 12) * (pressureFloor / robot->GetPressureSensorVal());
+	intakeWeight = 0.6 * (totalVoltage / 12) *
+		(humanControl->GetIntakeMotorForwardDesired() * humanControl->GetIntakeMotorReverseDesired());
+
+	if (IsBatteryLow()) {
+		LOG(robot, "battery low", true);
+	}
+
+	if (humanControl->GetPowerBudgetDesired()) {
+		if (totalVoltage < (voltageFloor + 2) ) {
+			LimitSingle();
+			PriorityScale();
+		}
+	}
 }
 
 bool PowerController::IsBatteryLow() {
@@ -83,21 +100,23 @@ bool PowerController::IsBatteryLow() {
 
 void PowerController::LimitSingle() {
 	// linear regression model of current vs speed:
-	// current = 47.4 * speed - 4.84
+	// current = 47.4 * speed - 4.84 changes depending on BATTERY VOLTAGE!!!!!axqwaz
 	double diffCurr = avgLeftCurr - driveCurrentLimit;
 	double scaledSpeed =  robot->GetWheelSpeed(RobotModel::kLeftWheels)
-			- (diffCurr + 4.84) / 47.4;
+		- (diffCurr + 4.84) / 47.4;
 	if (diffCurr >= 0) {
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, scaledSpeed);
 	}
 
-	double diffCurr = avgRightCurr - driveCurrentLimit;
-		double scaledSpeed =  robot->GetWheelSpeed(RobotModel::kRightWheels)
-				- (diffCurr + 4.84) / 47.4;
-		if (diffCurr >= 0) {
-			robot->SetWheelSpeed(RobotModel::kRightWheels, scaledSpeed);
-		}
+	diffCurr = avgRightCurr - driveCurrentLimit;
+	scaledSpeed =  robot->GetWheelSpeed(RobotModel::kRightWheels)
+		- (diffCurr + 4.84) / 47.4;
+	if (diffCurr >= 0) {
+		robot->SetWheelSpeed(RobotModel::kRightWheels, scaledSpeed);
+	}
 
+	diffCurr = avgIntakeCurr - intakeCurrentLimit;
+	// scaledSpeed = robot->GetIntakeMotorSpeed() -
 	// todo add scaling for intake motor and outtake motor, compressor, roborio
 }
 void PowerController::PriorityScale() {

@@ -35,6 +35,9 @@ public:
 	bool GetManualOuttakeForwardDesired();
 	bool GetManualOuttakeReverseDesired();
 
+	// power controller button accessor
+	bool GetPowerBudgetDesired();
+
 	enum Defenses {
 		LowBar = 0,
 		Portcullis = 1,
@@ -49,13 +52,14 @@ public:
 
 private:
 	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipDesired, intakePistonDesired,
-		 intakeMotorForwardDesired, intakeMotorReverseDesired, outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired;
+		 intakeMotorForwardDesired, intakeMotorReverseDesired, outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired,
+		 powerBudgetDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
 	uint32_t defense;
 	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
 				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton,
-				 *manualOuttakeReverseButton;
+				 *manualOuttakeReverseButton, *powerBudgetButton;
 	void ReadAllButtons();
 };
 
