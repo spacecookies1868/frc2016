@@ -75,6 +75,12 @@ static const int OUTTAKE_BUTTON_PORT					= 9;
 static const int MANUAL_OUTTAKE_FORWARD_BUTTON_PORT		= 4;
 static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 3;
 
+
+//Other controller button ports
+static const int DEFENSE_ID_1_BUTTON_PORT				= 7;
+static const int DEFENSE_ID_2_BUTTON_PORT				= 8;
+static const int DEFENSE_ID_3_BUTTON_PORT				= 9;
+
 // Power controller button port
 static const int POWER_BUDGET_SWITCH					= 2;
 

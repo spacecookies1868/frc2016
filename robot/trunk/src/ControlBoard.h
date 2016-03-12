@@ -59,7 +59,8 @@ private:
 	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
 				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton,
-				 *manualOuttakeReverseButton, *powerBudgetButton;
+				 *manualOuttakeReverseButton, *defense_ID_1_Button, *defense_ID_2_Button, *defense_ID_3_Button,
+				 *powerBudgetButton;
 	void ReadAllButtons();
 };
 

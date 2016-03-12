@@ -22,6 +22,11 @@ ControlBoard::ControlBoard() {
 	outtakeButton = new ButtonReader(operatorJoy, OUTTAKE_BUTTON_PORT);
 	manualOuttakeForwardButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_FORWARD_BUTTON_PORT);
 	manualOuttakeReverseButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
+
+	defense_ID_1_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_1_BUTTON_PORT);
+	defense_ID_2_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_2_BUTTON_PORT);
+	defense_ID_3_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_3_BUTTON_PORT);
+
 	powerBudgetButton = new ButtonReader(operatorJoy, POWER_BUDGET_SWITCH);
 
 	leftJoyX = 0.0;
@@ -59,7 +64,40 @@ void ControlBoard::ReadControls() {
  * Add buttons for defense combinations and if statement on buttons here, then assign defense to
  * the corresponding defense enum
  */
-	defense = Portcullis;
+	bool firstDown = defense_ID_1_Button->IsDown();
+	bool secondDown = defense_ID_2_Button->IsDown();
+	bool thirdDown = defense_ID_3_Button->IsDown();
+
+	if (firstDown) {
+		if (secondDown) {
+			if (thirdDown) {
+				defense = RoughTerrain;
+			} else {
+				defense = RockWall;
+			}
+		} else {
+			if (thirdDown) {
+				defense = LowBar;
+				//filler one bc no sally port or drawbridge
+			} else {
+				defense = Moat;
+			}
+		}
+	} else {
+		if (secondDown) {
+			if (thirdDown) {
+				defense = Ramparts;
+			} else {
+				defense = ChevalDeFrise;
+			}
+		} else {
+			if (thirdDown) {
+				defense = Portcullis;
+			} else {
+				defense = LowBar;
+			}
+		}
+	}
 
 	defenseManipDesired = defenseManipButton->WasJustPressed();
 	intakePistonDesired = intakePistonButton->WasJustPressed();
@@ -158,5 +196,8 @@ void ControlBoard::ReadAllButtons() {
 	outtakeButton->ReadValue();
 	manualOuttakeForwardButton->ReadValue();
 	manualOuttakeReverseButton->ReadValue();
+	defense_ID_1_Button->ReadValue();
+	defense_ID_2_Button->ReadValue();
+	defense_ID_3_Button->ReadValue();
 	powerBudgetButton->ReadValue();
 }
