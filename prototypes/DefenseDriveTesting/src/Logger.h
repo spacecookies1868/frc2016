@@ -3,6 +3,8 @@
 
 #include "RobotModel.h"
 #include "DefenseDrive.h"
+#include "RockWallDrive.h"
+#include "MoatDrive.h"
 #include <fstream>
 #include <string>
 #include <ctime>
@@ -12,6 +14,9 @@
 class Logger {
 public:
 	static void LogState(RobotModel* myRobot, DefenseDrive* myDefenseDrive);
+	static void LogState(RobotModel* myRobot, RockWallDrive* myRockWallDrive);
+	static void LogState(RobotModel* myRobot, MoatDrive* myRockWallDrive);
+
 	/* with time stamp */
 	static void LogAction(RobotModel* myRobot, const std::string& fileName, int line,
 				const std::string& stateName, double state);

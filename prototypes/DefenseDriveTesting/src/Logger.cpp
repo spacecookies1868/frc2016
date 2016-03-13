@@ -25,6 +25,38 @@ void Logger::LogState(RobotModel* myRobot, DefenseDrive* myDefenseDrive) {
 			myRobot->GetPitch() << "\r\n";
 	logData.flush();
 }
+
+void Logger::LogState(RobotModel* myRobot, RockWallDrive* myRockWallDrive) {
+	if (!logData.is_open()) {
+		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
+		logData << "Time, DefenseDriveState, LeftWheelSpeed, RightWheelSpeed, Yaw, Roll, Pitch\r\n";
+	}
+	logData <<
+			myRobot->GetTime() << ", " <<
+			myRockWallDrive->GetState() << ", " <<
+			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
+			myRobot->GetWheelSpeed(RobotModel::kRightWheels) << ", " <<
+			myRobot->GetYaw() << ", " <<
+			myRobot->GetRoll() << ", " <<
+			myRobot->GetPitch() << "\r\n";
+	logData.flush();
+}
+
+void Logger::LogState(RobotModel* myRobot, MoatDrive* myMoatDrive) {
+	if (!logData.is_open()) {
+		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
+		logData << "Time, DefenseDriveState, LeftWheelSpeed, RightWheelSpeed, Yaw, Roll, Pitch\r\n";
+	}
+	logData <<
+			myRobot->GetTime() << ", " <<
+			myMoatDrive->GetState() << ", " <<
+			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
+			myRobot->GetWheelSpeed(RobotModel::kRightWheels) << ", " <<
+			myRobot->GetYaw() << ", " <<
+			myRobot->GetRoll() << ", " <<
+			myRobot->GetPitch() << "\r\n";
+	logData.flush();
+}
 /* format:
  * robotmodel state / controlboard state
  *

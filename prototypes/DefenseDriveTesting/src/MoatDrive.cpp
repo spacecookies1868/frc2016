@@ -1,6 +1,6 @@
-#include <DefenseDrive.h>
+#include <MoatDrive.h>
 
-DefenseDrive::DefenseDrive(RobotModel* myRobot) {
+MoatDrive::MoatDrive(RobotModel* myRobot) {
 	robot = myRobot;
 	currState = kInit;
 	nextState = kBeforeUpRamp;
@@ -8,23 +8,27 @@ DefenseDrive::DefenseDrive(RobotModel* myRobot) {
 	lastRoll = 0.0;
 	speed = 0.0;
 	startRoll = 0.0;
+	diffRoll = 0.0;
+
 	isFlatThreshold = 0.0;
 	onRampThreshold = 0.0;
 	endThreshold = 0.0;
-	diffRoll = 0.0;
+	rollDerivativeIsFlatThreshold = 0.0;
+
+	derivativeOfRoll = 0.0;
 	startTime = 0.0;
 	startWaitTime = 0.0;
+
 	pivotToAngleCommand = nullptr;
 	driveStraightCommand = nullptr;
 }
 
-void DefenseDrive::Init() {
+void MoatDrive::Init() {
 	speed = 0.65;
 
-	// ramp and rough terrain
-	isFlatThreshold = 2.0;
-	onRampThreshold = 6.0;
-	endThreshold = 4.0;
+	isFlatThreshold = 12.0;
+	rollDerivativeIsFlatThreshold = 35.0;
+	onRampThreshold = 16.0;
 
 	currRoll = robot->GetRoll();
 	startRoll = currRoll;
@@ -35,10 +39,13 @@ void DefenseDrive::Init() {
 	startTime = 0.0;
 }
 
-void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
+void MoatDrive::Update(double currTimeSec, double deltaTimeSec) {
 	lastRoll = currRoll;
 	currRoll = robot->GetRoll();
 	diffRoll = currRoll - startRoll;
+
+	double deltaRoll = lastRoll - currRoll;
+	derivativeOfRoll = deltaRoll / deltaTimeSec;
 	double startYaw = 0.0;
 
 	switch(currState) {
@@ -69,9 +76,11 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 	case (kUpRamp):
 		//robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
 		driveStraightCommand->Update(currTimeSec, deltaTimeSec);
-		if (fabs(diffRoll) < isFlatThreshold) {
+		if ((fabs(derivativeOfRoll) < rollDerivativeIsFlatThreshold) &&
+			(fabs(diffRoll) < isFlatThreshold)) {
+		//if (fabs(diffRoll) < isFlatThreshold) {
 			nextState = kMiddleRamp;
-			printf("next state: kMiddleRamp\n");
+			printf("next state: kMiddle\n");
 		} else {
 			nextState = kUpRamp;
 		}
@@ -90,7 +99,8 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 		driveStraightCommand->Update(currTimeSec, deltaTimeSec);
 		//robot->SetWheelSpeed(RobotModel::kAllWheels, speed);
 		//if (diffRoll > -endThreshold){
-		if (diffRoll > -isFlatThreshold) {
+		if ((fabs(derivativeOfRoll) < rollDerivativeIsFlatThreshold) &&
+				(fabs(diffRoll) < isFlatThreshold)) {
 			startWaitTime = currTimeSec;
 			nextState = kWait;
 			printf("next state: kWait\n");
@@ -110,6 +120,7 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 		if (pivotToAngleCommand->IsDone()) {
 			nextState = kDone;
 			printf("next state: kDone\n");
+			printf("done time: %f", currTimeSec - startTime);
 		} else {
 			pivotToAngleCommand->Update(currTimeSec, deltaTimeSec);
 			printf("yaw: %f\n", robot->GetYaw());
@@ -124,22 +135,20 @@ void DefenseDrive::Update(double currTimeSec, double deltaTimeSec) {
 
 	currState = nextState;
 
-	SmartDashboard::PutNumber("state: ", currState);
-
-	if (currTimeSec - startTime > 4.0) {		// safeguard to 2.5 sec
+	if (currTimeSec - startTime > 3.0) {		// safeguard to 2.5 sec
 		printf("done from timer: %f", currTimeSec - startTime);
 		SmartDashboard::PutString("Done from ", "timer");
 		currState = kDone;
 	}
 }
 
-int DefenseDrive::GetState() {
+int MoatDrive::GetState() {
 	return currState;
 }
 
-bool DefenseDrive::IsDone() {
+bool MoatDrive::IsDone() {
 	return (currState == kDone) ;
 }
 
-DefenseDrive::~DefenseDrive() {
+MoatDrive::~MoatDrive() {
 }
