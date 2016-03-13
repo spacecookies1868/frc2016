@@ -111,8 +111,8 @@ private:
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
 		}
 
-		printf("Right Encoder Val %f\n", robot->GetRightEncoderVal());
-		printf("Left Encoder Val %f\n", robot->GetLeftEncoderVal());
+		//printf("Right Encoder Val %f\n", robot->GetRightEncoderVal());
+		//printf("Left Encoder Val %f\n", robot->GetLeftEncoderVal());
 		Logger::LogState(robot, humanControl);
 
 #if USE_CAMERA

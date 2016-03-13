@@ -331,7 +331,7 @@ double RobotModel::GetOuttakeMotorSpeed() {
 
 void RobotModel::SetOuttakeMotorSpeed(double speed) {
 	//TODO check that this is the correct direction
-	DO_PERIODIC(1, printf("Set outtake speed to %f\n", speed));
+	DO_PERIODIC(20, printf("Set outtake speed to %f\n", speed));
 	outtakeMotorA->Set(speed);
 	outtakeMotorB->Set(-speed);
 }
