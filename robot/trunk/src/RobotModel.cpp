@@ -61,7 +61,7 @@ RobotModel::RobotModel() {
 	frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0); // 0 bordersize
 #endif
 
-	compressor = new Compressor(COMPRESSOR_PORT);
+	compressor = new Compressor(PNEUMATICS_CONTROL_MODULE_ID);
 #if USE_NAVX
 	//serialPort = new SerialPort(57600, SerialPort::kMXP);
 	navx = new AHRS(SPI::Port::kMXP);

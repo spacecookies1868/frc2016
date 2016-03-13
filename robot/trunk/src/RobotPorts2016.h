@@ -44,7 +44,7 @@ static const int PRESSURE_SENSOR_PORT					= 3;
 
 // ***************** MISC *****************
 static const int COMPRESSOR_PORT						= 1;
-static const int PNEUMATICS_CONTROL_MODULE_ID			= 0;
+static const int PNEUMATICS_CONTROL_MODULE_ID			= 1;
 
 // ***************** SOLENOID PORTS *****************
 static const int GEAR_SHIFT_SOLENOID_PORT				= 7;
