@@ -17,11 +17,10 @@ public:
 	double GetDistanceInches();
 	double GetBoulderXDistance();
 	double GetBoulderYDistance();
-	void CalculateDesiredDeltaAngle();
-	void CalculateBoulderRadius();
+//	void CalculateDesiredDeltaAngle();
+//	void CalculateBoulderRadius();
 	void CalculateBoulderAxisDistance();
-	void CalculateAverageStartBoulderAngle();
-	void IsBoulder();
+//	void IsBoulder();
 	bool IsDone();
 
 	virtual ~SensingBoulders();
@@ -47,8 +46,10 @@ private:
 	int readingCount;
 //	double calculatedRadius;
 	double startServoAngle, endServoAngle, deltaServoAngle;
+	double deltaServoRange;
 	double startBoulderAngle, endBoulderAngle, centerBoulderAngle;
 	double lastBoulderAngle;
+	double deltaMeasuredDistance;
 	double sumAngle;
 	double averageAngle;
 //	double sumStartBoulderAngle;
@@ -57,7 +58,6 @@ private:
 	double averageDistance;
 	double sumDistance;
 //	double sumStartBoulderDistance;
-	double centerToBoulder;
 	double startBoulderDistance, endBoulderDistance, centerBoulderDistance;
 	double lastBoulderDistance;
 	double minBoulderDistance;

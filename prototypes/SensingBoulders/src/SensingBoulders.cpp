@@ -8,22 +8,19 @@ SensingBoulders::SensingBoulders(RobotModel* myRobot) {
 	printf("Creating ultrasonic sensor \n");
 	ultrasonicSensor = new UltrasonicSensor(0);
 
-	centerToBoulder = 0.0;
 	xBoulderDistance = 0.0;
 	yBoulderDistance = 0.0;
 	xDistanceToCenterRobot = 12.2; // the number should be changed for comp bot, should ask mechanical for this
 	yDistanceToCenterRobot = 12.0; // the number should be changed for comp bot, should ask mechanical for this
-//	angleThreshold = 0.5;
-//	boulderRadius = 0.0;		   // the number should be changed if the position of the ultrasonic is changed
-//	boulderRadiusThreshold = 1.5;
 	deltaServoAngle = 0.3;
+//	deltaServoRange = atan2(45.5, 36.0) * 2 * PI / 180;
 }
 
 void SensingBoulders::Init() {
 	printf("Initializing SensingBoulders \n");
 
 	readingCount = 0;
-	startServoAngle = 10;
+	startServoAngle = 35;
 	endServoAngle = 160;
 
 	robot->InitServo(startServoAngle);
@@ -40,6 +37,10 @@ void SensingBoulders::Init() {
 	endBoulderDistance = startBoulderDistance;
 	centerBoulderDistance = startBoulderDistance;
 
+	lastBoulderAngle = currAngle;
+	lastBoulderDistance = currDistance;
+	deltaMeasuredDistance = currDistance - lastBoulderDistance;
+
 	thresholdDistance = 1.2;	// 20 percent from minBoulderDistance
 	isSensingDone = false;
 	isDone = false;
@@ -47,9 +48,6 @@ void SensingBoulders::Init() {
 
 	xBoulderDistance = 0.0;
 	yBoulderDistance = 0.0;
-
-//	currState = kSensingBoulder;
-//	nextState = currState;
 
 	desiredDeltaAngle = 0.0;
 
@@ -60,6 +58,7 @@ void SensingBoulders::Init() {
 void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 	currAngle = robot->GetServoAngle();	//actually takes the value the servo was set to last
 	currDistance = ultrasonicSensor->GetRangeInInches();
+	deltaMeasuredDistance = abs(currAngle - lastBoulderAngle);
 
 	if (isSensingDone) {
 		return;
@@ -79,7 +78,8 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 		readingCount = 0;
 	}
 
-	if (averageAngle * thresholdDistance < startBoulderDistance) {
+	if ((averageDistance * thresholdDistance < startBoulderDistance) &&
+			deltaMeasuredDistance < 40) {
 		startBoulderDistance = averageDistance;
 		startBoulderAngle = averageAngle;
 		minBoulderDistance = startBoulderDistance;
@@ -103,16 +103,16 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 		printf("CHANGED MIN DISTANCE: %f \n", minBoulderDistance);
 	}
 
-	if ((averageDistance > thresholdDistance * startBoulderDistance) && !endBoulderFound) {
+	if ((averageDistance > thresholdDistance * startBoulderDistance) && (!endBoulderFound)) {
 		endBoulderFound = true;
 		endBoulderDistance = lastBoulderDistance;
 		endBoulderAngle = lastBoulderAngle;
 		printf("Curr Distance: %f\n", averageDistance);
 		printf("CHANGED END BOULDER \n");
-/*		if (fabs(endBoulderAngle - startBoulderAngle) < 20) {
+		if (fabs(endBoulderAngle - startBoulderAngle) < 20) {
 			startBoulderDistance = 225;
 			printf("REJECTED!!!\n");
-		}*/
+		}
 //		PrintState();
 	}
 
@@ -127,7 +127,7 @@ void SensingBoulders::Update(double myCurrTimeSec, double myLastTimeSec) {
 	IsSensingDone();
 }
 
-/* 	FOR DETECTING THE BOULDER AND TURNING TOWARDS IT
+/* 	FOR DETECTING THE BOULDER AND TURNING TOWARDS IT IF USE ADD IN NECESSARY VARIABLES
 void SensingBoulders::Update(double myCurrTimeSec, double myDeltaTimeSec) {
 	currAngle = robot->GetServoAngle();
 	currDistance = ultrasonicSensor->GetRangeInInches();
@@ -274,18 +274,6 @@ double SensingBoulders::GetBoulderXDistance() {
 double SensingBoulders::GetBoulderYDistance() {
 	return yBoulderDistance;
 }
-/*
-void SensingBoulders::IsBoulder() {
-	printf("Expected Boulder Radius: %f \n", boulderRadius);
-	if (calculatedRadius < boulderRadius * boulderRadiusThreshold &&
-			calculatedRadius * boulderRadiusThreshold > boulderRadius) {
-		printf("IS BOULDER :D!!!! \n");
-		isBoulder = true;
-		printf("bool: %d", isBoulder);
-	} else {
-		isBoulder = false;
-	}
-}*/
 
 bool SensingBoulders::IsDone() {
 	return isDone;
