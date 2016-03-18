@@ -69,11 +69,11 @@ static const int QUICK_TURN_BUTTON_PORT					= 1;
 //Superstructure controller button ports
 static const int DEFENSE_MANIP_BUTTON_PORT				= 5;
 static const int INTAKE_PISTON_BUTTON_PORT				= 1;
-static const int INTAKE_MOTOR_FORWARD_BUTTON_PORT		= 4;
-static const int INTAKE_MOTOR_REVERSE_BUTTON_PORT		= 3;
-static const int OUTTAKE_BUTTON_PORT					= 9;
-static const int MANUAL_OUTTAKE_FORWARD_BUTTON_PORT		= 4;
-static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 3;
+static const int INTAKE_MOTOR_FORWARD_BUTTON_PORT		= 11;
+static const int INTAKE_MOTOR_REVERSE_BUTTON_PORT		= 12;
+static const int OUTTAKE_BUTTON_PORT					= 6;
+static const int MANUAL_OUTTAKE_FORWARD_BUTTON_PORT		= 8;
+static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 9;
 
 
 //Other controller button ports
@@ -82,6 +82,6 @@ static const int DEFENSE_ID_2_BUTTON_PORT				= 8;
 static const int DEFENSE_ID_3_BUTTON_PORT				= 9;
 
 // Power controller button port
-static const int POWER_BUDGET_SWITCH					= 2;
+static const int POWER_BUDGET_SWITCH					= 7;
 
 #endif

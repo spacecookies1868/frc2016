@@ -14,6 +14,7 @@ public:
 	void QuickTurn(double myRight);
 	void ArcadeDrive(double myX, double myY);
 	void TankDrive(double myLeft, double myRight);
+
 	int DriveDirection();
 	virtual ~DriveController();
 

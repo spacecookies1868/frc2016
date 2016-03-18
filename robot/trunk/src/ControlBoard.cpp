@@ -20,8 +20,8 @@ ControlBoard::ControlBoard() {
 	intakeMotorForwardButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_FORWARD_BUTTON_PORT);
 	intakeMotorReverseButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_REVERSE_BUTTON_PORT);
 	outtakeButton = new ButtonReader(operatorJoy, OUTTAKE_BUTTON_PORT);
-	manualOuttakeForwardButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_FORWARD_BUTTON_PORT);
-	manualOuttakeReverseButton = new ButtonReader(operatorJoyB, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
+	manualOuttakeForwardButton = new ButtonReader(operatorJoy, MANUAL_OUTTAKE_FORWARD_BUTTON_PORT);
+	manualOuttakeReverseButton = new ButtonReader(operatorJoy, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
 
 	defense_ID_1_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_1_BUTTON_PORT);
 	defense_ID_2_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_2_BUTTON_PORT);
