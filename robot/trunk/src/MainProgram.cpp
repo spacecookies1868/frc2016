@@ -5,6 +5,7 @@
 #include "SuperstructureController.h"
 #include "AutonomousController.h"
 #include "CameraController.h"
+#include "PowerController.h"
 #include "Debugging.h"
 #include "Logger.h"
 #include <string.h>
@@ -17,6 +18,7 @@ class MainProgram : public IterativeRobot {
 	SuperstructureController *superstructureController;
 	AutonomousController *autonomousController;
 	CameraController *cameraController;
+	PowerController *powerController;
 
 	double currTimeSec;
 	double lastTimeSec;
@@ -37,6 +39,7 @@ public:
 		superstructureController = new SuperstructureController(robot, humanControl);
 		cameraController = new CameraController(robot);
 		autonomousController = new AutonomousController(robot, driveController, superstructureController, cameraController, humanControl);
+		powerController = new PowerController(robot, humanControl);
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -91,6 +94,7 @@ private:
 		superstructureController->Reset();
 		cameraController->Reset();
 		autonomousController->Reset();
+		powerController->Reset();
 
 		currTimeSec = 0.0;
 		lastTimeSec = 0.0;
@@ -113,6 +117,7 @@ private:
 
 		//printf("Right Encoder Val %f\n", robot->GetRightEncoderVal());
 		//printf("Left Encoder Val %f\n", robot->GetLeftEncoderVal());
+		powerController->Update(currTimeSec, deltaTimeSec);
 		Logger::LogState(robot, humanControl);
 
 #if USE_CAMERA
@@ -141,6 +146,7 @@ private:
 		superstructureController->Reset();
 		autonomousController->Reset();
 		cameraController->Reset();
+		powerController->Reset();
 
 		//LOG(robot, "Finished disabled init", 0.0);
 	}

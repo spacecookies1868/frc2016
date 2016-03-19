@@ -42,7 +42,7 @@
 
 class PowerController {
 	public:
-		PowerController(RobotModel* myRobot, ControlBoard* myHumanControl);
+		PowerController(RobotModel* myRobot, RemoteControl* myHumanControl);
 		void Update(double currTimeSec, double deltaTimeSec);
 		bool IsBatteryLow();
 		void LimitSingle();
@@ -55,7 +55,7 @@ class PowerController {
 		virtual ~PowerController();
 	private:
 		RobotModel* robot;
-		ControlBoard* humanControl;
+		RemoteControl* humanControl;
 		double totalCurrent, oldCurrent;
 
 		double avgLeftCurr, avgRightCurr, avgIntakeCurr, avgCompCurr, avgRioCurr;

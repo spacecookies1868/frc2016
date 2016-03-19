@@ -27,6 +27,9 @@ public:
 	virtual bool GetManualOuttakeForwardDesired() = 0;
 	virtual bool GetManualOuttakeReverseDesired() = 0;
 
+	// power controller button accessors
+	virtual bool GetPowerBudgetDesired() = 0;
+
 	virtual ~RemoteControl() {}
 };
 

@@ -23,7 +23,8 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 				<< "Intake Down, Defense Down, Low Gear, Left Joy X, Left Joy Y, "
 				<< "Right Joy X, Right Joy Y, Reverse, Arcade, Defense Desired, "
 				<< "Intake Reverse Desired, Intake Forward Desired, Intake Piston Desired, "
-				<< "Low Gear Desired, Outtake Desired, Quick Turn Desired \r\n";
+				<< "Low Gear Desired, Outtake Desired, Quick Turn Desired, "
+				<< "Power Budget Desired \r\n";
 	}
 	logData << myRobot->GetTime() << ", " <<
 			myRobot->GetLeftEncoderVal() << ", " <<
@@ -63,7 +64,8 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myHumanControl->GetIntakePistonDesired()  << ", " <<
 			myHumanControl->GetLowGearDesired() << ", " <<
 			myHumanControl->GetOuttakeDesired()  << ", " <<
-			myHumanControl->GetQuickTurnDesired() << "\r\n";
+			myHumanControl->GetQuickTurnDesired() << ", " <<
+			myHumanControl->GetPowerBudgetDesired() << "\r\n";
 	logData.flush();
 }
 /* format:

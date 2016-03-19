@@ -6,7 +6,7 @@
  */
 #include "PowerController.h"
 
-PowerController::PowerController(RobotModel* myRobot, ControlBoard* myHumanControl) {
+PowerController::PowerController(RobotModel* myRobot, RemoteControl* myHumanControl) {
 	robot = myRobot;
 	humanControl = myHumanControl;
 	totalCurrent = 0;
@@ -105,6 +105,7 @@ void PowerController::LimitSingle() {
 	double scaledSpeed =  robot->GetWheelSpeed(RobotModel::kLeftWheels)
 		- (diffCurr + 4.84) / 47.4;
 	if (diffCurr >= 0) {
+		LOG(robot, "l drive maxed", 1);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, scaledSpeed);
 	}
 
@@ -112,6 +113,7 @@ void PowerController::LimitSingle() {
 	scaledSpeed =  robot->GetWheelSpeed(RobotModel::kRightWheels)
 		- (diffCurr + 4.84) / 47.4;
 	if (diffCurr >= 0) {
+		LOG(robot, "r drive maxed", 1);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, scaledSpeed);
 	}
 
@@ -131,6 +133,7 @@ void PowerController::PriorityScale() {
 	*/
 	if (diffRatio >= 1) {
 // todo test total current values
+		LOG(robot, "current maxed", 1);
 		double adjLeftWheelSpeed =  ((1 / diffRatio) - roboRIORatio) * robot->GetWheelSpeed(RobotModel::kLeftWheels);
 		double adjRightWheelSpeed =  ((1 / diffRatio) - roboRIORatio) * robot->GetWheelSpeed(RobotModel::kRightWheels);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, driveWeight * adjLeftWheelSpeed);
