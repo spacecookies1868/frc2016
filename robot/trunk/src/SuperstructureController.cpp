@@ -88,7 +88,7 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			robot->MoveDefenseManipUp();
 			autoDefenseManipUp = false;
 		} else if (autoDefenseManipDown) {
-			DO_PERIODIC(1, printf("Teleop Defense Manip Down\n"));
+			DO_PERIODIC(1, printf("Auto Defense Manip Down\n"));
 			robot->MoveDefenseManipDown();
 			autoDefenseManipDown = false;
 		}
@@ -121,10 +121,10 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 
 		//Allows for manual control of the outtake motors
 		if (humanControl->GetManualOuttakeForwardDesired() || autoManualOuttakeForward) {
-			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
 			//robot->MoveDefenseManipDown();
 		} else if (humanControl->GetManualOuttakeReverseDesired() || autoManualOuttakeReverse) {
-			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
 		} else {
 			robot->SetOuttakeMotorSpeed(0.0);
 		}
