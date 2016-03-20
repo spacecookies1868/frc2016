@@ -4,6 +4,7 @@
 #include "RobotModel.h"
 #include "RemoteControl.h"
 #include "Debugging.h"
+#include "PIDControlLoop.h"
 
 class DriveController {
 public:
@@ -25,6 +26,14 @@ public:
 private:
 	RobotModel *robot;
 	RemoteControl *humanControl;
+
+	PIDConfig* CreateRPIDConfig();
+	PIDConfig* rPIDConfig;
+	PIDControlLoop* rPID;
+	double rPFac, rIFac, rDFac, rDesiredAccuracy, rMaxAbsOutput, rMaxAbsDiffError,
+			rMaxAbsError, rMaxAbsITerm, rTimeLimit;
+	double lastR;
+	bool initializedRPID;
 
 	uint32_t m_stateVal;
 	uint32_t nextState;
