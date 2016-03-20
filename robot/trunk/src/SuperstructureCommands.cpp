@@ -141,6 +141,63 @@ bool DefenseManipPosCommand::IsDone() {
 	return isDone;
 }
 
+OuttakeCommand::OuttakeCommand(SuperstructureController* mySuperstructure) {
+	superstructure = mySuperstructure;
+	defenseDown = new DefenseManipPosCommand(superstructure, true);
+	isDone = false;
+}
 
+void OuttakeCommand::Init() {
+	defenseDown->Init();
+	superstructure->SetAutoOuttake(true);
+}
 
+void OuttakeCommand::Update(double currTimeSec, double deltaTimeSec) {
+	if (!defenseDown->IsDone()) {
+		defenseDown->Update(currTimeSec, deltaTimeSec);
+	} else if (superstructure->GetOuttakeFinished()) {
+		isDone = true;
+	} else {
+		superstructure->Update(currTimeSec, deltaTimeSec);
+	}
+}
 
+bool OuttakeCommand::IsDone() {
+	return isDone;
+}
+
+OuttakeByTimeCommand::OuttakeByTimeCommand(SuperstructureController* mySuperstructure, double myTime) {
+	superstructure = mySuperstructure;
+	defenseDown = new DefenseManipPosCommand(superstructure, true);
+	wait = new WaitingCommand(0.5);
+	isDone = false;
+	time = myTime;
+	initTime = 0.0;
+}
+
+void OuttakeByTimeCommand::Init() {
+	defenseDown->Init();
+}
+
+void OuttakeByTimeCommand::Update(double currTimeSec, double deltaTimeSec) {
+	if (!defenseDown->IsDone()) {
+		defenseDown->Update(currTimeSec, deltaTimeSec);
+		wait->Init();
+	} else if (!wait->IsDone()) {
+		wait->Update(currTimeSec, deltaTimeSec);
+		initTime = currTimeSec;
+	} else if ((currTimeSec - initTime) <= time) {
+		printf("Outtaking \n");
+		superstructure->SetAutoManualOuttakeForward(true);
+		superstructure->Update(currTimeSec, deltaTimeSec);
+	} else {
+		printf("Done \n");
+		superstructure->SetAutoManualOuttakeForward(false);
+		superstructure->Update(currTimeSec, deltaTimeSec);
+		isDone = true;
+	}
+}
+
+bool OuttakeByTimeCommand::IsDone() {
+	return isDone;
+}

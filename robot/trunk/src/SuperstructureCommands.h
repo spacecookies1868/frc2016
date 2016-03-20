@@ -82,6 +82,33 @@ private:
 	bool desiredDown;
 };
 
+class OuttakeCommand : public SimpleAutoCommand {
+public:
+	OuttakeCommand(SuperstructureController* mySuperstructure);
+	~OuttakeCommand() {}
+	void Init();
+	void Update(double currTimeSec, double deltaTimeSec);
+	bool IsDone();
+private:
+	SuperstructureController* superstructure;
+	DefenseManipPosCommand* defenseDown;
+	bool isDone;
+};
 
+class OuttakeByTimeCommand : public SimpleAutoCommand {
+public:
+	OuttakeByTimeCommand(SuperstructureController* mySuperstructure, double myTime);
+	~OuttakeByTimeCommand() {}
+	void Init();
+	void Update(double currTimeSec, double deltaTimeSec);
+	bool IsDone();
+private:
+	SuperstructureController* superstructure;
+	WaitingCommand* wait;
+	DefenseManipPosCommand* defenseDown;
+	bool isDone;
+	double time;
+	double initTime;
+};
 
 #endif /* SRC_SUPERSTRUCTURECOMMANDS_H_ */
