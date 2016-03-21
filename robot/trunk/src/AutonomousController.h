@@ -43,8 +43,6 @@ public:
 	void Reset();
 	void RefreshIni();
 
-	unsigned int autoMode;
-
 private:
 	void CreateQueue();
 	void AddtoQueue(AutoCommand* myNewAutoCommand, SimpleAutoCommand* myLastAutoCommand);
@@ -56,6 +54,7 @@ private:
 	SuperstructureController* superstructure;
 	CameraController* camera;
 	RemoteControl* humanControl;
+	unsigned int autoMode;
 	unsigned int autoStart;
 	bool hardCodeShoot;
 	unsigned int firstDefense;

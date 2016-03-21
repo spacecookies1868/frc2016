@@ -13,8 +13,10 @@ SuperstructureController::SuperstructureController(RobotModel* myRobot, RemoteCo
 	deltaTimePTO = 0.0;
 
 	startedOT = false;
-	startEncoderValOT = 0.0;
-	deltaEncoderValOT = 0.0;
+	startEncoderValEOT = 0.0;
+	deltaEncoderValEOT = 0.0;
+	startTimeTOT = 0.0;
+	deltaTimeTOT = 0.0;
 
 	autoDefenseManipUp = false;
 	autoDefenseManipDown = false;
@@ -41,7 +43,8 @@ void SuperstructureController::Reset() {
 	startTimePTO = 0.0;
 
 	startedOT = false;
-	startEncoderValOT = 0.0;
+	startEncoderValEOT = 0.0;
+	startTimeTOT = 0.0;
 
 	autoDefenseManipUp = false;
 	autoDefenseManipDown = false;
@@ -60,21 +63,11 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 	case (kInit):
 		//maybe set all single solenoids to their base positions so that they don't move when you enable
 		robot->SetIntakeMotorSpeed(0.0);
+		robot->SetOuttakeMotorSpeed(0.0);
 		nextState = kIdle;
 		break;
 	case (kIdle):
 		nextState = kIdle;
-
-		//Change the position of the intake in auto
-		if (autoIntakeUp) {
-			DO_PERIODIC(1, printf("Auto Intake Up \n"));
-			robot->MoveIntakeArmUp();
-			autoIntakeUp = false;
-		} else if (autoIntakeDown) {
-			DO_PERIODIC(1, printf("Auto Intake Down \n"));
-			robot->MoveIntakeArmDown();
-			autoIntakeDown = false;
-		}
 
 		//Change the position of the defense manipulator in teleop
 		if (humanControl->GetDefenseManipDesired()) {
@@ -99,6 +92,17 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			robot->ChangeIntakeArmState();
 		}
 
+		//Change the position of the intake in auto
+		if (autoIntakeUp) {
+			DO_PERIODIC(1, printf("Auto Intake Up \n"));
+			robot->MoveIntakeArmUp();
+			autoIntakeUp = false;
+		} else if (autoIntakeDown) {
+			DO_PERIODIC(1, printf("Auto Intake Down \n"));
+			robot->MoveIntakeArmDown();
+			autoIntakeDown = false;
+		}
+
 		//Move the intake motor forward or backward
 		if (humanControl->GetIntakeMotorForwardDesired() || autoIntakeMotorForward) {
 			robot->SetIntakeMotorSpeed(intakeSpeed);
@@ -112,7 +116,7 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		//If already down, goes straight to outtake
 		if (humanControl->GetOuttakeDesired() || autoOuttake) {
 			if (robot->IsDefenseManipDown()) {
-				nextState = kOuttake;
+				nextState = kTimeOuttake;
 			} else {
 				nextState = kPrepToOuttake;
 			}
@@ -121,10 +125,10 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 
 		//Allows for manual control of the outtake motors
 		if (humanControl->GetManualOuttakeForwardDesired() || autoManualOuttakeForward) {
-			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
 			//robot->MoveDefenseManipDown();
 		} else if (humanControl->GetManualOuttakeReverseDesired() || autoManualOuttakeReverse) {
-			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
 		} else {
 			robot->SetOuttakeMotorSpeed(0.0);
 		}
@@ -142,19 +146,36 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			nextState = kPrepToOuttake;
 		} else {
 			startedPTO = false;
-			nextState = kOuttake;
+			nextState = kTimeOuttake;
 		}
 		break;
-	case (kOuttake):
+	case (kTimeOuttake):
 		//Runs the outtake motors for a certain amount of time to ensure that they have outtaken
 		if (!startedOT) {
-			startEncoderValOT = robot->GetOuttakeEncoderVal();
+			startTimeTOT = robot->GetTime();
 			robot->SetOuttakeMotorSpeed(outtakeSpeed);
 			startedOT = true;
-			nextState = kOuttake;
-		} else if (robot->GetOuttakeEncoderVal() - startEncoderValOT < deltaEncoderValOT) {
+			nextState = kTimeOuttake;
+		} else if (robot->GetTime() - startTimeTOT < deltaTimeTOT) {
 			robot->SetOuttakeMotorSpeed(outtakeSpeed);
-			nextState = kOuttake;
+			nextState = kTimeOuttake;
+		} else {
+			robot->SetOuttakeMotorSpeed(0.0);
+			startedOT = false;
+			autoOuttakeFinished = true;
+			nextState = kIdle;
+		}
+		break;
+	case (kEncOuttake):
+		//Runs the outtake motors for a certain amount of encoder ticks to ensure that they have outtaken
+		if (!startedOT) {
+			startEncoderValEOT = robot->GetOuttakeEncoderVal();
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			startedOT = true;
+			nextState = kEncOuttake;
+		} else if (robot->GetOuttakeEncoderVal() - startEncoderValEOT < deltaEncoderValEOT) {
+			robot->SetOuttakeMotorSpeed(outtakeSpeed);
+			nextState = kEncOuttake;
 		} else {
 			robot->SetOuttakeMotorSpeed(0.0);
 			startedOT = false;
@@ -173,7 +194,9 @@ void SuperstructureController::RefreshIni() {
 	intakeSpeed = robot->pini->getf("SUPERSTRUCTURE", "intakeSpeed", 0.4);
 	outtakeSpeed = robot->pini->getf("SUPERSTRUCTURE", "outtakeSpeed", 0.4);
 	deltaTimePTO = robot->pini->getf("SUPERSTRUCTURE", "deltaTimePTO", 1.0);
-	deltaEncoderValOT = robot->pini->getf("SUPERSTRUCTURE", "intakeSpeed", 0.0);
+	deltaEncoderValEOT = robot->pini->getf("SUPERSTRUCTURE", "deltaEncoderValEOT", 0.0);
+	deltaTimeTOT = robot->pini->getf("SUPERSTRUCTURE", "deltaTimeTOT", 0.0);
+
 }
 
 void SuperstructureController::SetAutoDefenseManipUp(bool desired) {

@@ -61,12 +61,9 @@ void AutonomousController::Reset() {
 	firstCommand = NULL;
 	currentCommand = NULL;
 	humanControl->ReadControls();
-	/*
-	robot->SetWheelSpeed(RobotModel::kFrontLeftWheel, 0.0);
-	robot->SetWheelSpeed(RobotModel::kRearLeftWheel, 0.0);
-	robot->SetWheelSpeed(RobotModel::kFrontRightWheel, 0.0);
-	robot->SetWheelSpeed(RobotModel::kRearRightWheel, 0.0);
-	*/
+
+	robot->ShiftToLowGear();
+	robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 }
 
 void AutonomousController::RefreshIni() {

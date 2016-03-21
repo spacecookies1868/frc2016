@@ -30,6 +30,7 @@ public:
 			lw = LiveWindow::GetInstance();
 			robot = new RobotModel();
 		} catch (std::exception &e) {
+			DUMP("NavX Error", "Error Instantiating NavX");
 			std::string err_string = "Error instantiating navX MXP:  ";
 			err_string += e.what();
 			DriverStation::ReportError(err_string.c_str());

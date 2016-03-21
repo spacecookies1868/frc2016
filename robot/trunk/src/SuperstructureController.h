@@ -28,7 +28,7 @@ public:
 	bool GetOuttakeFinished();
 
 	enum SuperstructureState {
-		kInit, kIdle, kPrepToOuttake, kOuttake
+		kInit, kIdle, kPrepToOuttake, kEncOuttake, kTimeOuttake
 	};
 
 private:
@@ -45,8 +45,10 @@ private:
 
 	//OT = outtake
 	bool startedOT;
-	double startEncoderValOT;
-	double deltaEncoderValOT;
+	double startEncoderValEOT;
+	double deltaEncoderValEOT;
+	double startTimeTOT;
+	double deltaTimeTOT;
 
 	//auto booleans
 	bool autoDefenseManipUp;

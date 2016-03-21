@@ -22,7 +22,6 @@ public:
 
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetWheelSpeed(Wheels w);
-	double GetMotorSpeed();
 
 	double GetNavXYaw();
 	double GetNavXRoll();
