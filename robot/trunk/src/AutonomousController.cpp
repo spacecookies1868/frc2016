@@ -19,12 +19,14 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	hardCodeShoot = true;
 	firstDefense = 0;
 	secondDefensePos = 0;
+	useSallyPort = true;
 }
 
 /**
  * Creates the queue of AutoCommand instances
  */
 void AutonomousController::StartAutonomous() {
+	humanControl->ReadControls();
 	CreateQueue();
 	currentCommand = firstCommand;
 	if (currentCommand != NULL) {
@@ -71,6 +73,7 @@ void AutonomousController::RefreshIni() {
 	hardCodeShoot = robot->pini->getbool("AUTONOMOUS", "HardCodeShoot", true);
 	firstDefense = robot->pini->geti("AUTONOMOUS", "FirstDefense", 0);
 	secondDefensePos = robot->pini->geti("AUTONOMOUS", "SecondDefense", 0);
+	useSallyPort = robot->pini->getbool("AUTONOMOUS", "UseSallyPort", true);
 
 #if USE_NAVX
 	/*
@@ -166,20 +169,32 @@ void AutonomousController::CreateQueue() {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
 		DUMP("TEST AUTO", 0.0);
-//		DefenseManipPosCommand* goDownArm = new DefenseManipPosCommand(superstructure, true);
-//		firstCommand = goDownArm;
-//		DefenseCommand* testDefense = new DefenseCommand(robot, superstructure, DefenseCommand::Portcullis);
-//		goDownArm->SetNextCommand(testDefense);
-		PivotToAngleCommand* straighten = new PivotToAngleCommand(robot, 300.0);
-		firstCommand = straighten;
-//		testDefense->SetNextCommand(straighten);
-//		CurveCommand* goToGoal = new CurveCommand(robot, 2.0, 8.0);
-//		straighten->SetNextCommand(goToGoal);
+//		DriveStraightCommand* driveStraight = new DriveStraightCommand(robot, 10.0);
+//		firstCommand =  driveStraight;
+//		IntakeCommand* intakeTest = new IntakeCommand(superstructure, 2.0);
+//		firstCommand = intakeTest;
+//		OuttakeByTimeCommand* outtakeTest = new OuttakeByTimeCommand(superstructure, 3.0);
+//		intakeTest->SetNextCommand(outtakeTest);
+//		firstCommand = outtakeTest;
+		CurveCommand* testmurple = new CurveCommand(robot, 3.0, 12.3);
+		firstCommand = testmurple;
+		PivotToAngleCommand* pivotmurple = new PivotToAngleCommand(robot, 42.0);
+		testmurple->SetNextCommand(pivotmurple);
+		OuttakeByTimeCommand* outtakemurple = new OuttakeByTimeCommand(superstructure, 1.0);
+		pivotmurple->SetNextCommand(outtakemurple);
 		break;
 	}
 	case (kBlankAuto): {
 		printf("kBlankAuto ----------------------\n");
 		DUMP("BLANK AUTO", 0.0);
+		IntakePositionCommand* andYouThoughtItWasBlankIntakeUp = new IntakePositionCommand(
+				superstructure, false);
+		DefenseManipPosCommand* andYouThoughtItWasBlankDefenseUp = new DefenseManipPosCommand(
+				superstructure, false);
+		ParallelAutoCommand* andYouThoughtItWasBlankMechanismsUp = new ParallelAutoCommand(
+				andYouThoughtItWasBlankIntakeUp, andYouThoughtItWasBlankDefenseUp);
+		firstCommand = andYouThoughtItWasBlankMechanismsUp;
+
 		break;
 	}
 	case (kReachAuto): {
@@ -188,24 +203,34 @@ void AutonomousController::CreateQueue() {
 		 * Length of robot is 2.823ft
 		 * Distance from auto line to outerworks is 6.167;
 		 */
+		IntakePositionCommand* intakeUpWhee = new IntakePositionCommand(
+				superstructure, false);
+		DefenseManipPosCommand* defenseUpWhee = new DefenseManipPosCommand(
+				superstructure, false);
+		ParallelAutoCommand* mechanismsUpWhee = new ParallelAutoCommand(intakeUpWhee,
+				defenseUpWhee);
+		firstCommand = mechanismsUpWhee;
+
 		printf("kReachAuto ------------------------\n");
 		DUMP("REACH AUTO", 0.0);
-		DriveStraightCommand* reachDrive = new DriveStraightCommand(robot, 3.35);
-		firstCommand = reachDrive;
+		DriveStraightCommand* reachDrive = new DriveStraightCommand(robot, 6.0);
+		mechanismsUpWhee->SetNextCommand(reachDrive);
 
 		break;
 	}
 	case (kCrossAuto): {
 		printf("kCrossAuto -----------------------------\n");
 		DUMP("CROSS AUTO", 0.0);
-		/*
-		 * Assumption: starting position is back of robot on auto line
-		 * Length of robot is 2.823 ft
-		 * Distance from auto line to end of autoworks is
-		 * Added clearance of 3 ft
-		 */
+		IntakePositionCommand* myIntakeGoesUp = new IntakePositionCommand(
+				superstructure, false);
+		DefenseManipPosCommand* myDefenseGoesUp = new DefenseManipPosCommand(
+				superstructure, false);
+		ParallelAutoCommand* andThemMechanismsGoUp = new ParallelAutoCommand(myIntakeGoesUp,
+				myDefenseGoesUp);
+		firstCommand = andThemMechanismsGoUp;
+
 		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
-		firstCommand = cross;
+		andThemMechanismsGoUp->SetNextCommand(cross);
 		break;
 	}
 	case (kShootAuto): {
@@ -219,9 +244,13 @@ void AutonomousController::CreateQueue() {
 		 * Distance from auto line to end of autoworks is
 		 *
 		 */
+		IntakePositionCommand* intakeUp = new IntakePositionCommand(superstructure, false);
+		DefenseManipPosCommand* defenseUp = new DefenseManipPosCommand(superstructure, false);
+		ParallelAutoCommand* mechanismsUp = new ParallelAutoCommand(intakeUp, defenseUp);
+		firstCommand = mechanismsUp;
 		if (hardCodeShoot) {
 			DefenseCommand* hardCodeCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
-			firstCommand = hardCodeCross;
+			mechanismsUp->SetNextCommand(hardCodeCross);
 			PivotToAngleCommand* hardCodeStraighten = new PivotToAngleCommand(robot, 0.0);
 			hardCodeCross->SetNextCommand(hardCodeStraighten);
 			CurveCommand* hardCodeDrive;
@@ -232,59 +261,85 @@ void AutonomousController::CreateQueue() {
 				break;
 			}
 			case (kLowBar): {
-				hardCodeDrive = new CurveCommand(robot, 1.0, 8.0); //ARBITRARY VALUES
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
+				hardCodeDrive = new CurveCommand(robot, 6.2, 12.3);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kSecond): {
-				hardCodeDrive = new CurveCommand(robot, 0.0, 8.0); //ARBITRARY VALUES
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
+				hardCodeDrive = new CurveCommand(robot, 2.0, 12.3);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kThird): {
-				hardCodeDrive = new CurveCommand(robot, -3.0, 8.0); //ARBITRARY VALUES
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
+				hardCodeDrive = new CurveCommand(robot, -2.2, 12.3);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kFourth): {
-				hardCodeDrive = new CurveCommand(robot, 5.0, 8.0); //ARBITRARY VALUES
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 300.0); //ARBITRARY VALUES
+				hardCodeDrive = new CurveCommand(robot, 4.0, 11.5);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 290.0);
 				break;
 			}
 			case (kFifth): {
-				hardCodeDrive = new CurveCommand(robot, 0.0, 9.5);
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 300.0);
+				// hardCodeDrive = new CurveCommand(robot, -0.5, 12.3);
+				hardCodeDrive = new CurveCommand(robot, -1.0, 12.0);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 290.0);
 				break;
 			}
 			}
 			hardCodeStraighten->SetNextCommand(hardCodeDrive);
 			hardCodeDrive->SetNextCommand(hardCodeLineUpShoot);
+			OuttakeByTimeCommand* outtaking = new OuttakeByTimeCommand(superstructure, 1.0);
+			hardCodeLineUpShoot->SetNextCommand(outtaking);
 
 		} else {
 			DefenseCommand* cameraCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
-			firstCommand = cameraCross;
+			mechanismsUp->SetNextCommand(cameraCross);
 			PivotToAngleCommand* cameraStraighten = new PivotToAngleCommand(robot, 0.0);
 			cameraCross->SetNextCommand(cameraStraighten);
+			CurveCommand* weShallGetNear;
+			CameraCommand* theCameraCommand;
+			PivotToAngleCommand* gottaLineUp;
 			switch (firstDefense) {
 			case (kNone): {
 				printf("UH OH ERROR ERROR EEEEEEEKKKKKKK! \n");
 				break;
 			}
 			case (kLowBar): {
+				weShallGetNear = new CurveCommand(robot, 1.0, 7.0); //ARBITRARY VALUES
+				theCameraCommand = new CameraCommand(robot, camera, 0.0, 5.0, true); //ARBITRARY VALUES
+				gottaLineUp = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
 				break;
 			}
 			case (kSecond): {
+				weShallGetNear = new CurveCommand(robot, 0.0, 7.0); //ARBITRARY VALUES
+				theCameraCommand = new CameraCommand(robot, camera, 0.0, 5.0, true); //ARBITRARY VALUES
+				gottaLineUp = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
 				break;
 			}
 			case (kThird): {
+				weShallGetNear = new CurveCommand(robot, -4.0, 7.0); //ARBITRARY VALUES
+				theCameraCommand = new CameraCommand(robot, camera, 0.0, 5.0, true); //ARBITRARY VALUES
+				gottaLineUp = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUES
 				break;
 			}
 			case (kFourth): {
+				weShallGetNear = new CurveCommand(robot, 6.0, 7.0); //ARBITRARY VALUES
+				theCameraCommand = new CameraCommand(robot, camera, 0.0, 5.0, false); //ARBITRARY VALUES
+				gottaLineUp = new PivotToAngleCommand(robot, 300.0); //ARBITRARY VALUES
 				break;
 			}
 			case (kFifth): {
+				weShallGetNear = new CurveCommand(robot, 2.0, 7.0); //ARBITRARY VALUES
+				theCameraCommand = new CameraCommand(robot, camera, 0.0, 5.0, false); //ARBITRARY VALUES
+				gottaLineUp = new PivotToAngleCommand(robot, 300.0); //ARBITRARY VALUES
 				break;
 			}
+			cameraStraighten->SetNextCommand(weShallGetNear);
+			weShallGetNear->SetNextCommand(theCameraCommand);
+			theCameraCommand->SetNextCommand(gottaLineUp);
+			OuttakeCommand* shootThatBoulder = new OuttakeCommand(superstructure);
+			gottaLineUp->SetNextCommand(shootThatBoulder);
 			}
 		}
 
@@ -303,6 +358,76 @@ void AutonomousController::CreateQueue() {
 		DriveStraightCommand* hoardingGoAcross = new DriveStraightCommand(robot, 6.0);
 		hoardingStraighten->SetNextCommand(hoardingGoAcross);
 		//Got to find ball stuff
+		break;
+	}
+	case (kSpyBotShootAuto): {
+		printf("kSpyBotShootAuto -------------------------------------\n");
+		DUMP("SPYBOTSHOOTAUTO", 0.0);
+		IntakePositionCommand* intakeUpSBSA = new IntakePositionCommand(
+				superstructure, false);
+		DefenseManipPosCommand* defenseUpSBSA = new DefenseManipPosCommand(
+				superstructure, false);
+		ParallelAutoCommand* mechanismsUpSBSA = new ParallelAutoCommand(intakeUpSBSA,
+				defenseUpSBSA);
+		firstCommand = mechanismsUpSBSA;
+		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 0.6, 5.5);
+		mechanismsUpSBSA->SetNextCommand(drivingToTheLowGoal);
+		PivotCommand* pivotMe = new PivotCommand(robot, -15.0);
+		drivingToTheLowGoal->SetNextCommand(pivotMe);
+		OuttakeByTimeCommand* yeahShooting = new OuttakeByTimeCommand(superstructure, 1.0);
+		pivotMe->SetNextCommand(yeahShooting);
+
+		break;
+	}
+	case (kSpyBotCatCAuto): {
+		printf("kSpyBotCatCAuto --------------------------------------\n");
+		DUMP("SPYBOTCATCAUTO", 0.0);
+		// BEGINNING OF AUTO
+		IntakePositionCommand* intakeUpSBC = new IntakePositionCommand(
+				superstructure, false);
+		DefenseManipPosCommand* defenseUpSBC = new DefenseManipPosCommand(
+				superstructure, false);
+		ParallelAutoCommand* mechanismsUpSBC = new ParallelAutoCommand(
+				intakeUpSBC, defenseUpSBC);
+		firstCommand = mechanismsUpSBC;
+		//SHOOTING IN THE GOAL
+		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 0.6, 5.5);
+		mechanismsUpSBC->SetNextCommand(driveToGoalSBC);
+		PivotCommand* pivotForGoalSBC = new PivotCommand(robot, -15.0);
+		driveToGoalSBC->SetNextCommand(pivotForGoalSBC);
+		OuttakeByTimeCommand* shootingSBC = new OuttakeByTimeCommand(superstructure, 1.0);
+		pivotForGoalSBC->SetNextCommand(shootingSBC);
+		//LINING UP AND DRIVING TO THE CAT C
+		DriveStraightCommand* driveOffBatterSBC = new DriveStraightCommand(robot, -2.0);
+		shootingSBC->SetNextCommand(driveOffBatterSBC);
+		PivotToAngleCommand* SBCLiningUp = new PivotToAngleCommand(robot, -90.0);
+		driveOffBatterSBC->SetNextCommand(SBCLiningUp);
+		CurveCommand* drivingToCatC = new CurveCommand(robot, -7.0 + 4.2 * firstDefense, -12.0); //ARBITRARY VALUES
+		SBCLiningUp->SetNextCommand(drivingToCatC);
+		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, -90.0);
+		drivingToCatC->SetNextCommand(straightenMeSBC);
+		if (!useSallyPort) {
+			//DRAWBRIDGE DRIVING ROUTINE
+			DriveStraightCommand* drivingThroughD = new DriveStraightCommand(robot, 7.0); //ARBITRARY VALUES
+			DefenseManipPosCommand* defenseGoDownNow = new DefenseManipPosCommand(superstructure, true);
+			ParallelAutoCommand* throughDrawbridge = new ParallelAutoCommand(drivingThroughD, defenseGoDownNow);
+			straightenMeSBC->SetNextCommand(throughDrawbridge);
+			DefenseManipPosCommand* drawBridgeDefenseUp = new DefenseManipPosCommand(superstructure, false);
+			throughDrawbridge->SetNextCommand(drawBridgeDefenseUp);
+			DefenseManipPosCommand* drawBridgeDefenseDown = new DefenseManipPosCommand(superstructure, true);
+			drawBridgeDefenseUp->SetNextCommand(drawBridgeDefenseDown);
+			DriveStraightCommand* drawbridgeGoBack = new DriveStraightCommand(robot, -8.0); //ARBITRARY VALUES
+			drawBridgeDefenseDown->SetNextCommand(drawbridgeGoBack);
+		} else {
+			//SALLYPORT DRIVING ROUTINE
+			DriveStraightCommand* drivingThroughSP = new DriveStraightCommand(robot, 6.0); //ARBITRARY VALUES
+			straightenMeSBC->SetNextCommand(drivingThroughSP);
+			PivotCommand* turningAroundSP = new PivotCommand(robot, -180.0);
+			drivingThroughSP->SetNextCommand(turningAroundSP);
+			DriveStraightCommand* driveBackThroughSP = new DriveStraightCommand(robot, -6.0); //ARBITRARY VALUES
+			turningAroundSP->SetNextCommand(driveBackThroughSP);
+
+		}
 		break;
 	}
 	}

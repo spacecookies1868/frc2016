@@ -16,40 +16,16 @@
 #define PI 3.14159265358979
 
 /*
- * DriveFromCamera Command
- *
- * Notes: in Camera Command, setting x and y in Camera Controller. Get x and y in Camera Controller and do a Drive Command
- * accordingly. Needs flushing, this is the basic framework.
- */
-
-DriveFromCameraCommand::DriveFromCameraCommand(RobotModel* myRobot, CameraController* myCamera) {
-	robot = myRobot;
-	camera = myCamera;
-	isDone = false;
-}
-
-void DriveFromCameraCommand::Init() {
-
-}
-
-void DriveFromCameraCommand::Update(double currTimeSec, double deltaTimeSec) {
-
-}
-
-bool DriveFromCameraCommand::IsDone() {
-	return isDone;
-}
-
-/*
  * Camera Command
  *
  * checked by Katy, command works -- need to print less once the camera is done because the
  * netconsole print queue is filling and stalling, camera might need help still
  */
 
-CameraDetectionCommand::CameraDetectionCommand(CameraController* myCamera) {
+CameraDetectionCommand::CameraDetectionCommand(CameraController* myCamera, bool myOnLeft) {
 	camera = myCamera;
 	isDone = false;
+	onLeft = myOnLeft;
 	x = 0;
 	y = 0;
 	sumx = 0;
@@ -72,7 +48,8 @@ void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
 		lastReadTime = currTimeSec;
 		iterationCounter++;
 		camera->Reset();
-	} else if (iterationCounter < numIterations){
+	}
+	if (iterationCounter < numIterations){
 		if ((currTimeSec - lastReadTime) >= waitTime) {
 			camera->CalculateDistanceWithAngles();
 			sumx += camera->GetX();
@@ -99,6 +76,92 @@ double CameraDetectionCommand::GetX() {
 double CameraDetectionCommand::GetY() {
 	return y;
 }
+
+
+/*
+ * DriveFromCamera Command
+ *
+ * Notes: in Camera Command, setting x and y in Camera Controller. Get x and y in Camera Controller and do a Drive Command
+ * accordingly. Needs flushing, this is the basic framework.
+ */
+
+CameraCommand::CameraCommand(RobotModel* myRobot, CameraController* myCamera, double myDesiredX, double myDesiredY, bool myOnLeft) {
+	/*
+	 * desired X and Y are compared to the target
+	 */
+	robot = myRobot;
+	camera = myCamera;
+	isDone = false;
+	desiredX = myDesiredX;
+	desiredY = myDesiredY;
+	currState = kInit;
+	nextState = kInit;
+	onLeft = myOnLeft;
+	detect = new CameraDetectionCommand(camera, onLeft);
+	if (onLeft) {
+		pivoting = new PivotToAngleCommand(robot, 60.0); //ARBITRARY VALUE
+	} else {
+		pivoting = new PivotToAngleCommand(robot, 300.0); //ARBITRARY VALUE
+	}
+}
+
+void CameraCommand::Init() {
+	pivoting->Init();
+	detect->Init();
+}
+
+void CameraCommand::Update(double currTimeSec, double deltaTimeSec) {
+	switch (currState) {
+	case (kInit): {
+		nextState = kPivoting;
+		break;
+	}
+	case (kPivoting): {
+		if (pivoting->IsDone()) {
+			nextState = kDetecting;
+			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		} else {
+			pivoting->Update(currTimeSec, deltaTimeSec);
+		}
+		break;
+	}
+	case (kDetecting): {
+		if (detect->IsDone()) {
+			nextState = kDriveInit;
+		} else {
+			detect->Update(currTimeSec, deltaTimeSec);
+			nextState = kDetecting;
+		}
+		break;
+	}
+	case (kDriveInit): {
+		drive = new CurveCommand(robot, detect->GetX() - desiredX, detect->GetY() - desiredY);
+		drive->Init();
+		nextState = kDriving;
+		break;
+	}
+	case (kDriving): {
+		if (drive->IsDone()) {
+			nextState = kDone;
+		} else {
+			drive->Update(currTimeSec, deltaTimeSec);
+		}
+		break;
+	}
+	case (kDone): {
+		nextState = kDone;
+		isDone = true;
+		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+		break;
+	}
+	}
+	currState = nextState;
+}
+
+bool CameraCommand::IsDone() {
+	return isDone;
+}
+
 
 UltrasonicDetectionCommand::UltrasonicDetectionCommand() {
 	x = 0.0;
@@ -152,6 +215,7 @@ void UltrasonicCommand::Update(double currTimeSec, double deltaTimeSec) {
 			nextState = kNearingInit;
 		} else {
 			uDetect->Update(currTimeSec, deltaTimeSec);
+			nextState = kDetecting;
 		}
 		break;
 	}
@@ -168,6 +232,7 @@ void UltrasonicCommand::Update(double currTimeSec, double deltaTimeSec) {
 			nextState = kIntakingInit;
 		} else {
 			nearingDrive->Update(currTimeSec, deltaTimeSec);
+			nextState = kNearing;
 		}
 		break;
 	}
@@ -187,6 +252,7 @@ void UltrasonicCommand::Update(double currTimeSec, double deltaTimeSec) {
 			backingDrive->Init();
 		} else {
 			forwardDrive->Update(currTimeSec, deltaTimeSec);
+			nextState = kForward;
 		}
 		break;
 	}
@@ -195,6 +261,7 @@ void UltrasonicCommand::Update(double currTimeSec, double deltaTimeSec) {
 			nextState = kDone;
 		} else {
 			backingDrive->Update(currTimeSec, deltaTimeSec);
+			nextState = kBacking;
 		}
 		break;
 	}
@@ -203,6 +270,7 @@ void UltrasonicCommand::Update(double currTimeSec, double deltaTimeSec) {
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 		superstructure->SetAutoIntakeMotorForward(false);
 		superstructure->Update(currTimeSec, deltaTimeSec);
+		nextState = kDone;
 		break;
 	}
 	}

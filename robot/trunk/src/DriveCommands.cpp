@@ -403,6 +403,9 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 	bool radiusPIDDone = radiusPID->ControlLoopDone(radius, deltaTimeSec);
 	bool anglePIDDone = anglePID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
 
+	printf("Radius PID Done? %i\n", radiusPIDDone);
+	printf("Angle PID Done? %i\n", anglePIDDone);
+
 	if (radiusPIDDone && anglePIDDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
@@ -438,6 +441,7 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 		printf("Angle Output %f\n", angleOutput);
 		printf("Left Output %f\n", leftOutput);
 		printf("Right Output %f\n",rightOutput);
+
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, leftOutput);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, rightOutput);
 	}
@@ -583,18 +587,21 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	defense = myDefense;
 	isDone = false;
 
-	hardCodeLowBar = new DriveStraightCommand(robot, 6.0); //NOT ACTUAL VALUE PROBABLY, SHOULD MEASURE
+	hardCodeLowBar = new DriveStraightCommand(robot, -12.0); //NOT ACTUAL VALUE PROBABLY, SHOULD MEASURE
 
-	portcullisDriveUp = new DriveStraightCommand(robot, 5.6);
+	portcullisDriveUp = new DriveStraightCommand(robot, 5.85);
 	portcullisDriving = new DriveStraightCommand(robot, 6.0);
 //	portcullisDriving = new DriveStraightCommand(robot, 0.0);
 	portcullisDefenseUp = new DefenseManipPosCommand(superstructure, false);
 	portcullisDefenseDown = new DefenseManipPosCommand(superstructure, true);
+	portcullisIntakeDown = new IntakePositionCommand(superstructure, true);
 	portcullisWaitTimeDone = false;
 	portcullisWaiting = 0.0;
+	portcullisDriveTimeOut = 4.5;
 
-	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.4);
+	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.6);
 	chevalDeFriseDriving = new DriveStraightCommand(robot, 6.0);
+//	chevalDeFriseDriving = new DriveStraightCommand(robot, 0.0);
 	chevalDeFriseDefenseUp = new DefenseManipPosCommand(superstructure, false);
 	chevalDeFriseDefenseDown = new DefenseManipPosCommand(superstructure, true);
 	chevalDeFriseDefenseUpInitted = false;
@@ -632,10 +639,10 @@ void DefenseCommand::Init() {
 		printf("Cheval de Frise Init \n");
 		chevalDeFriseDriveUp->Init();
 		chevalDeFriseDriveUp->disPIDConfig->pFac = 0.3;
-		chevalDeFriseDriveUp->disPIDConfig->iFac = 0.0007;
+		chevalDeFriseDriveUp->disPIDConfig->iFac = 0.001;
 		chevalDeFriseDriveUp->disPIDConfig->dFac = 6.7;
 		chevalDeFriseDriveUp->disPIDConfig->desiredAccuracy = 0.15;
-		chevalDeFriseDriveUp->disPIDConfig->maxAbsOutput = 0.6;
+		chevalDeFriseDriveUp->disPIDConfig->maxAbsOutput = 0.5;
 		chevalDeFriseDriveUp->disPIDConfig->maxAbsITerm = 0.5;
 		chevalDeFriseDriveUp->disPIDConfig->timeLimit = 0.125;
 		chevalDeFriseDefenseDown->Init();
@@ -686,12 +693,15 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 		isDone = false;
 		if (!portcullisDefenseDown->IsDone()) {
 			portcullisDefenseDown->Update(currTimeSec, deltaTimeSec);
-		} else if (!portcullisDriveUp->IsDone()) {
+			portcullisInitTime = currTimeSec;
+		} else if (!portcullisDriveUp->IsDone() && (currTimeSec - portcullisInitTime) < portcullisDriveTimeOut) {
 			portcullisDriveUp->Update(currTimeSec, deltaTimeSec);
 			portcullisDefenseUp->Init();
-		} else if (!portcullisDefenseUp->IsDone()) {
+			portcullisIntakeDown->Init();
+		} else if (!portcullisDefenseUp->IsDone() && !portcullisIntakeDown->IsDone()) {
 			printf("HI HI HI HI");
 			portcullisDefenseUp->Update(currTimeSec, deltaTimeSec);
+			portcullisIntakeDown->Update(currTimeSec, deltaTimeSec);
 			portcullisDriving->Init();
 			portcullisDriving->disPIDConfig->maxAbsOutput = 0.5;
 		} else if (!portcullisDriving->IsDone()) {

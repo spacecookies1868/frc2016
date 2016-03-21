@@ -213,7 +213,10 @@ private:
 	DriveStraightCommand* portcullisDriving;
 	DefenseManipPosCommand* portcullisDefenseUp;
 	DefenseManipPosCommand* portcullisDefenseDown;
+	IntakePositionCommand* portcullisIntakeDown;
 	bool portcullisWaitTimeDone;
+	double portcullisDriveTimeOut;
+	double portcullisInitTime;
 	double portcullisWaiting;
 
 	DriveStraightCommand* chevalDeFriseDriveUp;

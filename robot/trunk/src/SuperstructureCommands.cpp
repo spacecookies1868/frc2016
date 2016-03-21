@@ -143,20 +143,22 @@ bool DefenseManipPosCommand::IsDone() {
 
 OuttakeCommand::OuttakeCommand(SuperstructureController* mySuperstructure) {
 	superstructure = mySuperstructure;
-	defenseDown = new DefenseManipPosCommand(superstructure, true);
+	//defenseDown = new DefenseManipPosCommand(superstructure, true);
 	isDone = false;
 }
 
 void OuttakeCommand::Init() {
-	defenseDown->Init();
+	//defenseDown->Init();
 	superstructure->SetAutoOuttake(true);
 }
 
 void OuttakeCommand::Update(double currTimeSec, double deltaTimeSec) {
-	if (!defenseDown->IsDone()) {
-		defenseDown->Update(currTimeSec, deltaTimeSec);
-	} else if (superstructure->GetOuttakeFinished()) {
+	//if (!defenseDown->IsDone()) {
+		//defenseDown->Update(currTimeSec, deltaTimeSec);
+	//} else
+	if (superstructure->GetOuttakeFinished()) {
 		isDone = true;
+		superstructure->SetAutoOuttake(false);
 	} else {
 		superstructure->Update(currTimeSec, deltaTimeSec);
 	}

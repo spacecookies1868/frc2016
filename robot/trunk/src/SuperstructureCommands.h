@@ -91,7 +91,7 @@ public:
 	bool IsDone();
 private:
 	SuperstructureController* superstructure;
-	DefenseManipPosCommand* defenseDown;
+	//DefenseManipPosCommand* defenseDown;
 	bool isDone;
 };
 

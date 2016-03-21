@@ -22,21 +22,6 @@
 
 using namespace std;
 
-/*
- * NOT DONE NOT DONE NOT DONE NOT DONE NOT DONE
- */
-class DriveFromCameraCommand : public SimpleAutoCommand {
-public:
-	DriveFromCameraCommand(RobotModel* myRobot, CameraController* myCamera);
-	~DriveFromCameraCommand() {}
-	virtual void Init();
-	virtual void Update(double currTimeSec, double deltaTimeSec);
-	virtual bool IsDone();
-private:
-	RobotModel* robot;
-	CameraController* camera;
-	bool isDone;
-};
 
 /*
  * CAMERA COMMANDS YAY!
@@ -44,7 +29,7 @@ private:
 
 class CameraDetectionCommand : public SimpleAutoCommand {
 public:
-	CameraDetectionCommand(CameraController* myCamera);
+	CameraDetectionCommand(CameraController* myCamera, bool myOnLeft);
 	~CameraDetectionCommand() {}
 	virtual void Init();
 	virtual void Update(double currTimeSec, double deltaTimeSec);
@@ -64,7 +49,35 @@ private:
 	int numIterations;
 	double waitTime;
 	double lastReadTime;
+	bool onLeft;
 };
+
+class CameraCommand : public SimpleAutoCommand {
+public:
+	enum cameraStates {
+		kInit, kPivoting, kDetecting, kDriveInit, kDriving, kDone
+	};
+	CameraCommand(RobotModel* myRobot, CameraController* myCamera, double myDesiredX, double myDesiredY, bool myOnLeft);
+	~CameraCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+private:
+	RobotModel* robot;
+	CameraController* camera;
+	bool isDone;
+	double desiredX;
+	double desiredY;
+
+	uint32_t currState;
+	uint32_t nextState;
+
+	PivotToAngleCommand* pivoting;
+	CameraDetectionCommand* detect;
+	CurveCommand* drive;
+	bool onLeft;
+};
+
 
 /*
  * ULTRASONIC COMMANDS YAY!

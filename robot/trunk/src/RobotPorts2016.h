@@ -10,8 +10,8 @@ static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 8;
 static const int RIGHT_DRIVE_MOTOR_A_PWM_PORT			= 2;
 static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 1;
 static const int INTAKE_MOTOR_PWM_PORT					= 0;
-static const int OUTTAKE_MOTOR_A_PWM_PORT				= 4; //arbitrary value
-static const int OUTTAKE_MOTOR_B_PWM_PORT				= 5; //arbitrary value
+static const int OUTTAKE_MOTOR_A_PWM_PORT				= 4;
+static const int OUTTAKE_MOTOR_B_PWM_PORT				= 5;
 
 // ***************** PDP CHANNELS *****************
 
@@ -61,7 +61,7 @@ static const int OPERATOR_JOY_B_USB_PORT				= 3;
 
 // ***************** BUTTON PORTS *****************
 //Drive controller button ports
-static const int DRIVE_DIRECTION_BUTTON_PORT			= 12;
+static const int DRIVE_DIRECTION_BUTTON_PORT			= 2; //new on left joystick, was 12 on op b
 static const int HIGH_LOW_GEAR_BUTTON_PORT				= 3;
 static const int ARCADE_DRIVE_BUTTON_PORT				= 3;
 static const int QUICK_TURN_BUTTON_PORT					= 1;
@@ -77,9 +77,9 @@ static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 9;
 
 
 //Other controller button ports
-static const int DEFENSE_ID_1_BUTTON_PORT				= 7;
-static const int DEFENSE_ID_2_BUTTON_PORT				= 8;
-static const int DEFENSE_ID_3_BUTTON_PORT				= 9;
+static const int DEFENSE_ID_1_BUTTON_PORT				= 3;
+static const int DEFENSE_ID_2_BUTTON_PORT				= 4;
+static const int DEFENSE_ID_3_BUTTON_PORT				= 5;
 
 // Power controller button port
 static const int POWER_BUDGET_SWITCH					= 7;

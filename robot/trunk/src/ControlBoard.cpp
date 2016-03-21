@@ -11,7 +11,7 @@ ControlBoard::ControlBoard() {
 	operatorJoy = new Joystick(OPERATOR_JOY_USB_PORT);
 	operatorJoyB = new Joystick(OPERATOR_JOY_B_USB_PORT);
 
-	driveDirectionButton = new ButtonReader(operatorJoy, DRIVE_DIRECTION_BUTTON_PORT);
+	driveDirectionButton = new ButtonReader(leftJoy, DRIVE_DIRECTION_BUTTON_PORT);
 	gearShiftButton = new ButtonReader(leftJoy, HIGH_LOW_GEAR_BUTTON_PORT);
 	arcadeDriveButton = new ButtonReader(rightJoy, ARCADE_DRIVE_BUTTON_PORT);
 	quickTurnButton = new ButtonReader(rightJoy, QUICK_TURN_BUTTON_PORT);
@@ -98,6 +98,8 @@ void ControlBoard::ReadControls() {
 			}
 		}
 	}
+	//defense = ChevalDeFrise;
+	printf("MY DEFENSE %i\n", defense);
 
 	defenseManipDesired = defenseManipButton->WasJustPressed();
 	intakePistonDesired = intakePistonButton->WasJustPressed();

@@ -22,7 +22,9 @@ public:
 					kReachAuto = 2,
 					kCrossAuto = 3,
 					kShootAuto = 4,
-					kHoardingAuto = 5};
+					kHoardingAuto = 5,
+					kSpyBotShootAuto = 6,
+					kSpyBotCatCAuto = 7};
 	enum FirstDefensePos {
 		kNone = 0,
 		kLowBar = 1,
@@ -60,6 +62,7 @@ private:
 	unsigned int firstDefense;
 	unsigned int secondDefensePos;
 	double timeFinished;
+	bool useSallyPort;
 };
 
 #endif

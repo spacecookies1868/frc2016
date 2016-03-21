@@ -29,7 +29,6 @@ public:
 
 	// power controller button accessors
 	virtual bool GetPowerBudgetDesired() = 0;
-
 	virtual ~RemoteControl() {}
 };
 
