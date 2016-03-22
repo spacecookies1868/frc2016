@@ -348,16 +348,100 @@ void AutonomousController::CreateQueue() {
 	case (kHoardingAuto): {
 		printf("kHoardingAuto ------------------------------\n");
 		DUMP("HOARDING AUTO", 0.0);
-		DefenseCommand* hoardingCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
-		firstCommand = hoardingCross;
-		//insert Outtake command here
-		CurveCommand* hoardingGoBack = new CurveCommand(robot, 4.0*(secondDefensePos - firstDefense), 0.0);
-		hoardingCross->SetNextCommand(hoardingGoBack);
-		PivotToAngleCommand* hoardingStraighten = new PivotToAngleCommand(robot, 0.0);
-		hoardingGoBack->SetNextCommand(hoardingStraighten);
-		DriveStraightCommand* hoardingGoAcross = new DriveStraightCommand(robot, 6.0);
-		hoardingStraighten->SetNextCommand(hoardingGoAcross);
-		//Got to find ball stuff
+		IntakePositionCommand* hoardIntakeUp = new IntakePositionCommand(superstructure, false);
+		DefenseManipPosCommand* hoardDefenseUp = new DefenseManipPosCommand(superstructure, false);
+		ParallelAutoCommand* hoardMechanismsUp = new ParallelAutoCommand(hoardIntakeUp, hoardDefenseUp);
+		firstCommand = hoardMechanismsUp;
+		DefenseCommand* hoardFirstCrossA = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+		hoardMechanismsUp->SetNextCommand(hoardFirstCrossA);
+		CurveCommand* hoardGoToCatC = new CurveCommand(robot, 4.0*(secondDefensePos - firstDefense), 1.0);
+		hoardFirstCrossA->SetNextCommand(hoardGoToCatC);
+		PivotToAngleCommand* hoardStraightenBeforeCatC = new PivotToAngleCommand(robot, 0.0);
+		hoardGoToCatC->SetNextCommand(hoardStraightenBeforeCatC);
+		DriveStraightCommand* hoardCrossCatC;
+		if (useSallyPort) {
+			hoardCrossCatC = new DriveStraightCommand(robot, -8.0);
+		} else {
+			hoardCrossCatC = new DriveStraightCommand(robot, -7.5);
+		}
+		hoardStraightenBeforeCatC->SetNextCommand(hoardCrossCatC);
+		PivotToAngleCommand* hoardStraightenBeforeBall = new PivotToAngleCommand(robot, 0.0);
+		hoardCrossCatC->SetNextCommand(hoardStraightenBeforeBall);
+		CurveCommand* hoardGetBall;
+		PivotToAngleCommand* hoardLineUpBall;
+		IntakePositionCommand* hoardIntakeDown;
+		IntakeRollersCommand* hoardStartIntaking;
+		DriveStraightCommand* hoardDriveTo;
+		DriveStraightCommand* hoardDriveBack;
+		ChainedCommand* hoardDriveToAndFromBall;
+		ParallelAutoCommand* hoardCollectBall;
+		switch (secondDefensePos) {
+		case (kSecond) : {
+			hoardGetBall = new CurveCommand(robot, -1.5, 3.0); //ARBITRARY VALUES
+			hoardStraightenBeforeBall->SetNextCommand(hoardGetBall);
+			hoardLineUpBall = new PivotToAngleCommand(robot, 0.0);
+			hoardGetBall->SetNextCommand(hoardLineUpBall);
+			hoardIntakeDown = new IntakePositionCommand(superstructure, true);
+			hoardLineUpBall->SetNextCommand(hoardIntakeDown);
+			hoardStartIntaking = new IntakeRollersCommand(superstructure, true,  5.0);
+			hoardDriveTo = new DriveStraightCommand(robot, -3.0); //ARBITRARY VALUES
+			hoardDriveTo->disDFac = hoardDriveTo->disDFac * 3.0;
+			hoardDriveBack = new DriveStraightCommand(robot, 3.0); // ARBITRARY VALUES
+			hoardDriveToAndFromBall = new ChainedCommand(hoardDriveTo, hoardDriveBack);
+			hoardCollectBall = new ParallelAutoCommand(hoardDriveToAndFromBall, hoardStartIntaking);
+		}
+		case (kThird) : {
+			hoardGetBall = new CurveCommand(robot, -1.0, 3.0); //ARBITRARY VALUES
+			hoardStraightenBeforeBall->SetNextCommand(hoardGetBall);
+			hoardLineUpBall = new PivotToAngleCommand(robot, 0.0);
+			hoardGetBall->SetNextCommand(hoardLineUpBall);
+			hoardIntakeDown = new IntakePositionCommand(superstructure, true);
+			hoardLineUpBall->SetNextCommand(hoardIntakeDown);
+			hoardStartIntaking = new IntakeRollersCommand(superstructure, true,
+					5.0);
+			hoardDriveTo = new DriveStraightCommand(robot, -3.0); //ARBITRARY VALUES
+			hoardDriveTo->disDFac = hoardDriveTo->disDFac * 3.0;
+			hoardDriveBack = new DriveStraightCommand(robot, 3.0); // ARBITRARY VALUES
+			hoardDriveToAndFromBall = new ChainedCommand(hoardDriveTo,
+					hoardDriveBack);
+			hoardCollectBall = new ParallelAutoCommand(hoardDriveToAndFromBall,
+					hoardStartIntaking);
+		}
+		case (kFourth) : {
+			hoardGetBall = new CurveCommand(robot, 0.0, 3.0); //ARBITRARY VALUES
+			hoardStraightenBeforeBall->SetNextCommand(hoardGetBall);
+			hoardLineUpBall = new PivotToAngleCommand(robot, 0.0);
+			hoardGetBall->SetNextCommand(hoardLineUpBall);
+			hoardIntakeDown = new IntakePositionCommand(superstructure, true);
+			hoardLineUpBall->SetNextCommand(hoardIntakeDown);
+			hoardStartIntaking = new IntakeRollersCommand(superstructure, true,
+					5.0);
+			hoardDriveTo = new DriveStraightCommand(robot, -3.0); //ARBITRARY VALUES
+			hoardDriveTo->disDFac = hoardDriveTo->disDFac * 3.0;
+			hoardDriveBack = new DriveStraightCommand(robot, 3.0); // ARBITRARY VALUES
+			hoardDriveToAndFromBall = new ChainedCommand(hoardDriveTo,
+					hoardDriveBack);
+			hoardCollectBall = new ParallelAutoCommand(hoardDriveToAndFromBall,
+					hoardStartIntaking);
+		}
+		case (kFifth) : {
+			hoardGetBall = new CurveCommand(robot, 0.75, 3.0); //ARBITRARY VALUES
+			hoardStraightenBeforeBall->SetNextCommand(hoardGetBall);
+			hoardLineUpBall = new PivotToAngleCommand(robot, 0.0);
+			hoardGetBall->SetNextCommand(hoardLineUpBall);
+			hoardIntakeDown = new IntakePositionCommand(superstructure, true);
+			hoardLineUpBall->SetNextCommand(hoardIntakeDown);
+			hoardStartIntaking = new IntakeRollersCommand(superstructure, true,
+					5.0);
+			hoardDriveTo = new DriveStraightCommand(robot, -3.0); //ARBITRARY VALUES
+			hoardDriveTo->disDFac = hoardDriveTo->disDFac * 3.0;
+			hoardDriveBack = new DriveStraightCommand(robot, 3.0); // ARBITRARY VALUES
+			hoardDriveToAndFromBall = new ChainedCommand(hoardDriveTo,
+					hoardDriveBack);
+			hoardCollectBall = new ParallelAutoCommand(hoardDriveToAndFromBall,
+					hoardStartIntaking);
+		}
+		}
 		break;
 	}
 	case (kSpyBotShootAuto): {
@@ -370,9 +454,9 @@ void AutonomousController::CreateQueue() {
 		ParallelAutoCommand* mechanismsUpSBSA = new ParallelAutoCommand(intakeUpSBSA,
 				defenseUpSBSA);
 		firstCommand = mechanismsUpSBSA;
-		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 0.6, 5.5);
+		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 0.8, 5.8);
 		mechanismsUpSBSA->SetNextCommand(drivingToTheLowGoal);
-		PivotCommand* pivotMe = new PivotCommand(robot, -15.0);
+		PivotCommand* pivotMe = new PivotCommand(robot, -20.0);
 		drivingToTheLowGoal->SetNextCommand(pivotMe);
 		OuttakeByTimeCommand* yeahShooting = new OuttakeByTimeCommand(superstructure, 1.0);
 		pivotMe->SetNextCommand(yeahShooting);
@@ -391,24 +475,27 @@ void AutonomousController::CreateQueue() {
 				intakeUpSBC, defenseUpSBC);
 		firstCommand = mechanismsUpSBC;
 		//SHOOTING IN THE GOAL
-		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 0.6, 5.5);
+		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 0.8, 5.8);
 		mechanismsUpSBC->SetNextCommand(driveToGoalSBC);
-		PivotCommand* pivotForGoalSBC = new PivotCommand(robot, -15.0);
+		PivotCommand* pivotForGoalSBC = new PivotCommand(robot, -20.0);
 		driveToGoalSBC->SetNextCommand(pivotForGoalSBC);
 		OuttakeByTimeCommand* shootingSBC = new OuttakeByTimeCommand(superstructure, 1.0);
 		pivotForGoalSBC->SetNextCommand(shootingSBC);
-		//LINING UP AND DRIVING TO THE CAT C
-		DriveStraightCommand* driveOffBatterSBC = new DriveStraightCommand(robot, -2.0);
+
+		//LINING UP
+		DriveStraightCommand* driveOffBatterSBC = new DriveStraightCommand(robot, -0.0);
 		shootingSBC->SetNextCommand(driveOffBatterSBC);
 		PivotToAngleCommand* SBCLiningUp = new PivotToAngleCommand(robot, -90.0);
 		driveOffBatterSBC->SetNextCommand(SBCLiningUp);
-		CurveCommand* drivingToCatC = new CurveCommand(robot, -7.0 + 4.2 * firstDefense, -12.0); //ARBITRARY VALUES
+
+		//DRIVING TO CAT C
+		CurveCommand* drivingToCatC = new CurveCommand(robot, -10.0 + 4.2 * firstDefense, -12.0);
 		SBCLiningUp->SetNextCommand(drivingToCatC);
-		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, -90.0);
+		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, 0.0); //should be -90
 		drivingToCatC->SetNextCommand(straightenMeSBC);
 		if (!useSallyPort) {
 			//DRAWBRIDGE DRIVING ROUTINE
-			DriveStraightCommand* drivingThroughD = new DriveStraightCommand(robot, 7.0); //ARBITRARY VALUES
+			DriveStraightCommand* drivingThroughD = new DriveStraightCommand(robot, 11.0); //ARBITRARY VALUES
 			DefenseManipPosCommand* defenseGoDownNow = new DefenseManipPosCommand(superstructure, true);
 			ParallelAutoCommand* throughDrawbridge = new ParallelAutoCommand(drivingThroughD, defenseGoDownNow);
 			straightenMeSBC->SetNextCommand(throughDrawbridge);
@@ -416,15 +503,15 @@ void AutonomousController::CreateQueue() {
 			throughDrawbridge->SetNextCommand(drawBridgeDefenseUp);
 			DefenseManipPosCommand* drawBridgeDefenseDown = new DefenseManipPosCommand(superstructure, true);
 			drawBridgeDefenseUp->SetNextCommand(drawBridgeDefenseDown);
-			DriveStraightCommand* drawbridgeGoBack = new DriveStraightCommand(robot, -8.0); //ARBITRARY VALUES
+			DriveStraightCommand* drawbridgeGoBack = new DriveStraightCommand(robot, -10.0); //ARBITRARY VALUES
 			drawBridgeDefenseDown->SetNextCommand(drawbridgeGoBack);
 		} else {
 			//SALLYPORT DRIVING ROUTINE
-			DriveStraightCommand* drivingThroughSP = new DriveStraightCommand(robot, 6.0); //ARBITRARY VALUES
+			DriveStraightCommand* drivingThroughSP = new DriveStraightCommand(robot, -10.0);
 			straightenMeSBC->SetNextCommand(drivingThroughSP);
 			PivotCommand* turningAroundSP = new PivotCommand(robot, -180.0);
 			drivingThroughSP->SetNextCommand(turningAroundSP);
-			DriveStraightCommand* driveBackThroughSP = new DriveStraightCommand(robot, -6.0); //ARBITRARY VALUES
+			DriveStraightCommand* driveBackThroughSP = new DriveStraightCommand(robot, -10.0);
 			turningAroundSP->SetNextCommand(driveBackThroughSP);
 
 		}
