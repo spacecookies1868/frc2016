@@ -161,6 +161,7 @@ private:
 		autonomousController->RefreshIni();
 		driveController->RefreshIni();
 		superstructureController->RefreshIni();
+		powerController->RefreshIni();
 	}
 
 };

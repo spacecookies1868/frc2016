@@ -56,14 +56,12 @@ class PowerController {
 	private:
 		RobotModel* robot;
 		RemoteControl* humanControl;
-		double totalCurrent, oldCurrent;
+		double totalCurrent, totalVoltage;
 
 		double avgLeftCurr, avgRightCurr, avgIntakeCurr, avgCompCurr, avgRioCurr;
 		int size; // number of past values to average
 		std::vector<double> pastLeftCurr, pastRightCurr, pastIntakeCurr,
 			pastCompCurr, pastRioCurr;
-
-		double totalVoltage, oldVoltage, diffVoltage;
 
 		double driveCurrentLimit, intakeCurrentLimit, totalCurrentLimit;
 		double voltageFloor, pressureFloor;

@@ -25,6 +25,7 @@ class Logger {
 public:
 	static void LogState(RobotModel* myRobot, RemoteControl *myHumanControl);
 	/* with time stamp */
+	// todo make logaction and gettimestamp private ?
 	static void LogAction(RobotModel* myRobot, const std::string& fileName, int line,
 				const std::string& stateName, double state);
 	static void LogAction(RobotModel* myRobot, const std::string& fileName, int line,

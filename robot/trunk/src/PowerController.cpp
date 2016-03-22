@@ -10,10 +10,7 @@ PowerController::PowerController(RobotModel* myRobot, RemoteControl* myHumanCont
 	robot = myRobot;
 	humanControl = myHumanControl;
 	totalCurrent = 0;
-	oldCurrent = 0;
-	totalVoltage = robot->GetVoltage();
-	oldVoltage = 0;
-	diffVoltage = 0;
+	totalVoltage = 0;
 
 	avgLeftCurr = 0;
 	avgRightCurr = 0;
@@ -29,22 +26,18 @@ PowerController::PowerController(RobotModel* myRobot, RemoteControl* myHumanCont
 	std::vector<double> pastCompCurr(size, 0);
 	std::vector<double> pastRioCurr(size, 0);
 
-	driveCurrentLimit = 40; // in amps
-	intakeCurrentLimit = 20;
-	totalCurrentLimit = 160;
-	voltageFloor = 7; // technically 6.8V but 7 to be safe
-	pressureFloor = 60; // todo test!!!!!!!
+	driveCurrentLimit = 0; // pdp measures amps inaccurately :. these are in chloeamps now
+	intakeCurrentLimit = 0;
+	totalCurrentLimit = 0;
+	voltageFloor = 0;
+	pressureFloor = 0;
 
-	// todo put all these suckers in the ini?????
-	driveWeight = 0.8 * (totalVoltage / 12);
-	compWeight = 0.5 * (totalVoltage / 12) * (pressureFloor / robot->GetPressureSensorVal());
-	intakeWeight = 0.6 * (totalVoltage / 12) * (humanControl->GetIntakeMotorForwardDesired() * humanControl->GetIntakeMotorReverseDesired());
+	driveWeight = 0.8 * (totalVoltage / 13);
+	compWeight = 0.5 * (totalVoltage / 13) * (pressureFloor / robot->GetPressureSensorVal());
+	intakeWeight = 0.6 * (totalVoltage / 13) * (humanControl->GetIntakeMotorForwardDesired() * humanControl->GetIntakeMotorReverseDesired());
 }
 
 void PowerController::Update(double currTimeSec, double deltaTimeSec) {
-	oldCurrent = totalCurrent;
-	oldVoltage = totalVoltage;
-
 	pastLeftCurr.insert(pastLeftCurr.begin(),
 			(robot->GetCurrent(LEFT_DRIVE_MOTOR_A_PDP_CHAN) +
 			robot->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN)) / 2);
@@ -71,11 +64,14 @@ void PowerController::Update(double currTimeSec, double deltaTimeSec) {
 			+ avgRioCurr;
 	totalVoltage = robot->GetVoltage();
 
+	driveCurrentLimit *= (totalVoltage / 12);
+	intakeCurrentLimit *= (totalVoltage / 12);
+
 	driveWeight = 0.8 * (totalVoltage / 12);
 	compWeight = 0.5 * (totalVoltage / 12) * (pressureFloor / robot->GetPressureSensorVal());
 	intakeWeight = 0.6 * (totalVoltage / 12) *
 		(humanControl->GetIntakeMotorForwardDesired() * humanControl->GetIntakeMotorReverseDesired());
-
+	// todo add outtake motors
 	if (IsBatteryLow()) {
 		LOG(robot, "battery low", true);
 	}
@@ -101,17 +97,18 @@ bool PowerController::IsBatteryLow() {
 void PowerController::LimitSingle() {
 	// linear regression model of current vs speed:
 	// current = 47.4 * speed - 4.84 changes depending on BATTERY VOLTAGE!!!!!axqwaz
+	// todo scale drivecurrentlimit as voltage decreases
 	double diffCurr = avgLeftCurr - driveCurrentLimit;
-	double scaledSpeed =  robot->GetWheelSpeed(RobotModel::kLeftWheels)
-		- (diffCurr + 4.84) / 47.4;
+	double scaledSpeed =  (robot->GetWheelSpeed(RobotModel::kLeftWheels)
+		- (diffCurr + 4.84) / 47.4) * totalVoltage / 13;
 	if (diffCurr >= 0) {
 		LOG(robot, "l drive maxed", 1);
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, scaledSpeed);
 	}
 
 	diffCurr = avgRightCurr - driveCurrentLimit;
-	scaledSpeed =  robot->GetWheelSpeed(RobotModel::kRightWheels)
-		- (diffCurr + 4.84) / 47.4;
+	scaledSpeed =  (robot->GetWheelSpeed(RobotModel::kRightWheels)
+		- (diffCurr + 4.84) / 47.4) * totalVoltage / 13;
 	if (diffCurr >= 0) {
 		LOG(robot, "r drive maxed", 1);
 		robot->SetWheelSpeed(RobotModel::kRightWheels, scaledSpeed);
@@ -154,16 +151,31 @@ void PowerController::CompressorCut() {
 	}
 }
 
-void PowerController::Reset() {
-
-}
-
 double PowerController::GetAverage(std::vector<double> v) {
 	double avg = 0;
 	for (size_t i = 1; i < (v.size() + 1); i++) {
 		avg += (v[i] - avg) / i;
 	}
 	return avg;
+}
+
+void PowerController::RefreshIni() {
+	driveCurrentLimit = robot->pini->getf("POWERBUDGET", "driveCurrentLimit", 40);
+	intakeCurrentLimit = robot->pini->getf("POWERBUDGET", "intakeCurrentLimit", 20);
+	totalCurrentLimit = robot->pini->getf("POWERBUDGET", "totalCurrentLimit", 160);
+	voltageFloor = robot->pini->getf("POWERBUDGET", "voltageFloor", 7);
+	pressureFloor = robot->pini->getf("POWERBUDGET", "pressureFloor", 60);
+	size = robot->pini->getf("POWERBUDGET", "movingAverageSize", 5);
+}
+
+void PowerController::Reset() {
+	totalCurrent = 0;
+	totalVoltage = 0;
+	avgLeftCurr = 0;
+	avgRightCurr = 0;
+	avgIntakeCurr = 0;
+	avgCompCurr = 0;
+	avgRioCurr = 0;
 }
 
 PowerController::~PowerController() {
