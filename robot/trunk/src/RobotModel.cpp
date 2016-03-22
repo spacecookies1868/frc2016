@@ -25,7 +25,9 @@ RobotModel::RobotModel() {
 
 	isLowGear = false;
 
-	servo = new Servo(9);
+	servo = new Servo(SERVO_MOTOR_PORT);
+	servoAngle = servo->GetAngle();
+	servoDirection = true;
 
 	gearShiftSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, GEAR_SHIFT_SOLENOID_PORT);
 	intakeArmSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_A_PORT);
@@ -38,6 +40,8 @@ RobotModel::RobotModel() {
 
 	pressureSensor = new AnalogInput(PRESSURE_SENSOR_PORT);
 	pressureSensor->SetAverageBits(2);
+
+	ultra = new UltrasonicSensor(ULTRASONIC_SENSOR_PORT);
 
 	leftDriveACurrent = 0;
 	leftDriveBCurrent = 0;
@@ -116,6 +120,39 @@ float RobotModel::GetWheelSpeed(Wheels w) {
 		return 0.0;
 		break;
 	}
+}
+
+void RobotModel::InitServo(double angle) {
+	servo->SetAngle(angle);
+}
+
+void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle) {
+	servoAngle = servo->GetAngle();
+	if (servoAngle >= endAngle){
+		servoDirection = false;
+	} else if (servoAngle <= startAngle){
+		servoDirection = true;
+	}
+
+	if (servoDirection == true){
+		servoAngle += deltaAngle;
+	} else {
+		servoAngle -= deltaAngle;
+	}
+//	printf("Start angle: %f \n", startAngle);
+//	printf("End Angle: %f \n", endAngle);
+//	printf("Delta Angle: %f \n", deltaAngle);
+//	printf("servoAnlge: %f \n", servoAngle);
+	servo->SetAngle(servoAngle);
+}
+
+double RobotModel::GetServoAngle() {
+	servoAngle = servo->GetAngle();
+	return servoAngle;
+}
+
+bool RobotModel::GetServoDirection() {
+	return servoDirection;
 }
 
 double RobotModel::GetNavXYaw() {
@@ -258,6 +295,10 @@ void RobotModel::ResetDriveEncoders() {
 
 double RobotModel::GetPressureSensorVal() {
 	return 250 * (pressureSensor->GetAverageVoltage() / 5) - 25;
+}
+
+double RobotModel::GetUltrasonicDistance() {
+	return ultra->GetRangeInInches();
 }
 
 void RobotModel::RefreshIni() {

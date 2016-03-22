@@ -10,6 +10,7 @@
 #include "navx/AHRS.h"
 #include "TableReader.h"
 #include "nivision.h"
+#include "UltrasonicSensor.h"
 
 // todo cache current and voltage methods so theyre called only once per loop
 
@@ -22,6 +23,11 @@ public:
 
 	void SetWheelSpeed(Wheels w, double speed);
 	float GetWheelSpeed(Wheels w);
+
+	void InitServo(double angle);
+	void SetServo(double startAngle, double endAngle, double deltaAngle);
+	double GetServoAngle();
+	bool GetServoDirection();
 
 	double GetNavXYaw();
 	double GetNavXRoll();
@@ -45,6 +51,8 @@ public:
 	void ResetDriveEncoders();
 
 	double GetPressureSensorVal();
+
+	double GetUltrasonicDistance();
 
 	void RefreshIni();
 	void ResetTimer();
@@ -80,7 +88,6 @@ public:
 	Image* GetCameraImage();
 
 	Ini* pini;
-	Servo* servo;
 	TableReader* gripLines;
 private:
 	bool isLowGear;
@@ -94,6 +101,9 @@ private:
 
 	//Actuators
 	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB, *intakeMotor, *outtakeMotorA, *outtakeMotorB;
+	Servo* servo;
+	double servoAngle;
+	bool servoDirection;
 
 	// Solenoids
 	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB, *defenseManipSolenoidA, *defenseManipSolenoidB;
@@ -101,6 +111,7 @@ private:
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
 	AnalogInput *pressureSensor;
+	UltrasonicSensor *ultra;
 
 #if USE_CAMERA
 	AxisCamera *camera;

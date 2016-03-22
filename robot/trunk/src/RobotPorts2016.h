@@ -12,6 +12,7 @@ static const int RIGHT_DRIVE_MOTOR_B_PWM_PORT			= 1;
 static const int INTAKE_MOTOR_PWM_PORT					= 0;
 static const int OUTTAKE_MOTOR_A_PWM_PORT				= 4;
 static const int OUTTAKE_MOTOR_B_PWM_PORT				= 5;
+static const int SERVO_MOTOR_PORT						= 9; //arbitrary value
 
 // ***************** PDP CHANNELS *****************
 
@@ -41,6 +42,7 @@ static const int RIGHT_ENCODER_B_PWM_PORT				= 1;
 //******************* ANALOG IN PORTS*******************
 
 static const int PRESSURE_SENSOR_PORT					= 3;
+static const int ULTRASONIC_SENSOR_PORT				    = 2; //arbitrary value
 
 // ***************** MISC *****************
 static const int COMPRESSOR_PORT						= 1;
