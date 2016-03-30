@@ -56,7 +56,6 @@ PIDConfig* PivotCommand::CreateRPIDConfig(){
 	pidConfig->maxAbsITerm = rMaxAbsITerm;
 	pidConfig->timeLimit = rTimeLimit;
 	return pidConfig;
-
 }
 
 double PivotCommand::GetAccumulatedYaw() {
@@ -72,6 +71,10 @@ double PivotCommand::GetAccumulatedYaw() {
 		accumulatedYaw += deltaYaw;
 	}
 	return accumulatedYaw;
+}
+
+void PivotCommand::SetDesiredR(double desiredRotation) {
+	desiredR = desiredRotation;
 }
 
 void PivotCommand::Update(double currTimeSec, double deltaTimeSec) {
@@ -587,39 +590,48 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	defense = myDefense;
 	isDone = false;
 
-	hardCodeLowBar = new DriveStraightCommand(robot, -12.0); //NOT ACTUAL VALUE PROBABLY, SHOULD MEASURE
+	lowBarDriveUp = new DriveStraightCommand(robot, -2.0); //NOT ACTUAL VALUE PROBABLY, SHOULD MEASURE
+	lowBarDriving = new DriveStraightCommand(robot, -11.0);
+	lowBarDefenseDown = new DefenseManipPosCommand(superstructure, true);
+	lowBarIntakeDown = new IntakePositionCommand(superstructure, true);
+	lowBarPivot = new PivotCommand(robot, 180.0);
 
-	portcullisDriveUp = new DriveStraightCommand(robot, 5.85);
-	portcullisDriving = new DriveStraightCommand(robot, 6.0);
+	portcullisDriveUp = new DriveStraightCommand(robot, 5.75);
+	portcullisDriving = new DriveStraightCommand(robot, 6.3);
 //	portcullisDriving = new DriveStraightCommand(robot, 0.0);
 	portcullisDefenseUp = new DefenseManipPosCommand(superstructure, false);
 	portcullisDefenseDown = new DefenseManipPosCommand(superstructure, true);
 	portcullisIntakeDown = new IntakePositionCommand(superstructure, true);
 	portcullisWaitTimeDone = false;
 	portcullisWaiting = 0.0;
-	portcullisDriveTimeOut = 4.5;
+	portcullisDriveTimeOut = 3.5;
 
-	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.6);
+	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.3);
 	chevalDeFriseDriving = new DriveStraightCommand(robot, 6.0);
+	chevalDeFriseStay = new DriveStraightCommand(robot, 0.0);
 //	chevalDeFriseDriving = new DriveStraightCommand(robot, 0.0);
 	chevalDeFriseDefenseUp = new DefenseManipPosCommand(superstructure, false);
 	chevalDeFriseDefenseDown = new DefenseManipPosCommand(superstructure, true);
 	chevalDeFriseDefenseUpInitted = false;
 	chevalDeFriseWaitTimeDone = false;
 	chevalDeFriseWaiting = 0.0;
+	chevalDeFriseTimeOut = 2.0;
+	chevalDeFriseTime = 0.0;
+	chevalDeFriseFirstTime = true;
+	chevalDeFriseInitTime = 0.0;
 
-	hardCodeMoat = new DriveStraightCommand(robot, 12.0);
+	hardCodeMoat = new DriveStraightCommand(robot, 18.0);
 
-	hardCodeRockWall = new DriveStraightCommand(robot, 10.0);
+	hardCodeRockWall = new DriveStraightCommand(robot, 18.0);
 
-	hardCodeRoughTerrain = new DriveStraightCommand(robot, 9.0);
+	hardCodeRoughTerrain = new DriveStraightCommand(robot, 16.0);
 }
 
 void DefenseCommand::Init() {
 	switch (defense) {
 	case (LowBar): {
 		printf("Low Bar Init \n");
-		hardCodeLowBar->Init();
+		lowBarDriveUp->Init();
 		break;
 	}
 	case (Portcullis): {
@@ -639,7 +651,9 @@ void DefenseCommand::Init() {
 		printf("Cheval de Frise Init \n");
 		chevalDeFriseDriveUp->Init();
 		chevalDeFriseDriveUp->disPIDConfig->pFac = 0.3;
+		//chevalDeFriseDriveUp->disPIDConfig->pFac = 0.0;
 		chevalDeFriseDriveUp->disPIDConfig->iFac = 0.001;
+		//chevalDeFriseDriveUp->disPIDConfig->iFac = 0.000;
 		chevalDeFriseDriveUp->disPIDConfig->dFac = 6.7;
 		chevalDeFriseDriveUp->disPIDConfig->desiredAccuracy = 0.15;
 		chevalDeFriseDriveUp->disPIDConfig->maxAbsOutput = 0.5;
@@ -682,9 +696,23 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 	switch (defense) {
 	case (LowBar): {
 		printf("Low Bar Update \n");
-		isDone = hardCodeLowBar->IsDone();
-		if (!isDone) {
-			hardCodeLowBar->Update(currTimeSec, deltaTimeSec);
+		if (!lowBarDriveUp->IsDone()) {
+			lowBarDriveUp->Update(currTimeSec, deltaTimeSec);
+			lowBarDefenseDown->Init();
+			lowBarIntakeDown->Init();
+		} else if (!lowBarDefenseDown->IsDone() || !lowBarDefenseDown->IsDone()) {
+			lowBarDefenseDown->Update(currTimeSec, deltaTimeSec);
+			lowBarIntakeDown->Update(currTimeSec, deltaTimeSec);
+			lowBarDriving->Init();
+			lowBarDriving->disPIDConfig->maxAbsOutput = 0.5;
+		} else if (!lowBarDriving->IsDone()) {
+			lowBarDriving->Update(currTimeSec, deltaTimeSec);
+			lowBarPivot->Init();
+		} else if (!lowBarPivot->IsDone()) {
+			lowBarPivot->Update(currTimeSec, deltaTimeSec);
+		} else {
+			isDone = true;
+			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 		}
 		break;
 	}
@@ -718,18 +746,31 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 	case (ChevalDeFrise): {
 		printf("Cheval de Frise Update \n");
 		isDone = false;
-		if (!chevalDeFriseDriveUp->IsDone()) {
+		if (chevalDeFriseFirstTime) {
+			chevalDeFriseTime = currTimeSec;
+			chevalDeFriseInitTime = currTimeSec;
+			chevalDeFriseFirstTime = false;
+		} else if (!chevalDeFriseDriveUp->IsDone() && (chevalDeFriseTime - chevalDeFriseInitTime) < chevalDeFriseTimeOut) {
 			chevalDeFriseDriveUp->Update(currTimeSec, deltaTimeSec);
+			chevalDeFriseTime += deltaTimeSec;
+			if (chevalDeFriseTime >= chevalDeFriseTimeOut) {
+				printf("TIMEOUT TIMEOUT \n");
+			}
+			chevalDeFriseStay->Init();
+			chevalDeFriseStay->disPIDConfig->pFac = 0.5;
+			chevalDeFriseStay->disPIDConfig->iFac = 0.01;
 		} else if (!chevalDeFriseDefenseDown->IsDone()) {
 			DUMP("Puttin my defense down now",0.0);
 			chevalDeFriseDriving->Init();
 			chevalDeFriseDefenseDown->Update(currTimeSec, deltaTimeSec);
+			chevalDeFriseStay->Update(currTimeSec, deltaTimeSec);
 		} else if (!chevalDeFriseDriving->IsDone()) {
 			if (chevalDeFriseWaitTimeDone) {
 				chevalDeFriseDriving->Update(currTimeSec, deltaTimeSec);
 			} else {
 				chevalDeFriseWaiting += deltaTimeSec;
-				chevalDeFriseWaitTimeDone = chevalDeFriseWaiting > 1.0;
+				chevalDeFriseWaitTimeDone = chevalDeFriseWaiting > 0.5;
+				chevalDeFriseStay->Update(currTimeSec, deltaTimeSec);
 			}
 		}
 		if ((robot->GetLeftEncoderVal() + robot->GetRightEncoderVal())/2.0 > 7.0) {

@@ -34,6 +34,7 @@ public:
 	PivotCommand(RobotModel* myRobot, double myDesiredR);
 	~PivotCommand() {}
 	virtual void Init();
+	virtual void SetDesiredR(double desiredRotation);
 	virtual void Update(double currTimeSec, double deltaTimeSec);
 	virtual bool IsDone();
 	static double rPFac, rIFac, rDFac, rDesiredAccuracy, rMaxAbsOutput, rMaxAbsDiffError,
@@ -207,7 +208,11 @@ private:
 	uint32_t defense;
 	bool isDone;
 
-	DriveStraightCommand* hardCodeLowBar;
+	DriveStraightCommand* lowBarDriveUp;
+	DefenseManipPosCommand* lowBarDefenseDown;
+	IntakePositionCommand* lowBarIntakeDown;
+	DriveStraightCommand* lowBarDriving;
+	PivotCommand* lowBarPivot;
 
 	DriveStraightCommand* portcullisDriveUp;
 	DriveStraightCommand* portcullisDriving;
@@ -220,12 +225,17 @@ private:
 	double portcullisWaiting;
 
 	DriveStraightCommand* chevalDeFriseDriveUp;
+	DriveStraightCommand* chevalDeFriseStay;
 	DriveStraightCommand* chevalDeFriseDriving;
 	DefenseManipPosCommand* chevalDeFriseDefenseDown;
 	DefenseManipPosCommand* chevalDeFriseDefenseUp;
 	bool chevalDeFriseDefenseUpInitted;
 	bool chevalDeFriseWaitTimeDone;
 	double chevalDeFriseWaiting;
+	double chevalDeFriseTimeOut;
+	double chevalDeFriseTime;
+	bool chevalDeFriseFirstTime;\
+	double chevalDeFriseInitTime;
 
 	DriveStraightCommand* hardCodeMoat;
 

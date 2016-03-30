@@ -133,11 +133,33 @@ private:
 		DO_PERIODIC(10, LOG(robot, "Navx Roll", robot->GetNavXRoll()));
 		DO_PERIODIC(10, LOG(robot, "Left Encoder", robot->GetLeftEncoderVal()));
 		DO_PERIODIC(10, LOG(robot, "Right Encoder", robot->GetRightEncoderVal()));
+		DO_PERIODIC(10, LOG(robot, "Left Joy Y",
+						humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY)));
+		DO_PERIODIC(10, LOG(robot, "Left Joy X",
+						humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kX)));
+		DO_PERIODIC(10, LOG(robot, "Right Joy Y",
+						humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY)));
+		DO_PERIODIC(10, LOG(robot, "Right Joy X",
+						humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX)));
+		DO_PERIODIC(10, LOG(robot, "Reverse Drive Desired", humanControl->GetReverseDriveDesired()));
+		DO_PERIODIC(10, LOG(robot, "Arcade Drive Desired", humanControl->GetArcadeDriveDesired()));
 		DO_PERIODIC(10, printf("Navx angle %f\n", robot->GetNavXYaw()));
 		DO_PERIODIC(10, printf("Navx pitch %f\n", robot->GetNavXPitch()));
 		DO_PERIODIC(10, printf("Navx Roll %f\n", robot->GetNavXRoll()));
 		DO_PERIODIC(10, printf("Left Encoder %f\n", robot->GetLeftEncoderVal()));
 		DO_PERIODIC(10, printf("Right Encoder %f\n", robot->GetRightEncoderVal()));
+		DO_PERIODIC(10, printf("Pressure %f\n", robot->GetPressureSensorVal()));
+	//	DO_PERIODIC(10, printf("Left Joy Y %f\n",
+	//					humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY)));
+	//	DO_PERIODIC(10, printf("Left Joy X %f\n",
+	//					humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kX)));
+	//	DO_PERIODIC(10, printf("Right Joy Y %f\n",
+	//					humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY)));
+	//	DO_PERIODIC(10, printf("Right Joy X %f\n",
+	//					humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY)));
+		DO_PERIODIC(10, printf("Reverse Drive Desired %f\n", humanControl->GetReverseDriveDesired()));
+		DO_PERIODIC(10, printf("Arcade Drive Desired %f\n", humanControl->GetArcadeDriveDesired()));
+
 
 	}
 

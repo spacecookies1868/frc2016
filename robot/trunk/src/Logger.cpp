@@ -58,10 +58,10 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myHumanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY) << ", " <<
 			myHumanControl->GetReverseDriveDesired() << ", " <<
 			myHumanControl->GetArcadeDriveDesired() << ", " <<
-			myHumanControl->GetDefenseManipDesired() << ", " <<
+			myHumanControl->GetDefenseManipToggleDesired() << ", " <<
 			myHumanControl->GetIntakeMotorReverseDesired() << ", " <<
 			myHumanControl->GetIntakeMotorForwardDesired()  << ", " <<
-			myHumanControl->GetIntakePistonDesired()  << ", " <<
+			myHumanControl->GetIntakePistonToggleDesired()  << ", " <<
 			myHumanControl->GetLowGearDesired() << ", " <<
 			myHumanControl->GetOuttakeDesired()  << ", " <<
 			myHumanControl->GetQuickTurnDesired() << ", " <<
@@ -81,6 +81,7 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 
 void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int line,
 				const std::string& stateName, double state) {
+	logAction.flush();
 	if (!logAction.is_open()) {
 			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
 	}

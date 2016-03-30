@@ -28,7 +28,8 @@ public:
 	bool GetOuttakeFinished();
 
 	enum SuperstructureState {
-		kInit, kIdle, kPrepToOuttake, kEncOuttake, kTimeOuttake
+		kInit, kIdle, kAutoPrepToOuttake, kTeleopPrepToOuttake, kEncOuttake, kAutoTimeOuttake,
+		kTeleopTimeOuttake
 	};
 
 private:
@@ -37,6 +38,8 @@ private:
 
 	uint32_t m_stateVal;
 	uint32_t nextState;
+
+	bool useDoorbellButtons;
 
 	//PTO = prep to outtake
 	bool startedPTO;

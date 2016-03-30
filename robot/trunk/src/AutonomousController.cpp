@@ -164,7 +164,9 @@ void AutonomousController::AddtoQueue(AutoCommand* myNewAutoCommand, SimpleAutoC
 void AutonomousController::CreateQueue() {
 	firstCommand = NULL;
 	printf("AutoMode: %i \n", autoMode);
-
+	if (humanControl->GetStopAutoDesired()) {
+		autoMode = kBlankAuto;
+	}
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
@@ -231,6 +233,8 @@ void AutonomousController::CreateQueue() {
 
 		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
 		andThemMechanismsGoUp->SetNextCommand(cross);
+		OuttakeByTimeCommand* crossOuttake = new OuttakeByTimeCommand(superstructure, 3.0);
+		cross->SetNextCommand(crossOuttake);
 		break;
 	}
 	case (kShootAuto): {
@@ -261,28 +265,28 @@ void AutonomousController::CreateQueue() {
 				break;
 			}
 			case (kLowBar): {
-				hardCodeDrive = new CurveCommand(robot, 6.2, 12.3);
+				hardCodeDrive = new CurveCommand(robot, 6.2, -10.0); //was 12.3
 				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kSecond): {
-				hardCodeDrive = new CurveCommand(robot, 2.0, 12.3);
+				hardCodeDrive = new CurveCommand(robot, 2.2, 10.0); //was 12.3
 				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kThird): {
-				hardCodeDrive = new CurveCommand(robot, -2.2, 12.3);
+				hardCodeDrive = new CurveCommand(robot, -2.0, 10.0); //was 12.3
 				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kFourth): {
-				hardCodeDrive = new CurveCommand(robot, 4.0, 11.5);
+				hardCodeDrive = new CurveCommand(robot, 3.2, 10.0); //was 12.3
 				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 290.0);
 				break;
 			}
 			case (kFifth): {
 				// hardCodeDrive = new CurveCommand(robot, -0.5, 12.3);
-				hardCodeDrive = new CurveCommand(robot, -1.0, 12.0);
+				hardCodeDrive = new CurveCommand(robot, -1.0, 10.0); //was 12.3
 				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 290.0);
 				break;
 			}
@@ -454,7 +458,8 @@ void AutonomousController::CreateQueue() {
 		ParallelAutoCommand* mechanismsUpSBSA = new ParallelAutoCommand(intakeUpSBSA,
 				defenseUpSBSA);
 		firstCommand = mechanismsUpSBSA;
-		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 0.8, 5.8);
+
+		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 1.2, 5.5); //was 0.8 on x
 		mechanismsUpSBSA->SetNextCommand(drivingToTheLowGoal);
 		PivotCommand* pivotMe = new PivotCommand(robot, -20.0);
 		drivingToTheLowGoal->SetNextCommand(pivotMe);
@@ -475,7 +480,8 @@ void AutonomousController::CreateQueue() {
 				intakeUpSBC, defenseUpSBC);
 		firstCommand = mechanismsUpSBC;
 		//SHOOTING IN THE GOAL
-		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 0.8, 5.8);
+
+		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 1.2, 5.5); //was 0.8 for x
 		mechanismsUpSBC->SetNextCommand(driveToGoalSBC);
 		PivotCommand* pivotForGoalSBC = new PivotCommand(robot, -20.0);
 		driveToGoalSBC->SetNextCommand(pivotForGoalSBC);
@@ -489,22 +495,18 @@ void AutonomousController::CreateQueue() {
 		driveOffBatterSBC->SetNextCommand(SBCLiningUp);
 
 		//DRIVING TO CAT C
-		CurveCommand* drivingToCatC = new CurveCommand(robot, -10.0 + 4.2 * firstDefense, -12.0);
+		CurveCommand* drivingToCatC = new CurveCommand(robot, -10.6 + 4.2 * firstDefense, -12.0);
 		SBCLiningUp->SetNextCommand(drivingToCatC);
 		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, 0.0); //should be -90
 		drivingToCatC->SetNextCommand(straightenMeSBC);
 		if (!useSallyPort) {
 			//DRAWBRIDGE DRIVING ROUTINE
-			DriveStraightCommand* drivingThroughD = new DriveStraightCommand(robot, 11.0); //ARBITRARY VALUES
+			DriveStraightCommand* drivingThroughD = new DriveStraightCommand(robot, -9.0); //ARBITRARY VALUES
 			DefenseManipPosCommand* defenseGoDownNow = new DefenseManipPosCommand(superstructure, true);
 			ParallelAutoCommand* throughDrawbridge = new ParallelAutoCommand(drivingThroughD, defenseGoDownNow);
 			straightenMeSBC->SetNextCommand(throughDrawbridge);
-			DefenseManipPosCommand* drawBridgeDefenseUp = new DefenseManipPosCommand(superstructure, false);
-			throughDrawbridge->SetNextCommand(drawBridgeDefenseUp);
-			DefenseManipPosCommand* drawBridgeDefenseDown = new DefenseManipPosCommand(superstructure, true);
-			drawBridgeDefenseUp->SetNextCommand(drawBridgeDefenseDown);
 			DriveStraightCommand* drawbridgeGoBack = new DriveStraightCommand(robot, -10.0); //ARBITRARY VALUES
-			drawBridgeDefenseDown->SetNextCommand(drawbridgeGoBack);
+			throughDrawbridge->SetNextCommand(drawbridgeGoBack);
 		} else {
 			//SALLYPORT DRIVING ROUTINE
 			DriveStraightCommand* drivingThroughSP = new DriveStraightCommand(robot, -10.0);

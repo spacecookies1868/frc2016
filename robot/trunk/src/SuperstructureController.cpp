@@ -8,6 +8,8 @@ SuperstructureController::SuperstructureController(RobotModel* myRobot, RemoteCo
 	m_stateVal = kInit;
 	nextState = kInit;
 
+	useDoorbellButtons = false;
+
 	startedPTO = false;
 	startTimePTO = 0.0;
 	deltaTimePTO = 0.0;
@@ -70,9 +72,17 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		nextState = kIdle;
 
 		//Change the position of the defense manipulator in teleop
-		if (humanControl->GetDefenseManipDesired()) {
-			DO_PERIODIC(1, printf("Teleop Defense Manip Desired\n"));
-			robot->ChangeDefenseManipState();
+		if (useDoorbellButtons) {
+			if (humanControl->GetDefenseManipDownDesired()) {
+				robot->MoveDefenseManipDown();
+			} else {
+				robot->MoveDefenseManipUp();
+			}
+		} else {
+			if (humanControl->GetDefenseManipToggleDesired()) {
+				DO_PERIODIC(1, printf("Teleop Defense Manip Desired\n"));
+				robot->ChangeDefenseManipState();
+			}
 		}
 
 		//Change the position of the defense manipulator in auto
@@ -87,9 +97,18 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		}
 
 		//Change the position of the intake in teleop
-		if (humanControl->GetIntakePistonDesired()) {
-			DO_PERIODIC(1, printf("Teleop Intake Desired\n"));
-			robot->ChangeIntakeArmState();
+		if (useDoorbellButtons) {
+			if (humanControl->GetIntakePistonDownDesired()) {
+				robot->MoveIntakeArmDown();
+			} else {
+				robot->MoveIntakeArmUp();
+			}
+		} else {
+			if (humanControl->GetIntakePistonToggleDesired()) {
+				DO_PERIODIC(1, printf("Teleop Intake Desired\n"));
+				robot->ChangeIntakeArmState();
+			}
+
 		}
 
 		//Change the position of the intake in auto
@@ -114,13 +133,24 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 
 		//Makes sure that the defense manipulator is down first (must be in that position to outtake) and then outtakes
 		//If already down, goes straight to outtake
-		if (humanControl->GetOuttakeDesired() || autoOuttake) {
+		if (autoOuttake) {
+			autoOuttakeFinished = false;
 			if (robot->IsDefenseManipDown()) {
-				nextState = kTimeOuttake;
+				nextState = kAutoTimeOuttake;
 			} else {
-				nextState = kPrepToOuttake;
+				nextState = kAutoPrepToOuttake;
 			}
 			autoOuttake = false;
+		}
+
+		//Makes sure that the intake arm is up first (must be in that position to outtake) and then outtakes
+		//If already up, goes straight to outtake
+		if (humanControl->GetOuttakeDesired()) {
+			if (!robot->IsIntakeArmDown()) {
+				nextState = kTeleopTimeOuttake;
+			} else {
+				nextState = kTeleopPrepToOuttake;
+			}
 		}
 
 		//Allows for manual control of the outtake motors
@@ -134,35 +164,66 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		}
 
 		break;
-	case (kPrepToOuttake):
+	case (kAutoPrepToOuttake):
 		//Moves the defense manipulator down, so that it can outtake and waits
 		if(!startedPTO) {
 			DO_PERIODIC(1, "Starting kPrepToOuttake\n");
 			startTimePTO = currTimeSec;
 			robot->MoveDefenseManipDown();
 			startedPTO = true;
-			nextState = kPrepToOuttake;
+			nextState = kAutoPrepToOuttake;
 		} else if (currTimeSec - startTimePTO < deltaTimePTO){
-			nextState = kPrepToOuttake;
+			nextState = kAutoPrepToOuttake;
 		} else {
 			startedPTO = false;
-			nextState = kTimeOuttake;
+			nextState = kAutoTimeOuttake;
 		}
 		break;
-	case (kTimeOuttake):
+	case (kAutoTimeOuttake):
 		//Runs the outtake motors for a certain amount of time to ensure that they have outtaken
 		if (!startedOT) {
 			startTimeTOT = robot->GetTime();
 			robot->SetOuttakeMotorSpeed(outtakeSpeed);
 			startedOT = true;
-			nextState = kTimeOuttake;
+			nextState = kAutoTimeOuttake;
 		} else if (robot->GetTime() - startTimeTOT < deltaTimeTOT) {
 			robot->SetOuttakeMotorSpeed(outtakeSpeed);
-			nextState = kTimeOuttake;
+			nextState = kAutoTimeOuttake;
 		} else {
 			robot->SetOuttakeMotorSpeed(0.0);
 			startedOT = false;
 			autoOuttakeFinished = true;
+			nextState = kIdle;
+		}
+		break;
+	case (kTeleopPrepToOuttake):
+		//Moves the intake arm, so that it can outtake and waits
+		if(!startedPTO) {
+			DO_PERIODIC(1, "Starting kPrepToOuttake\n");
+			startTimePTO = currTimeSec;
+			robot->MoveIntakeArmUp();
+			startedPTO = true;
+			nextState = kTeleopPrepToOuttake;
+		} else if (currTimeSec - startTimePTO < deltaTimePTO){
+			nextState = kTeleopPrepToOuttake;
+		} else {
+			startedPTO = false;
+			nextState = kTeleopTimeOuttake;
+		}
+		break;
+	case (kTeleopTimeOuttake):
+		//Runs the outtake motors for a certain amount of time to ensure that they have outtaken
+		if (!startedOT) {
+			startTimeTOT = robot->GetTime();
+			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
+			startedOT = true;
+			nextState = kTeleopTimeOuttake;
+		} else if (robot->GetTime() - startTimeTOT < deltaTimeTOT) {
+			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
+			nextState = kTeleopTimeOuttake;
+		} else {
+			robot->SetOuttakeMotorSpeed(0.0);
+			startedOT = false;
 			nextState = kIdle;
 		}
 		break;
@@ -191,6 +252,7 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 }
 
 void SuperstructureController::RefreshIni() {
+	useDoorbellButtons = robot->pini->getbool("SUPERSTRUCTURE", "useDoorbellButton", false);
 	intakeSpeed = robot->pini->getf("SUPERSTRUCTURE", "intakeSpeed", 0.4);
 	outtakeSpeed = robot->pini->getf("SUPERSTRUCTURE", "outtakeSpeed", 0.4);
 	deltaTimePTO = robot->pini->getf("SUPERSTRUCTURE", "deltaTimePTO", 1.0);

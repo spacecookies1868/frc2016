@@ -6,6 +6,8 @@
 #include "Debugging.h"
 #include "PIDControlLoop.h"
 
+class PivotCommand;
+
 class DriveController {
 public:
 	DriveController(RobotModel*, RemoteControl*);
@@ -20,12 +22,14 @@ public:
 	virtual ~DriveController();
 
 	enum DriveState {
-		kInitialize, kTeleopDrive
+		kInitialize, kTeleopDrive, kDialToAngleButton, kDialToAngleSwitch
 	};
 
 private:
 	RobotModel *robot;
 	RemoteControl *humanControl;
+	PivotCommand *pivotCommandButton;
+	PivotCommand *pivotCommandSwitch;
 
 	PIDConfig* CreateRPIDConfig();
 	PIDConfig* rPIDConfig;

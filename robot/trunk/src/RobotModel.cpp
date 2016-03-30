@@ -91,18 +91,33 @@ void RobotModel::SetWheelSpeed(Wheels w, double speed) {
 
 	switch (w) {
 	case (kLeftWheels):
+/* comp bot inverted
+		leftDriveMotorA->Set(speed);
+		leftDriveMotorB->Set(speed);
+	*/
 		leftDriveMotorA->Set(speed);
 		leftDriveMotorB->Set(speed);
 		break;
 	case (kRightWheels):
+/* comp bot inverted
+		rightDriveMotorA->Set(-speed);
+		rightDriveMotorB->Set(-speed);
+*/
 		rightDriveMotorA->Set(-speed);
 		rightDriveMotorB->Set(-speed);
 		break;
 	case (kAllWheels):
+/* comp bot inverted
 		leftDriveMotorA->Set(speed);
 		leftDriveMotorB->Set(speed);
 		rightDriveMotorA->Set(-speed);
 		rightDriveMotorB->Set(-speed);
+*/
+		leftDriveMotorA->Set(speed);
+		leftDriveMotorB->Set(speed);
+		rightDriveMotorA->Set(-speed);
+		rightDriveMotorB->Set(-speed);
+
 		break;
 	}
 }

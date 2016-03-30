@@ -24,11 +24,19 @@ public:
 	bool GetLowGearDesired();
 	bool GetArcadeDriveDesired();
 	bool GetQuickTurnDesired();
+	bool GetPivotButtonDesired();
+	bool GetPivotSwitchDesired();
+	double GetDesiredAngle();
+
+	//Auto buttons
 	uint32_t GetDefense();
+	bool GetStopAutoDesired();
 
 	//Superstructure controller button accessors
-	bool GetDefenseManipDesired();
-	bool GetIntakePistonDesired();
+	bool GetDefenseManipToggleDesired();
+	bool GetDefenseManipDownDesired();
+	bool GetIntakePistonToggleDesired();
+	bool GetIntakePistonDownDesired();
 	bool GetIntakeMotorForwardDesired();
 	bool GetIntakeMotorReverseDesired();
 	bool GetOuttakeDesired();
@@ -51,16 +59,17 @@ public:
 	};
 
 private:
-	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipDesired, intakePistonDesired,
+	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
+		 intakePistonToggleDesired,intakePistonDownDesired,
 		 intakeMotorForwardDesired, intakeMotorReverseDesired, outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired,
-		 powerBudgetDesired;
-	double leftJoyX, leftJoyY, rightJoyX, rightJoyY;
+		 pivotButtonDesired, pivotSwitchDesired, powerBudgetDesired, stopAutoDesired;
+	double leftJoyX, leftJoyY, rightJoyX, rightJoyY, desiredAngle;
 	uint32_t defense;
 	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
-				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton,
+				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton, *dialPivotButton, *dialPivotSwitch,
 				 *manualOuttakeReverseButton, *defense_ID_1_Button, *defense_ID_2_Button, *defense_ID_3_Button,
-				 *powerBudgetButton;
+				 *powerBudgetButton, *stopAutoButton;
 	void ReadAllButtons();
 };
 

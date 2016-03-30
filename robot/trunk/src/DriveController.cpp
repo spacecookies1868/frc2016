@@ -1,6 +1,8 @@
 #include "DriveController.h"
+#include "DriveCommands.h"
 #include "ControlBoard.h"
 #include "RobotPorts2016.h"
+#include "RobotModel.h"
 #include "WPILib.h"
 #include <math.h>
 #include "Debugging.h"
@@ -11,6 +13,8 @@
 DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanControl){
 	robot = myRobot;
 	humanControl = myHumanControl;
+	pivotCommandButton = new PivotCommand(robot, 0.0);
+	pivotCommandSwitch = new PivotCommand(robot, 0.0);
 	m_stateVal = kInitialize;
 	nextState = kInitialize;
 	rPFac = 0.0;
@@ -34,6 +38,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		nextState = kTeleopDrive;
 		break;
 	case (kTeleopDrive):
+		printf("In case kTeleopDrive \n");
 		if(humanControl->GetLowGearDesired()){
 			if (!(robot->IsLowGear())){
 				robot->ShiftToLowGear();
@@ -46,21 +51,63 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
-		double rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
-		double rightJoyY = -humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY);
-		double leftJoyY = -humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
+		double rightJoyX;
+		rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
+		double rightJoyY;
+		rightJoyY = -humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kY);
+		double leftJoyY;
+		leftJoyY = -humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		if(humanControl->GetQuickTurnDesired()) {
 			QuickTurn(rightJoyX);
 		} else if(humanControl->GetArcadeDriveDesired()) {
 			ArcadeDrive(rightJoyX, leftJoyY);
 		} else {
-			TankDrive(leftJoyY, rightJoyY);
-		}
+			TankDrive(leftJoyY, rightJoyY);		}
 
-		nextState = kTeleopDrive;
+		if (humanControl->GetPivotButtonDesired()){
+			printf("Switching to kDialToAngleButton \n");
+			pivotCommandButton->Init();
+			pivotCommandButton->SetDesiredR(humanControl->GetDesiredAngle() - robot->GetNavXYaw());
+			nextState = kDialToAngleButton;
+		} else if (humanControl->GetPivotSwitchDesired()) {
+			printf("Switching to kDialToAngleSwitch \n");
+			pivotCommandSwitch->Init();
+			printf("Init \n");
+			pivotCommandSwitch->SetDesiredR(humanControl->GetDesiredAngle() - robot->GetNavXYaw());
+			printf("Set desired rotation \n");
+			nextState = kDialToAngleSwitch;
+		} else {
+			printf("Staying in kTeleopDrive \n");
+			nextState = kTeleopDrive;
+		}
 		break;
-	}
+	case (kDialToAngleButton):
+		printf("In case kDialtoAngleButton \n");
+		pivotCommandButton->Update(currTimeSec, deltaTimeSec);
+		if (pivotCommandButton->IsDone()){
+			printf("Button pivoting is done. Transition to kTeleopDrive \n");
+			nextState = kTeleopDrive;
+		} else {
+			printf("Still in kDialToAngleButton \n");
+			nextState = kDialToAngleButton;
+		}
+		break;
+	case (kDialToAngleSwitch):
+		printf("In case kDialToAngleSwitch \n");
+		if (humanControl->GetPivotSwitchDesired()){
+			pivotCommandSwitch->SetDesiredR(humanControl->GetDesiredAngle() - robot->GetNavXYaw());
+			pivotCommandSwitch->Update(currTimeSec, deltaTimeSec);
+		}
+		if (humanControl->GetPivotSwitchDesired()){
+			printf("Still Pivoting \n");
+			nextState = kDialToAngleSwitch;
+		} else {
+			printf("Switch has been turned off. Transition to kTeleopDrive \n");
+			nextState = kTeleopDrive;
+		}
+		break;
+	}// end of switch
 
 	m_stateVal = nextState;
 }
@@ -77,6 +124,10 @@ void DriveController::QuickTurn(double myRight) {
 void DriveController::ArcadeDrive(double myX, double myY) {
 	double moveValue = myY * DriveDirection();
 	double rotateValue = myX;
+	DO_PERIODIC(20, printf("Arcade Drive MoveValue %f\n", moveValue));
+	DO_PERIODIC(20, printf("Arcade Drive RotateValue %f\n", rotateValue));
+	LOG(robot, "Arcade Drive MoveValue", moveValue);
+	LOG(robot, "Arcade Drive RotateValue", rotateValue);
 
 	// does not rotate at all if not moving forward/backward
 	if (fabs(moveValue) < 0.1) {
@@ -87,6 +138,8 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 	double rightMotorOutput = moveValue;
 
 	double currR = robot->GetNavXYaw();
+	DO_PERIODIC(20, printf("Arcade Drive Curr Rotate %f\n", currR));
+	LOG(robot, "Arcade Drive Curr Rotate", currR);
 
 	if (fabs(rotateValue) < 0.1) {
 		// makes robot go straight without drifting
@@ -131,6 +184,11 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 	LOG(robot, "RotateValue", rotateValue);
 	LOG(robot, "Left Motor Output", leftMotorOutput);
 	LOG(robot, "Right Motor Output", rightMotorOutput);
+	DO_PERIODIC(20, printf("Arcade Drive Left Motor Output %f\n", leftMotorOutput));
+	DO_PERIODIC(20, printf("Arcade Drive Right Motor Output %f\n", rightMotorOutput));
+	LOG(robot, "Arcade Drive Left Motor Output", leftMotorOutput);
+	LOG(robot, "Arcade Drive Right Motor Output", rightMotorOutput);
+
 
 	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);
@@ -150,6 +208,15 @@ void DriveController::TankDrive(double myLeft, double myRight) {
 
 	leftMotorOutput = sin(leftMotorOutput * PI / 2) * DriveDirection();
 	rightMotorOutput = sin(rightMotorOutput * PI / 2) * DriveDirection();
+
+	DO_PERIODIC(20, printf("Tank Drive Left Input %f\n", myLeft));
+	DO_PERIODIC(20, printf("Tank Drive Right Input %f\n", myRight));
+	DO_PERIODIC(20, printf("Tank Drive Left Motor Output %f\n", leftMotorOutput));
+	DO_PERIODIC(20, printf("Tank Drive Right Motor Output %f\n", rightMotorOutput));
+	LOG(robot, "Tank Drive Left Input", myLeft);
+	LOG(robot, "Tank Drive Right Input", myRight);
+	LOG(robot, "Tank Drive Left Motor Output", leftMotorOutput);
+	LOG(robot, "Tank Drive Right Motor Output", rightMotorOutput);
 
 	robot->SetWheelSpeed(RobotModel::kLeftWheels, leftMotorOutput);
 	robot->SetWheelSpeed(RobotModel::kRightWheels, rightMotorOutput);

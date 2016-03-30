@@ -16,11 +16,19 @@ public:
 	virtual bool GetLowGearDesired() = 0;
 	virtual bool GetArcadeDriveDesired() = 0;
 	virtual bool GetQuickTurnDesired() = 0;
+	virtual bool GetPivotButtonDesired() = 0;
+	virtual bool GetPivotSwitchDesired() = 0;
+	virtual double GetDesiredAngle() = 0;
+
+	//Auto buttons
 	virtual uint32_t GetDefense() = 0;
+	virtual bool GetStopAutoDesired() = 0;
 
 	//Superstructure controller button accessors
-	virtual bool GetDefenseManipDesired() = 0;
-	virtual bool GetIntakePistonDesired() = 0;
+	virtual bool GetDefenseManipToggleDesired() = 0;
+	virtual bool GetDefenseManipDownDesired() = 0;
+	virtual bool GetIntakePistonToggleDesired() = 0;
+	virtual bool GetIntakePistonDownDesired() = 0;
 	virtual bool GetIntakeMotorForwardDesired() = 0;
 	virtual bool GetIntakeMotorReverseDesired() = 0;
 	virtual bool GetOuttakeDesired() = 0;
