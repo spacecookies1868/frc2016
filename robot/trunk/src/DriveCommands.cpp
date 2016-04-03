@@ -388,7 +388,8 @@ void CurveCommand::Init() {
 	initialRight = robot->GetRightEncoderVal();
 	desiredRadius = GetSign(desiredY) * sqrt(desiredX*desiredX + desiredY*desiredY);
 	radiusPID = new PIDControlLoop(radiusPIDConfig);
-	radiusPID->Init(initialRadius, desiredRadius);
+//	radiusPID->Init(initialRadius, desiredRadius);
+	radiusPID->Init(initialRadius-desiredRadius, initialRadius);
 	desiredAngle = atan(desiredX/desiredY) * 360.0 / (2 * PI);
 	anglePID = new PIDControlLoop(anglePIDConfig);
 	anglePID->Init(initialYaw, initialYaw + desiredAngle);
@@ -402,7 +403,8 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 	double x = CalculateX();
 	double y = CalculateY();
 
-	double radius = GetSign(y) * sqrt((x - initialX)*(x - initialX) + (y - initialY) * (y - initialY));
+//	double radius = GetSign(y) * sqrt((x - initialX)*(x - initialX) + (y - initialY) * (y - initialY));
+	double radius = -GetSign(desiredY - y) * sqrt((desiredX - x)*(desiredX - x) + (desiredY - y)*(desiredY - y));
 	bool radiusPIDDone = radiusPID->ControlLoopDone(radius, deltaTimeSec);
 	bool anglePIDDone = anglePID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
 
@@ -620,6 +622,13 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	chevalDeFriseFirstTime = true;
 	chevalDeFriseInitTime = 0.0;
 
+	rampartsDriveStraight = new DriveStraightCommand(robot, 4.0);
+	rampartsDriveOver = new DriveStraightCommand(robot, 10.0);
+	//rampartsDriveOver = new DriveStraightCommand(robot, 0.0);
+	rampartsPivotToAngle = new PivotToAngleCommand(robot, 330);
+	currRampartsState = kRampartsBeforeRamp;
+	nextRampartsState = kRampartsBeforeRamp;
+
 	hardCodeMoat = new DriveStraightCommand(robot, 18.0);
 
 	hardCodeRockWall = new DriveStraightCommand(robot, 18.0);
@@ -664,6 +673,11 @@ void DefenseCommand::Init() {
 	}
 	case (Ramparts): {
 		printf("Ramparts Init \n");
+		rampartsDriveStraight->disPFac = 1.0;
+		rampartsDriveStraight->disIFac = 0.001;
+		rampartsDriveStraight->disDFac = 13.4;
+		rampartsDriveStraight->Init(); //drive straight for 4 feet until bottom of ramp
+		nextRampartsState = kRampartsBeforeRamp;
 		break;
 	}
 	case (Moat): {
@@ -788,7 +802,51 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 	}
 	case (Ramparts): {
 		printf("Ramparts Update \n");
-		isDone = true;
+		isDone = false;
+		switch (currRampartsState) {
+		case (kRampartsBeforeRamp) : {
+			if (!rampartsDriveStraight->IsDone()) {
+				rampartsDriveStraight->Update(currTimeSec, deltaTimeSec);
+				nextRampartsState = kRampartsBeforeRamp;
+			} else {
+				nextRampartsState = kRampartsTurn;
+				rampartsPivotToAngle->Init();
+				printf("nextRampartstate = kRampartsTurn/n");
+			}
+			break;
+		}
+		case (kRampartsTurn) : {
+			if (!rampartsPivotToAngle->IsDone()) {
+				rampartsPivotToAngle->Update(currTimeSec, deltaTimeSec);
+				nextRampartsState = kRampartsTurn;
+			} else {
+				nextRampartsState = kRampartsDrive;
+				rampartsDriveOver->Init();
+				printf("nextRampartstate = kRampartsDone/n");
+			}
+			break;
+		}
+
+		case (kRampartsDrive) : {
+			if (!rampartsDriveOver->IsDone()) {
+				rampartsDriveOver->Update(currTimeSec, deltaTimeSec);
+				nextRampartsState = kRampartsDrive;
+			} else {
+				nextRampartsState = kRampartsDone;
+				printf("nextRampartstate = kRampartsDone/n");
+			}
+
+			break;
+		}
+		case (kRampartsDone) : {
+			isDone = true;
+			nextRampartsState = kRampartsDone;
+			printf("kRampartsDone!!/n");
+			break;
+		}
+		}
+		currRampartsState = nextRampartsState;
+
 		break;
 	}
 	case (Moat): {

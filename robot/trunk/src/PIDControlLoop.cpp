@@ -63,6 +63,7 @@ double PIDControlLoop::Update(double currentSensorValue) {
 
 double PIDControlLoop::Update(double currValue, double desiredValue) {
 	double error = desiredValue - currValue;
+	desiredSensorValue = desiredValue;
 	error = Saturate(error, pidConfig->maxAbsError);
 	double diffError = 0.0;
 	if (oldError != 0.0) {

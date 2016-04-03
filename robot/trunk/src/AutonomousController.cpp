@@ -164,9 +164,9 @@ void AutonomousController::AddtoQueue(AutoCommand* myNewAutoCommand, SimpleAutoC
 void AutonomousController::CreateQueue() {
 	firstCommand = NULL;
 	printf("AutoMode: %i \n", autoMode);
-	if (humanControl->GetStopAutoDesired()) {
-		autoMode = kBlankAuto;
-	}
+//	if (humanControl->GetStopAutoDesired()) {
+//		autoMode = kBlankAuto;
+//	}
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
@@ -178,12 +178,14 @@ void AutonomousController::CreateQueue() {
 //		OuttakeByTimeCommand* outtakeTest = new OuttakeByTimeCommand(superstructure, 3.0);
 //		intakeTest->SetNextCommand(outtakeTest);
 //		firstCommand = outtakeTest;
-		CurveCommand* testmurple = new CurveCommand(robot, 3.0, 12.3);
-		firstCommand = testmurple;
-		PivotToAngleCommand* pivotmurple = new PivotToAngleCommand(robot, 42.0);
-		testmurple->SetNextCommand(pivotmurple);
-		OuttakeByTimeCommand* outtakemurple = new OuttakeByTimeCommand(superstructure, 1.0);
-		pivotmurple->SetNextCommand(outtakemurple);
+//		CurveCommand* testmurple = new CurveCommand(robot, 3.0, 12.3);
+//		firstCommand = testmurple;
+//		PivotToAngleCommand* pivotmurple = new PivotToAngleCommand(robot, 42.0);
+//		testmurple->SetNextCommand(pivotmurple);
+//		OuttakeByTimeCommand* outtakemurple = new OuttakeByTimeCommand(superstructure, 1.0);
+//		pivotmurple->SetNextCommand(outtakemurple);
+		DefenseCommand* ramparts = new DefenseCommand(robot, superstructure, 3);
+		firstCommand = ramparts;
 		break;
 	}
 	case (kBlankAuto): {
@@ -459,9 +461,9 @@ void AutonomousController::CreateQueue() {
 				defenseUpSBSA);
 		firstCommand = mechanismsUpSBSA;
 
-		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 1.2, 5.5); //was 0.8 on x
+		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 1.8, 6.8); //was 0.8 on x
 		mechanismsUpSBSA->SetNextCommand(drivingToTheLowGoal);
-		PivotCommand* pivotMe = new PivotCommand(robot, -20.0);
+		PivotToAngleCommand* pivotMe = new PivotToAngleCommand(robot, 330.0);
 		drivingToTheLowGoal->SetNextCommand(pivotMe);
 		OuttakeByTimeCommand* yeahShooting = new OuttakeByTimeCommand(superstructure, 1.0);
 		pivotMe->SetNextCommand(yeahShooting);

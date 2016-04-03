@@ -237,6 +237,16 @@ private:
 	bool chevalDeFriseFirstTime;\
 	double chevalDeFriseInitTime;
 
+	DriveStraightCommand* rampartsDriveStraight;
+	DriveStraightCommand* rampartsDriveOver;
+	PivotToAngleCommand* rampartsPivotToAngle;
+
+	enum rampartsDriveStates {
+		kRampartsBeforeRamp, kRampartsTurn, kRampartsDrive, kRampartsDone
+	};
+	uint32_t currRampartsState;
+	uint32_t nextRampartsState;
+
 	DriveStraightCommand* hardCodeMoat;
 
 	DriveStraightCommand* hardCodeRockWall;
