@@ -196,7 +196,7 @@ bool PivotToAngleCommand::IsDone() {
 }
 
 double PivotToAngleCommand::CalculateDesiredChange(double myDesired) {
-	double normalizedInitial = fmod(initialR, 360.0);
+	double normalizedInitial = fmod(currYaw, 360.0);
 	if (normalizedInitial < 0) {
 		normalizedInitial += 360;
 	}
@@ -406,8 +406,8 @@ void CurveCommand::Update(double currTimeSec, double deltaTimeSec) {
 //	double radius = GetSign(y) * sqrt((x - initialX)*(x - initialX) + (y - initialY) * (y - initialY));
 	double radius = -GetSign(desiredY - y) * sqrt((desiredX - x)*(desiredX - x) + (desiredY - y)*(desiredY - y));
 	bool radiusPIDDone = radiusPID->ControlLoopDone(radius, deltaTimeSec);
-	bool anglePIDDone = anglePID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
-
+	//bool anglePIDDone = anglePID->ControlLoopDone(accumulatedYaw, deltaTimeSec);
+	bool anglePIDDone = true;
 	printf("Radius PID Done? %i\n", radiusPIDDone);
 	printf("Angle PID Done? %i\n", anglePIDDone);
 

@@ -59,7 +59,6 @@ private:
 	unsigned int autoMode;
 	unsigned int autoStart;
 	bool hardCodeShoot;
-	unsigned int firstDefense;
 	unsigned int secondDefensePos;
 	double timeFinished;
 	bool useSallyPort;

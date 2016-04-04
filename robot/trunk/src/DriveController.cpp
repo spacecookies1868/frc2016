@@ -59,11 +59,15 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		leftJoyY = -humanControl->GetJoystickValue(RemoteControl::kLeftJoy, RemoteControl::kY);
 
 		if(humanControl->GetQuickTurnDesired()) {
+			printf("Quicktuning \n");
 			QuickTurn(rightJoyX);
 		} else if(humanControl->GetArcadeDriveDesired()) {
+			printf("Arcade Driving \n");
 			ArcadeDrive(rightJoyX, leftJoyY);
 		} else {
-			TankDrive(leftJoyY, rightJoyY);		}
+			printf("Tank Driving \n");
+			TankDrive(leftJoyY, rightJoyY);
+		}
 
 		if (humanControl->GetPivotButtonDesired()){
 			printf("Switching to kDialToAngleButton \n");
@@ -142,6 +146,7 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 	LOG(robot, "Arcade Drive Curr Rotate", currR);
 
 	if (fabs(rotateValue) < 0.1) {
+		printf("Enabling PID \n");
 		// makes robot go straight without drifting
 		if (!initializedRPID) {
 			lastR = currR;
@@ -224,6 +229,7 @@ void DriveController::TankDrive(double myLeft, double myRight) {
 
 int DriveController::DriveDirection(){
 	if (humanControl->GetReverseDriveDesired()) {
+		printf("Reverse Drive \n");
 		return -1;
 	} else {
 		return 1;

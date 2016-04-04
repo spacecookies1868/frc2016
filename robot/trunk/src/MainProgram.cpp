@@ -120,7 +120,10 @@ private:
 		//printf("Left Encoder Val %f\n", robot->GetLeftEncoderVal());
 		powerController->Update(currTimeSec, deltaTimeSec);
 		Logger::LogState(robot, humanControl);
-
+		LOG(robot, "Right Current Draw A", robot->GetCurrent(2));
+		LOG(robot, "Right Current Draw B", robot->GetCurrent(1));
+		LOG(robot, "Left Current Draw A", robot->GetCurrent(7));
+		LOG(robot, "Left Current Draw B", robot->GetCurrent(8));
 #if USE_CAMERA
 		CameraServer::GetInstance()->SetQuality(50); // ?? what is quality?
 		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());

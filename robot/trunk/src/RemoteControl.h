@@ -22,6 +22,7 @@ public:
 
 	//Auto buttons
 	virtual uint32_t GetDefense() = 0;
+	virtual uint32_t GetDefensePosition() = 0;
 	virtual bool GetStopAutoDesired() = 0;
 
 	//Superstructure controller button accessors

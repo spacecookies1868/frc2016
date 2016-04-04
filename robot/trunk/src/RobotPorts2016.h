@@ -64,7 +64,7 @@ static const int OPERATOR_JOY_B_USB_PORT				= 3;
 // ***************** BUTTON PORTS *****************
 //Drive controller button ports
 static const int DRIVE_DIRECTION_BUTTON_PORT			= 3; //new on left joystick, was 12 on op b
-static const int HIGH_LOW_GEAR_BUTTON_PORT				= 2;
+static const int HIGH_LOW_GEAR_BUTTON_PORT				= 8;
 static const int ARCADE_DRIVE_BUTTON_PORT				= 3;
 static const int QUICK_TURN_BUTTON_PORT					= 1;
 static const int DIAL_PIVOT_BUTTON_PORT					= 7;
@@ -84,7 +84,9 @@ static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 9;
 static const int DEFENSE_ID_1_BUTTON_PORT				= 3;
 static const int DEFENSE_ID_2_BUTTON_PORT				= 4;
 static const int DEFENSE_ID_3_BUTTON_PORT				= 5;
-static const int STOP_AUTO_BUTTON_PORT					= 6; //ARBITRARY PORT
+static const int STOP_AUTO_BUTTON_PORT					= 6;
+static const int DEFENSE_POSITION_ID_1_BUTTON_PORT		= 1;
+static const int DEFENSE_POSITION_ID_2_BUTTON_PORT		= 2;
 
 // Power controller button port
 static const int POWER_BUDGET_SWITCH					= 7;

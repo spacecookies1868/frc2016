@@ -30,6 +30,7 @@ public:
 
 	//Auto buttons
 	uint32_t GetDefense();
+	uint32_t GetDefensePosition();
 	bool GetStopAutoDesired();
 
 	//Superstructure controller button accessors
@@ -58,6 +59,15 @@ public:
 		RoughTerrain = 8
 	};
 
+	enum DefensePositions {
+		kNone = 0,
+		kLowBar = 1,
+		kSecond = 2,
+		kThird = 3,
+		kFourth = 4,
+		kFifth = 5
+	};
+
 private:
 	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
 		 intakePistonToggleDesired,intakePistonDownDesired,
@@ -65,11 +75,12 @@ private:
 		 pivotButtonDesired, pivotSwitchDesired, powerBudgetDesired, stopAutoDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY, desiredAngle;
 	uint32_t defense;
+	uint32_t defensePos;
 	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
 				 *intakeMotorForwardButton,*intakeMotorReverseButton, *outtakeButton, *manualOuttakeForwardButton, *dialPivotButton, *dialPivotSwitch,
 				 *manualOuttakeReverseButton, *defense_ID_1_Button, *defense_ID_2_Button, *defense_ID_3_Button,
-				 *powerBudgetButton, *stopAutoButton;
+				 *powerBudgetButton, *stopAutoButton, *defensePos_ID_1_Button, *defensePos_ID_2_Button;
 	void ReadAllButtons();
 };
 

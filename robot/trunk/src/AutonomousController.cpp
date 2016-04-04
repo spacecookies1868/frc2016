@@ -17,7 +17,6 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	humanControl = myHumanControl;
 	timeFinished = 0.0;
 	hardCodeShoot = true;
-	firstDefense = 0;
 	secondDefensePos = 0;
 	useSallyPort = true;
 }
@@ -71,7 +70,6 @@ void AutonomousController::Reset() {
 void AutonomousController::RefreshIni() {
 	autoMode = robot->pini->geti("AUTONOMOUS","AutoMode",0);
 	hardCodeShoot = robot->pini->getbool("AUTONOMOUS", "HardCodeShoot", true);
-	firstDefense = robot->pini->geti("AUTONOMOUS", "FirstDefense", 0);
 	secondDefensePos = robot->pini->geti("AUTONOMOUS", "SecondDefense", 0);
 	useSallyPort = robot->pini->getbool("AUTONOMOUS", "UseSallyPort", true);
 
@@ -184,8 +182,63 @@ void AutonomousController::CreateQueue() {
 //		testmurple->SetNextCommand(pivotmurple);
 //		OuttakeByTimeCommand* outtakemurple = new OuttakeByTimeCommand(superstructure, 1.0);
 //		pivotmurple->SetNextCommand(outtakemurple);
-		DefenseCommand* ramparts = new DefenseCommand(robot, superstructure, 3);
-		firstCommand = ramparts;
+		IntakePositionCommand* intakeUp = new IntakePositionCommand(
+				superstructure, false);
+		DefenseManipPosCommand* defenseUp = new DefenseManipPosCommand(
+				superstructure, false);
+		ParallelAutoCommand* mechanismsUp = new ParallelAutoCommand(
+				intakeUp, defenseUp);
+		firstCommand = mechanismsUp;
+		//SHOOTING IN THE GOAL
+
+		CurveCommand* driveToGoal = new CurveCommand(robot, 1.8, 6.8); //was 0.8 for x
+		mechanismsUp->SetNextCommand(driveToGoal);
+		PivotToAngleCommand* pivotForGoal = new PivotToAngleCommand(robot, 330.0);
+		driveToGoal->SetNextCommand(pivotForGoal);
+		OuttakeByTimeCommand* shooting = new OuttakeByTimeCommand(
+				superstructure, 1.0);
+		pivotForGoal->SetNextCommand(shooting);
+
+		//LINING UP
+		DriveStraightCommand* driveOffBatter = new DriveStraightCommand(
+				robot, -0.0);
+		shooting->SetNextCommand(driveOffBatter);
+		PivotToAngleCommand* LiningUp = new PivotToAngleCommand(robot,
+				270.0);
+				driveOffBatter->SetNextCommand(LiningUp);
+
+		//DRIVING TO CAT C
+		CurveCommand* drivingToCatCT = new CurveCommand(robot,
+				-8.2 + 4.2 * 2, -10.0);
+		LiningUp->SetNextCommand(drivingToCatCT);
+		PivotToAngleCommand* straightenMe = new PivotToAngleCommand(robot,
+				270.0); //should be -90
+		drivingToCatCT->SetNextCommand(straightenMe);
+		if (!useSallyPort) {
+			//DRAWBRIDGE DRIVING ROUTINE
+			DriveStraightCommand* drivingThroughDT = new DriveStraightCommand(
+					robot, -9.0); //ARBITRARY VALUES
+			DefenseManipPosCommand* defenseGoDownNowT =
+					new DefenseManipPosCommand(superstructure, true);
+			ParallelAutoCommand* throughDrawbridgeT = new ParallelAutoCommand(
+					drivingThroughDT, defenseGoDownNowT);
+			straightenMe->SetNextCommand(throughDrawbridgeT);
+			DriveStraightCommand* drawbridgeGoBackT = new DriveStraightCommand(
+					robot, -10.0); //ARBITRARY VALUES
+			throughDrawbridgeT->SetNextCommand(drawbridgeGoBackT);
+		} else {
+			//SALLYPORT DRIVING ROUTINE
+			CurveCommand* drivingThroughSPT = new CurveCommand(
+					robot, -0.5, -10.0);
+			straightenMe->SetNextCommand(drivingThroughSPT);
+			PivotCommand* turningAroundSPT = new PivotCommand(robot, -180.0);
+			drivingThroughSPT->SetNextCommand(turningAroundSPT);
+			DriveStraightCommand* driveBackThroughSPT = new DriveStraightCommand(
+					robot, -10.0);
+			//turningAroundSPT->SetNextCommand(driveBackThroughSPT);
+
+		}
+
 		break;
 	}
 	case (kBlankAuto): {
@@ -242,7 +295,7 @@ void AutonomousController::CreateQueue() {
 	case (kShootAuto): {
 		printf("kShootAuto --------------------------------\n");
 		DUMP("SHOOT AUTO", 0.0);
-		DUMP("DEFENSE POSITION", (double) firstDefense);
+		DUMP("DEFENSE POSITION", (double) humanControl->GetDefensePosition());
 		/*
 		 * Assumption: starting position is back of robot on auto line
 		 * GOING THROUGH LOW BAR IN THESE CALCULATIONS
@@ -261,7 +314,7 @@ void AutonomousController::CreateQueue() {
 			hardCodeCross->SetNextCommand(hardCodeStraighten);
 			CurveCommand* hardCodeDrive;
 			PivotToAngleCommand* hardCodeLineUpShoot;
-			switch(firstDefense) {
+			switch(humanControl->GetDefensePosition()) {
 			case (kNone): {
 				printf("UH OH ERROR ERROR EEEEEEEKKKKKKK! \n");
 				break;
@@ -306,7 +359,7 @@ void AutonomousController::CreateQueue() {
 			CurveCommand* weShallGetNear;
 			CameraCommand* theCameraCommand;
 			PivotToAngleCommand* gottaLineUp;
-			switch (firstDefense) {
+			switch (humanControl->GetDefensePosition()) {
 			case (kNone): {
 				printf("UH OH ERROR ERROR EEEEEEEKKKKKKK! \n");
 				break;
@@ -360,7 +413,7 @@ void AutonomousController::CreateQueue() {
 		firstCommand = hoardMechanismsUp;
 		DefenseCommand* hoardFirstCrossA = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
 		hoardMechanismsUp->SetNextCommand(hoardFirstCrossA);
-		CurveCommand* hoardGoToCatC = new CurveCommand(robot, 4.0*(secondDefensePos - firstDefense), 1.0);
+		CurveCommand* hoardGoToCatC = new CurveCommand(robot, 4.0*(secondDefensePos - humanControl->GetDefensePosition()), 1.0);
 		hoardFirstCrossA->SetNextCommand(hoardGoToCatC);
 		PivotToAngleCommand* hoardStraightenBeforeCatC = new PivotToAngleCommand(robot, 0.0);
 		hoardGoToCatC->SetNextCommand(hoardStraightenBeforeCatC);
@@ -483,9 +536,9 @@ void AutonomousController::CreateQueue() {
 		firstCommand = mechanismsUpSBC;
 		//SHOOTING IN THE GOAL
 
-		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 1.2, 5.5); //was 0.8 for x
+		CurveCommand* driveToGoalSBC = new CurveCommand(robot, 1.8, 6.8); //was 0.8 for x
 		mechanismsUpSBC->SetNextCommand(driveToGoalSBC);
-		PivotCommand* pivotForGoalSBC = new PivotCommand(robot, -20.0);
+		PivotToAngleCommand* pivotForGoalSBC = new PivotToAngleCommand(robot, 330.0);
 		driveToGoalSBC->SetNextCommand(pivotForGoalSBC);
 		OuttakeByTimeCommand* shootingSBC = new OuttakeByTimeCommand(superstructure, 1.0);
 		pivotForGoalSBC->SetNextCommand(shootingSBC);
@@ -497,7 +550,7 @@ void AutonomousController::CreateQueue() {
 		driveOffBatterSBC->SetNextCommand(SBCLiningUp);
 
 		//DRIVING TO CAT C
-		CurveCommand* drivingToCatC = new CurveCommand(robot, -10.6 + 4.2 * firstDefense, -12.0);
+		CurveCommand* drivingToCatC = new CurveCommand(robot, -10.6 + 4.2 * humanControl->GetDefensePosition(), -12.0);
 		SBCLiningUp->SetNextCommand(drivingToCatC);
 		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, 0.0); //should be -90
 		drivingToCatC->SetNextCommand(straightenMeSBC);

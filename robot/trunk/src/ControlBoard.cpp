@@ -29,6 +29,8 @@ ControlBoard::ControlBoard() {
 	defense_ID_2_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_2_BUTTON_PORT);
 	defense_ID_3_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_3_BUTTON_PORT);
 	stopAutoButton = new ButtonReader(operatorJoyB, STOP_AUTO_BUTTON_PORT);
+	defensePos_ID_1_Button = new ButtonReader(operatorJoyB, DEFENSE_POSITION_ID_1_BUTTON_PORT);
+	defensePos_ID_2_Button = new ButtonReader(operatorJoyB, DEFENSE_POSITION_ID_2_BUTTON_PORT);
 
 	powerBudgetButton = new ButtonReader(operatorJoy, POWER_BUDGET_SWITCH);
 
@@ -52,6 +54,7 @@ ControlBoard::ControlBoard() {
 	pivotSwitchDesired = false;
 	desiredAngle = 0.0;
 	defense = LowBar;
+	defensePos = kNone;
 	manualOuttakeForwardDesired = false;
 	manualOuttakeReverseDesired = false;
 	powerBudgetDesired = false;
@@ -109,6 +112,27 @@ void ControlBoard::ReadControls() {
 	}
 	//defense = ChevalDeFrise;
 	printf("MY DEFENSE %i\n", defense);
+
+	bool firstPosDown = defensePos_ID_1_Button->IsDown();
+	bool secondPosDown = defensePos_ID_2_Button->IsDown();
+
+	if (defense == LowBar) {
+		defensePos = kLowBar;
+	} else {
+		if (firstPosDown) {
+			if (secondPosDown) {
+				defensePos = kFifth;
+			} else {
+				defensePos = kFourth;
+			}
+		} else {
+			if (secondPosDown) {
+				defensePos = kThird;
+			} else {
+				defensePos = kSecond;
+			}
+		}
+	}
 
 	stopAutoDesired = !stopAutoButton->IsDown();
 
@@ -182,6 +206,10 @@ uint32_t ControlBoard::GetDefense() {
 	return defense;
 }
 
+uint32_t ControlBoard::GetDefensePosition() {
+	return defensePos;
+}
+
 bool ControlBoard::GetStopAutoDesired() {
 	return stopAutoDesired;
 }
@@ -241,6 +269,8 @@ void ControlBoard::ReadAllButtons() {
 	defense_ID_1_Button->ReadValue();
 	defense_ID_2_Button->ReadValue();
 	defense_ID_3_Button->ReadValue();
+	defensePos_ID_1_Button->ReadValue();
+	defensePos_ID_2_Button->ReadValue();
 	stopAutoButton->ReadValue();
 	dialPivotButton->ReadValue();
 	dialPivotSwitch->ReadValue();
