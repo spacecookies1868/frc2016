@@ -26,7 +26,11 @@ DriveController::DriveController(RobotModel *myRobot, RemoteControl *myHumanCont
 	rMaxAbsError = 0.0;
 	rMaxAbsITerm = 0.0;
 	rTimeLimit = 0.0;
+#if USE_NAVX
 	lastR = robot->GetNavXYaw();
+#else
+	lastR = 0.0;
+#endif
 	rPIDConfig = CreateRPIDConfig();
 	rPID = new PIDControlLoop(rPIDConfig);
 	initializedRPID = false;
@@ -141,7 +145,11 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 	double leftMotorOutput = moveValue;
 	double rightMotorOutput = moveValue;
 
+#if USE_NAVX
 	double currR = robot->GetNavXYaw();
+#else
+	double currR = 0.0;
+#endif
 	DO_PERIODIC(20, printf("Arcade Drive Curr Rotate %f\n", currR));
 	LOG(robot, "Arcade Drive Curr Rotate", currR);
 

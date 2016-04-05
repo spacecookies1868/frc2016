@@ -162,9 +162,9 @@ void AutonomousController::AddtoQueue(AutoCommand* myNewAutoCommand, SimpleAutoC
 void AutonomousController::CreateQueue() {
 	firstCommand = NULL;
 	printf("AutoMode: %i \n", autoMode);
-//	if (humanControl->GetStopAutoDesired()) {
-//		autoMode = kBlankAuto;
-//	}
+	if (humanControl->GetStopAutoDesired()) {
+		autoMode = kBlankAuto;
+	}
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
@@ -182,7 +182,7 @@ void AutonomousController::CreateQueue() {
 //		testmurple->SetNextCommand(pivotmurple);
 //		OuttakeByTimeCommand* outtakemurple = new OuttakeByTimeCommand(superstructure, 1.0);
 //		pivotmurple->SetNextCommand(outtakemurple);
-		IntakePositionCommand* intakeUp = new IntakePositionCommand(
+		/*IntakePositionCommand* intakeUp = new IntakePositionCommand(
 				superstructure, false);
 		DefenseManipPosCommand* defenseUp = new DefenseManipPosCommand(
 				superstructure, false);
@@ -237,7 +237,10 @@ void AutonomousController::CreateQueue() {
 					robot, -10.0);
 			//turningAroundSPT->SetNextCommand(driveBackThroughSPT);
 
-		}
+		}*/
+
+		PivotCommand* turningAroundSPT = new PivotCommand(robot, -180.0);
+		firstCommand = turningAroundSPT;
 
 		break;
 	}
@@ -288,8 +291,8 @@ void AutonomousController::CreateQueue() {
 
 		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
 		andThemMechanismsGoUp->SetNextCommand(cross);
-		OuttakeByTimeCommand* crossOuttake = new OuttakeByTimeCommand(superstructure, 3.0);
-		cross->SetNextCommand(crossOuttake);
+		//OuttakeByTimeCommand* crossOuttake = new OuttakeByTimeCommand(superstructure, 3.0);
+		//cross->SetNextCommand(crossOuttake);
 		break;
 	}
 	case (kShootAuto): {

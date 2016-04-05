@@ -403,9 +403,13 @@ void RobotModel::ResetOuttakeEncoders() {
 void RobotModel::SetCompressorStop() {
 	compressor->Stop();
 }
-#if USE_CAMERA
+
 Image* RobotModel::GetCameraImage() {
+#if USE_CAMERA
 	camera->GetImage(frame);
 	return frame;
-}
+#else
+	return NULL;
 #endif
+
+}

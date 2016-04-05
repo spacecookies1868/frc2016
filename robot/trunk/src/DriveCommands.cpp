@@ -31,7 +31,11 @@ void PivotCommand::Init() {
 	initialR = GetAccumulatedYaw();
 	rPID = new PIDControlLoop(rPIDConfig);
 	rPID->Init(initialR, initialR + desiredR);
+#if USE_NAVX
 	LOG(robot, "START YAW", robot->GetNavXYaw());
+#else
+	LOG(robot, "START YAW", "USE_NAVX is false");
+#endif
 }
 
 double PivotCommand::rPFac = 0.0;
@@ -60,7 +64,11 @@ PIDConfig* PivotCommand::CreateRPIDConfig(){
 
 double PivotCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
+#if USE_NAVX
 	currYaw = robot->GetNavXYaw();
+#else
+	currYaw = 0.0;
+#endif
 	deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
@@ -78,18 +86,26 @@ void PivotCommand::SetDesiredR(double desiredRotation) {
 }
 
 void PivotCommand::Update(double currTimeSec, double deltaTimeSec) {
+#if USE_NAVX
 	bool pidDone = rPID->ControlLoopDone(GetAccumulatedYaw(), deltaTimeSec);
+#else
+	bool pidDone = true;
+#endif
 	if (pidDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+#if USE_NAVX
 		LOG(robot, "END YAW", robot->GetNavXYaw());
+#endif
 	} else {
 		double output = rPID->Update(GetAccumulatedYaw());
 		DO_PERIODIC(5, printf("My Yaw: %f\n", GetAccumulatedYaw()));
 		DO_PERIODIC(5, printf("Desired Yaw: %f\n", desiredR));
 		DO_PERIODIC(5, printf("Output: %f\n", output));
 		DO_PERIODIC(1, LOG(robot, "Accumulated Yaw", GetAccumulatedYaw()));
+#if USE_NAVX
 		DO_PERIODIC(1, LOG(robot, "Yaw", robot->GetNavXYaw()));
+#endif
 		DO_PERIODIC(1, LOG(robot, "Desired Yaw", desiredR));
 		DO_PERIODIC(1, LOG(robot, "Output", output));
 		robot->SetWheelSpeed(RobotModel::kLeftWheels, output);
@@ -124,14 +140,20 @@ PivotToAngleCommand::PivotToAngleCommand(RobotModel* myRobot, double myDesiredR)
 void PivotToAngleCommand::Init() {
 	rPIDConfig = CreateRPIDConfig();
 	rPID = new PIDControlLoop(rPIDConfig);
+#if USE_NAVX
 	currYaw = robot->GetNavXYaw();
+#endif
 	initialR = GetAccumulatedYaw();
 	double desiredChange = CalculateDesiredChange(desiredR);
 	LOG(robot, "initialR", initialR);
 	LOG(robot, "desiredR", desiredR);
 	LOG(robot, "desiredChange", desiredChange);
 	rPID->Init(initialR, initialR + desiredChange);
+#if USE_NAVX
 	LOG(robot, "START YAW", robot->GetNavXYaw());
+#else
+	LOG(robot, "START YAW", "USE_NAVX is false");
+#endif
 }
 
 double PivotToAngleCommand::rPFac = 0.0;
@@ -161,7 +183,11 @@ PIDConfig* PivotToAngleCommand::CreateRPIDConfig(){
 
 double PivotToAngleCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
+#if USE_NAVX
 	currYaw = robot->GetNavXYaw();
+#else
+	currYaw = 0.0;
+#endif
 	deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
@@ -176,11 +202,17 @@ double PivotToAngleCommand::GetAccumulatedYaw() {
 
 void PivotToAngleCommand::Update(double currTimeSec, double deltaTimeSec) {
 	LOG(robot, "my current angle", GetAccumulatedYaw());
+#if USE_NAVX
 	bool pidDone = rPID->ControlLoopDone(GetAccumulatedYaw(), deltaTimeSec);
+#else
+	bool pidDone = false;
+#endif
 	if (pidDone) {
 		isDone = true;
 		robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);
+#if USE_NAVX
 		LOG(robot, "END YAW", robot->GetNavXYaw());
+#endif
 	} else {
 		double output = rPID->Update(GetAccumulatedYaw());
 		DO_PERIODIC(5, printf("My Yaw: %f\n", GetAccumulatedYaw()));
@@ -297,7 +329,11 @@ PIDConfig* DriveStraightCommand::CreateRPIDConfig() {
 
 double DriveStraightCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
+#if USE_NAVX
 	currYaw = robot->GetNavXYaw();
+#else
+	currYaw = 0.0;
+#endif
 	deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
@@ -510,7 +546,11 @@ PIDConfig* CurveCommand::CreateAnglePIDConfig() {
 
 double CurveCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
+#if USE_NAVX
 	currYaw = robot->GetNavXYaw();
+#else
+	currYaw = 0.0;
+#endif
 	deltaYaw = currYaw - lastYaw;
 
 	if (deltaYaw < -180) {			// going clockwise (from 180 to -180)
@@ -608,7 +648,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	portcullisWaiting = 0.0;
 	portcullisDriveTimeOut = 3.5;
 
-	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.3);
+	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.4);
 	chevalDeFriseDriving = new DriveStraightCommand(robot, 6.0);
 	chevalDeFriseStay = new DriveStraightCommand(robot, 0.0);
 //	chevalDeFriseDriving = new DriveStraightCommand(robot, 0.0);

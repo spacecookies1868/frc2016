@@ -41,6 +41,7 @@ void CameraDetectionCommand::Init() {
 }
 
 void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
+#if USE_CAMERA
 	if (iterationCounter == 0) {
 		camera->CalculateDistanceWithAngles();
 		sumx += camera->GetX();
@@ -63,6 +64,12 @@ void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
 		x = sumx / numIterations;
 		y = sumy / numIterations;
 	}
+#else
+	x = 0.0;
+	y = 0.0;
+	isDone = true;
+	DUMP("Camera State", "USE_CAMERA is false");
+#endif
 }
 
 bool CameraDetectionCommand::IsDone() {
