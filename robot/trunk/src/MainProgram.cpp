@@ -52,6 +52,11 @@ private:
 		LOG(robot, "Initing", 0.0);
 		robot->ResetTimer();
 		robot->Reset();
+#if USE_USB_CAMERA
+		CameraServer::GetInstance()->SetQuality(50);
+		//the camera name (ex "cam1") can be found through the roborio web interface
+		CameraServer::GetInstance()->StartAutomaticCapture("cam1");
+#endif
 		RefreshAllIni();
 	}
 

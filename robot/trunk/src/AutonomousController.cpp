@@ -549,13 +549,15 @@ void AutonomousController::CreateQueue() {
 		//LINING UP
 		DriveStraightCommand* driveOffBatterSBC = new DriveStraightCommand(robot, -0.0);
 		shootingSBC->SetNextCommand(driveOffBatterSBC);
-		PivotToAngleCommand* SBCLiningUp = new PivotToAngleCommand(robot, -90.0);
+		PivotToAngleCommand* SBCLiningUp = new PivotToAngleCommand(robot, 270.0);
 		driveOffBatterSBC->SetNextCommand(SBCLiningUp);
 
 		//DRIVING TO CAT C
-		CurveCommand* drivingToCatC = new CurveCommand(robot, -10.6 + 4.2 * humanControl->GetDefensePosition(), -12.0);
-		SBCLiningUp->SetNextCommand(drivingToCatC);
-		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, 0.0); //should be -90
+		DefenseManipPosCommand* defenseManipUpSBC = new DefenseManipPosCommand(superstructure, false);
+		SBCLiningUp->SetNextCommand(defenseManipUpSBC);
+		CurveCommand* drivingToCatC = new CurveCommand(robot, -8.0 + 4.2 * humanControl->GetDefensePosition(), -10.0);
+		defenseManipUpSBC->SetNextCommand(drivingToCatC);
+		PivotToAngleCommand* straightenMeSBC = new PivotToAngleCommand(robot, 270.0);
 		drivingToCatC->SetNextCommand(straightenMeSBC);
 		if (!useSallyPort) {
 			//DRAWBRIDGE DRIVING ROUTINE
@@ -567,12 +569,10 @@ void AutonomousController::CreateQueue() {
 			throughDrawbridge->SetNextCommand(drawbridgeGoBack);
 		} else {
 			//SALLYPORT DRIVING ROUTINE
-			DriveStraightCommand* drivingThroughSP = new DriveStraightCommand(robot, -10.0);
-			straightenMeSBC->SetNextCommand(drivingThroughSP);
-			PivotCommand* turningAroundSP = new PivotCommand(robot, -180.0);
-			drivingThroughSP->SetNextCommand(turningAroundSP);
-			DriveStraightCommand* driveBackThroughSP = new DriveStraightCommand(robot, -10.0);
-			turningAroundSP->SetNextCommand(driveBackThroughSP);
+			DriveStraightCommand* drivingThroughSP = new DriveStraightCommand(robot, -8.0);
+			//straightenMeSBC->SetNextCommand(drivingThroughSP);
+			DriveStraightCommand* driveBackThroughSP = new DriveStraightCommand(robot, 11.0);
+			drivingThroughSP->SetNextCommand(driveBackThroughSP);
 
 		}
 		break;

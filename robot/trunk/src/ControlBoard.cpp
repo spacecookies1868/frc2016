@@ -113,8 +113,8 @@ void ControlBoard::ReadControls() {
 	//defense = ChevalDeFrise;
 	printf("MY DEFENSE %i\n", defense);
 
-	bool firstPosDown = defensePos_ID_1_Button->IsDown();
-	bool secondPosDown = defensePos_ID_2_Button->IsDown();
+	bool firstPosDown = !defensePos_ID_1_Button->IsDown();
+	bool secondPosDown = !defensePos_ID_2_Button->IsDown();
 
 	if (defense == LowBar) {
 		defensePos = kLowBar;
