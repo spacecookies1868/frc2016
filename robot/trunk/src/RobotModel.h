@@ -114,8 +114,8 @@ private:
 	UltrasonicSensor *ultra;
 
 #if USE_CAMERA
-	AxisCamera *camera;
-	Image *frame;
+//	AxisCamera *camera;
+//	Image *frame;
 #endif
 
 #if USE_NAVX

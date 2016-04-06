@@ -1,49 +1,13 @@
 #include "TableReader.h"
 #include <math.h>
+#include <algorithm>
+#include <vector>
+#include <cmath>
 #include "Logger.h"
 
-TableReader::TableReader(llvm::StringRef tableName) {
-	table = NetworkTable::GetTable(tableName);
-	sumLeftX1 = 0;
-	sumLeftY1 = 0;
-	sumLeftX2 = 0;
-	sumLeftY2 = 0;
-	sumRightX1 = 0;
-	sumRightY1 = 0;
-	sumRightX2 = 0;
-	sumRightY2 = 0;
-	numIterations = 20;
-	leftLineIndex = 0;
-	rightLineIndex = 0;
-
-//values assuming top right corner is 0,0
-//	topLeftX = 0;
-//	topLeftY = 240;
-//	topRightX = 320;
-//	topRightY = 240;
-//	bottomLeftX = 0;
-//	bottomLeftY = 0;
-//	bottomRightX = 320;
-//	bottomRightY = 0;
-
-//values top left corner is 0,0
-//	topRightX = 0;
-//	topRightY = 240;
-//	topLeftX = 320;
-//	topLeftY = 240;
-//	bottomRightX = 0;
-//	bottomRightY = 0;
-//	bottomLeftX = 320;
-//	bottomLeftY = 0;
-//
-//	topRightX = 0;
-//	topRightY = 360;
-//	topLeftX = 480;
-//	topLeftY = 360;
-//	bottomRightX = 0;
-//	bottomRightY = 0;
-//	bottomLeftX = 480;
-//	bottomLeftY = 0;
+TableReader::TableReader(llvm::StringRef lineTableName, llvm::StringRef contourTableName) {
+	lineTable = NetworkTable::GetTable(lineTableName);
+	contourTable = NetworkTable::GetTable(contourTableName);
 
 	topRightX = 0;
 	topRightY = 480;
@@ -56,27 +20,22 @@ TableReader::TableReader(llvm::StringRef tableName) {
 
 }
 
-void TableReader::ReadValues() {
-	lengths = table->GetNumberArray("length", llvm::ArrayRef<double>());
-	x1 = table->GetNumberArray("x1", llvm::ArrayRef<double>());
-	x2 = table->GetNumberArray("x2", llvm::ArrayRef<double>());
-	y1 = table->GetNumberArray("y1", llvm::ArrayRef<double>());
-	y2 = table->GetNumberArray("y2", llvm::ArrayRef<double>());
-	angles = table->GetNumberArray("angle", llvm::ArrayRef<double>());
+void TableReader::ReadValues(bool leftTargetDesired) {
+	x1 = lineTable->GetNumberArray("x1", llvm::ArrayRef<double>());
+	x2 = lineTable->GetNumberArray("x2", llvm::ArrayRef<double>());
+	y1 = lineTable->GetNumberArray("y1", llvm::ArrayRef<double>());
+	y2 = lineTable->GetNumberArray("y2", llvm::ArrayRef<double>());
+	angles = lineTable->GetNumberArray("angle", llvm::ArrayRef<double>());
+	centerXs = contourTable->GetNumberArray("centerX", llvm::ArrayRef<double>());
+	centerYs = contourTable->GetNumberArray("centerY", llvm::ArrayRef<double>());
+	widths = contourTable->GetNumberArray("width", llvm::ArrayRef<double>());
+	heights = contourTable->GetNumberArray("height", llvm::ArrayRef<double>());
 
-//	for (unsigned int i = 0; i < lengths.size(); i++) {
-//		printf("line %i: \n", i + 1);
-//		printf("length :%f \n", lengths[i]);
-//		printf("x1 :%f y1: %f x2: %f y2: %f\n", x1[i], y1[i], x2[i], y2[i]);
-//		printf("angle %f \n", angles[i]);
-//	}
-
-	//IterativeFilterLines();
-	FilterLines();
+	FilterLines(leftTargetDesired);
+	FindCorners();
 }
 
 void TableReader::Reset() {
-	//printf("Resetting \n");
 	topRightX = 0;
 	topRightY = 480;
 	topLeftX = 640;
@@ -112,223 +71,296 @@ double TableReader::GetTopRightY() {
 	return topRightY;
 }
 
-int TableReader::GetLeftLineIndex() {
-	return leftLineIndex;
-}
-
-int TableReader::GetRightLineIndex() {
-	return rightLineIndex;
-}
-
-double TableReader::GetLeftLineX1() {
-	return sumLeftX1 / numIterations;
-	//return x1[leftLineIndex];
-}
-
-double TableReader::GetLeftLineX2() {
-	return sumLeftX2 / numIterations;
-	//return x2[leftLineIndex];
-}
-
-double TableReader::GetLeftLineY1() {
-	return sumLeftY1 / numIterations;
-	//return y1[leftLineIndex];
-}
-
-double TableReader::GetLeftLineY2() {
-	return sumLeftY2 / numIterations;
-	//return y2[leftLineIndex];
-}
-
-double TableReader::GetLeftLineLength() {
-	return lengths[leftLineIndex];
-}
-
-double TableReader::GetRightLineX1() {
-	return sumRightX1 / numIterations;
-	//return x1[rightLineIndex];
-}
-
-double TableReader::GetRightLineX2() {
-	return sumRightX2 / numIterations;
-	//return x2[rightLineIndex];
-}
-
-double TableReader::GetRightLineY1() {
-	return sumRightY1 / numIterations;
-	//return y1[rightLineIndex];
-}
-
-double TableReader::GetRightLineY2() {
-	return sumRightY2 / numIterations;
-	//return y2[rightLineIndex];
-}
-
-double TableReader::GetRightLineLength() {
-	return lengths[rightLineIndex];
-}
-void TableReader::FilterLines() {
-	for (unsigned int i = 0; i < lengths.size(); i++) {
-//		printf("beginning iteration %i\n", i);
-//		printf("My Current values: \n");
-//		printf("Top Left (x,y): (%f,%f)\n", topLeftX, topLeftY);
-//		printf("Bottom Left (x,y): (%f,%f)\n", bottomLeftX, bottomLeftY);
-//		printf("Top Right (x,y): (%f,%f)\n", topRightX, topRightY);
-//		printf("Bottom Right (x,y): (%f,%f)\n", bottomRightX, bottomRightY);
-		if (fabs((double) angles[i]) < 45.0
-				|| fabs((double) angles[i]) > 135.0) {
-			//printf("Horizontal Line %i\n", i);
-		} else {
-			//printf("Vertical Line %i\n", i);
-			//ALL CALCS BASED ON TOP LEFT IS (0,0)
-			double currx = x1[i];
-			double curry = y1[i];
-			if ((currx < topLeftX && curry < topLeftY)
-					|| (fabs(currx - topLeftX) < 5 && curry < topLeftY)
-					|| ((topLeftX - currx) > 9 && fabs(curry - topLeftY) < 10)) {
-				printf("line %i, (x1, y1) replacing top Left: (%f, %f)\n", i,
-						currx, curry);
-				topLeftX = currx;
-				topLeftY = curry;
-			}
-			if (((currx < bottomLeftX && curry > bottomLeftY)
-					|| (fabs(currx - bottomLeftX) < 5 && curry > bottomLeftY)
-					|| ((bottomLeftX - currx) > 9
-							&& fabs(curry - bottomLeftY) < 10)) && fabs(topLeftX - currx) < 10) {
-				printf("line %i, (x1, y1) replacing bottom Left: (%f, %f)\n", i,
-						currx, curry);
-				bottomLeftX = currx;
-				bottomLeftY = curry;
-			}
-			if ((currx > topRightX && curry < topRightY)
-					|| (fabs(currx - topRightX) < 5 && curry < topRightY)
-					|| ((currx - topRightX) > 9 && fabs(curry - topRightY) < 10)) {
-				printf("line %i, (x1, y1) replacing top Right: (%f, %f)\n", i,
-						currx, curry);
-				topRightX = currx;
-				topRightY = curry;
-			}
-			if (((currx > bottomRightX && curry > bottomRightY)
-					|| (fabs(currx - bottomRightX) < 5 && curry > bottomRightY)
-					|| ((currx - bottomRightX) > 9
-							&& fabs(curry - bottomRightY) < 10)) && fabs(topRightX - currx) < 10) {
-				printf("line %i, (x1, y1) replacing bottom Right: (%f, %f)\n",
-						i, currx, curry);
-				bottomRightX = currx;
-				bottomRightY = curry;
-			}
-			/* testing x2, y2 */
-			currx = x2[i];
-			curry = y2[i];
-			//using threshold of 5 pixels to be actually same edge
-			if ((currx < topLeftX && curry < topLeftY)
-					|| (fabs(currx - topLeftX) < 5 && curry < topLeftY)
-					|| ((topLeftX - currx) > 9 && fabs(curry - topLeftY) < 10)) {
-				printf("line %i, (x1, y1) replacing top Left: (%f, %f)\n", i,
-						currx, curry);
-				topLeftX = currx;
-				topLeftY = curry;
-			}
-			if (((currx < bottomLeftX && curry > bottomLeftY)
-					|| (fabs(currx - bottomLeftX) < 5 && curry > bottomLeftY)
-					|| ((bottomLeftX - currx) > 9
-							&& fabs(curry - bottomLeftY) < 10))
-					&& fabs(topLeftX - currx) < 10) {
-				printf("line %i, (x1, y1) replacing bottom Left: (%f, %f)\n", i,
-						currx, curry);
-				bottomLeftX = currx;
-				bottomLeftY = curry;
-			}
-			if ((currx > topRightX && curry < topRightY)
-					|| (fabs(currx - topRightX) < 5 && curry < topRightY)
-					|| ((currx - topRightX) > 9 && fabs(curry - topRightY) < 10)) {
-				printf("line %i, (x1, y1) replacing top Right: (%f, %f)\n", i,
-						currx, curry);
-				topRightX = currx;
-				topRightY = curry;
-			}
-			if (((currx > bottomRightX && curry > bottomRightY)
-					|| (fabs(currx - bottomRightX) < 5 && curry > bottomRightY)
-					|| ((currx - bottomRightX) > 9
-							&& fabs(curry - bottomRightY) < 10))
-					&& fabs(topRightX - currx) < 10) {
-				printf("line %i, (x1, y1) replacing bottom Right: (%f, %f)\n",
-						i, currx, curry);
-				bottomRightX = currx;
-				bottomRightY = curry;
-			}
-
+void TableReader::FilterLines(bool leftTargetDesired) {
+//post-processing stuff
+//find desired contour!
+/*
+ * Finding the contours values of the target desired to analyze further
+ */
+DUMP("in filterlines", 0.0);
+DUMP("size of centerXs", (double) centerXs.size());
+DUMP("size of centerXs", (double) centerYs.size());
+	if(centerXs.size() == 0) {
+		return;
+	}
+	else if(centerXs.size() == 1) {
+		centerX = centerXs[0];
+		centerY = centerYs[0];
+		width = widths[0];
+		height = heights[0];
+	}
+	else if(centerXs[0] <= centerXs[1]) {
+		if(leftTargetDesired) {
+			centerX = centerXs[0];
+			centerY = centerYs[0];
+			width = widths[0];
+			height = heights[0];
+		}
+		else {
+			centerX = centerXs[1];
+			centerY = centerYs[1];
+			width = widths[1];
+			height = heights[1];
 		}
 	}
-	printf("Ending filter lines \n");
-	printf("My values: \n");
-	printf("Top Left (x,y): (%f,%f)\n", topLeftX, topLeftY);
-	printf("Bottom Left (x,y): (%f,%f)\n", bottomLeftX, bottomLeftY);
-	printf("Top Right (x,y): (%f,%f)\n", topRightX, topRightY);
-	printf("Bottom Right (x,y): (%f,%f)\n", bottomRightX, bottomRightY);
-	DUMP("Top Left X ", topLeftX);
-	DUMP("Top Left Y", topLeftY);
-	DUMP("Bottom Left X ", bottomLeftX);
-	DUMP("Bottom Left Y ", bottomLeftY);
-	DUMP("Top Right X ", topRightX);
-	DUMP("Top Right Y ", topRightY);
-	DUMP("Bottom Right X ", bottomRightX);
-	DUMP("Bottom Right Y ", bottomRightY);
+	else {
+		if (leftTargetDesired) {
+			centerX = centerXs[1];
+			centerY = centerYs[1];
+			width = widths[1];
+			height = heights[1];
+		} else {
+			centerX = centerXs[0];
+			centerY = centerYs[0];
+			width = widths[0];
+			height = heights[0];
+		}
+	}
+DUMP("in filterlines", 1.0);
+/*
+ * Filtering all the points found in lines report to figure out which points belong to the target desired
+ */
+	std::vector<int> maPoints;
+	printf("width and height %f %f \n", width, height);
+	printf("centerX and center Y %f %f \n", centerX, centerY);
+	for (unsigned int i = 0; i < x1.size(); i++) {
+//		printf("x1, y1 (%f,%f) \n", x1[i], y1[i]);
+//		printf("x2, y2 (%f,%f) \n", x2[i], y2[i]);
+//		printf("x1 diff, %f and width/2 + 10 %f \n", fabs(x1[i] - centerX), width/2 + 10);
+//		printf("y1 diff, %f and height/2 + 10 %f \n", fabs(y1[i] - centerY), height/2 + 10);
+		if (fabs(x1[i] - centerX) <= width / 2 + 10
+				&& fabs(y1[i] - centerY) <= height / 2 + 10
+				&& fabs(x2[i] - centerX) <= width / 2 + 10
+				&& fabs(y2[i] - centerY) <= height / 2 + 10) {
+			maPoints.push_back(i);
+			MyPoint temp;
+			temp.x = x1[i];
+			temp.y = y1[i];
+			myPoints.push_back(temp);
+		}
+	}
+DUMP("in filterlines", 2.0);
 }
+
+void TableReader::FindCorners() {
+	FindConvexHull();
+//	printf("This is my convex hull! \n");
+//	printMyConvexHull();
+
+	splitIntoFour(myConvexHull);
+	topLine = leastSquareRegression(topPoints);
+	rightLine = leastSquareRegression(rightPoints);
+	bottomLine = leastSquareRegression(bottomPoints);
+	leftLine = leastSquareRegression(leftPoints);
+	topLeft = findIntercept(topLine, leftLine);
+	topRight = findIntercept(topLine, rightLine);
+	bottomLeft = findIntercept(bottomLine, leftLine);
+	bottomRight = findIntercept(bottomLine, rightLine);
+
+	topLeftX = topLeft.x;
+	topLeftY = topLeft.y;
+	bottomLeftX = bottomLeft.x;
+	bottomLeftY = bottomLeft.y;
+	topRightX = topRight.x;
+	topRightY = topRight.y;
+	bottomRightX = bottomRight.x;
+	bottomRightY = bottomRight.y;
+	printf("top left (%f, %f) \n", topLeftX, topLeftY);
+	printf("top right (%f, %f) \n", topRightX, topRightY);
+	printf("bottom left (%f, %f) \n", bottomLeftX, bottomLeftY);
+	printf("bottom right (%f, %f) \n", bottomRightX, bottomRightY);
+}
+
+void TableReader::FindConvexHull() {
+	int size = myPoints.size();
+	if(size < 3) {
+		return;
+	}
+	int indexOfFirstPoint = findLowestY();
+//printf("lowest index %i \n", indexOfFirstPoint);
+  	std::swap(myPoints[indexOfFirstPoint], myPoints[0]);
+  	firstPoint = myPoints[0];
+  	std::sort(myPoints.begin() + 1, myPoints.end(), comparePoints);
+//printf("sorted\n");
+//print(myPoints);
+  	std::vector<MyPoint> temp;
+  	temp.push_back(myPoints[0]);
+  	int i = 1;
+  	while(i < size - 1) {
+  		int orientation = findCounterClockwise(myPoints[0], myPoints[i], myPoints[i + 1]);
+  		if(orientation != 0) {
+  			temp.push_back(myPoints[i]);
+  		}
+  		i++;
+  	}
+  	temp.push_back(myPoints[size - 1]);
+//printf("kept\n");
+//print(temp);
+	int size2 = temp.size();
+	if(size2 < 3) {
+		return;
+	}
+
+	myConvexHull.push_back(temp[0]);
+	myConvexHull.push_back(temp[1]);
+	myConvexHull.push_back(temp[2]);
+
+	for(int i = 3; i < size2; i++) {
+		int size3 = myConvexHull.size();
+		while (-1 != findCounterClockwise(myConvexHull[size3 - 2], myConvexHull[size3 - 1], temp[i])) {
+			myConvexHull.resize(size3 - 1);
+			size3--;
+		}
+		myConvexHull.push_back(temp[i]);
+	}
+}
+
+
+MyPoint TableReader::findIntercept(MyLine l1, MyLine l2) {
+	MyPoint intercept;
+	intercept.x = (l2.y_intercept - l1.y_intercept) / (l1.slope - l2.slope);
+	intercept.y = l1.slope*intercept.x + l1.y_intercept;
+	return intercept;
+}
+
+MyLine TableReader::leastSquareRegression(std::vector<MyPoint> pts) {
+	double sumX = 0;
+	double sumY = 0;
+	double sumXY = 0;
+	double sumXX = 0;
+	double slope = 0;
+	double y_intercept = 0;
+	for (unsigned int i = 0; i < pts.size(); i++) {
+		sumX += pts[i].x;
+		sumY += pts[i].y;
+		sumXY += pts[i].x * pts[i].y;
+		sumXX += pts[i].x * pts[i].x;
+	}
+	double avgX = sumX / pts.size();
+	double avgY = sumY / pts.size();
+
+	slope = (pts.size() * sumXY - sumX * sumY) / (pts.size() * sumXX - sumX * sumX);
+	y_intercept = avgY - avgX * slope;
+	MyLine l;
+	l.slope = slope;
+	l.y_intercept = y_intercept;
+//	printf("this is my line...slope: %f, y-intercept %f \n", slope, y_intercept);
+	return l;
+}
+
+void TableReader::splitIntoFour(std::vector<MyPoint> pts) {
+	// GOING AROUND CLOCKWISE. WILL NEED TO CHANGE IF CONVEX HULL IS COUNTERCLOCKWISE
+	double PI = 3.14159265358979;
+	for (unsigned int i = 0; i < pts.size(); i++) {
+		MyPoint p1 = pts[i];
+		MyPoint p2;
+		double angle;
+		double changeX, changeY;
+		if(i == pts.size() - 1) {
+			p2 = pts[0];
+		}
+		else {
+			p2 = pts[i + 1];
+		}
+		changeX = p2.x - p1.x;
+		changeY = p1.y - p2.y;
+		angle = atan2(changeY, changeX);
+//printf("p1 (%f, %f) p2 (%f, %f) angle %f \n", p1.x, p1.y, p2.x, p2.y, angle);
+		if (angle < PI/4 && angle > -PI/4) {
+			if (!include(bottomPoints, p1)) {
+				bottomPoints.push_back(p1);
+			}
+			if (!include(bottomPoints, p2)) {
+				bottomPoints.push_back(p2);
+			}
+		} else if (angle >= PI/4 && angle <= 3*PI/4) {
+			if (!include(rightPoints, p1)) {
+				rightPoints.push_back(p1);
+			}
+			if (!include(rightPoints, p2)) {
+				rightPoints.push_back(p2);
+			}
+		} else if (angle >= -3*PI/4 && angle <= -PI/4) {
+			if (!include(leftPoints, p1)) {
+				leftPoints.push_back(p1);
+			}
+			if (!include(leftPoints, p2)) {
+				leftPoints.push_back(p2);
+			}
+		} else {
+			if (!include(topPoints, p1)) {
+				topPoints.push_back(p1);
+			}
+			if (!include(topPoints, p2)) {
+				topPoints.push_back(p2);
+			}
+		}
+	}
+}
+
 
 
 /*
- * Old Filter Lines Method
-void TableReader::FilterLines() {
-	printf("Num of Lines %i\n", angles.size());
-	int leftIndex = 0;
-	int rightIndex = 0;
-	for (unsigned int i = 0; i < angles.size(); i++) {
-		printf("%i\n",i);
-		if (fabs((double)angles[i]) < 45.0 || fabs((double)angles[i]) > 135.0) {
-			printf("Horizontal Line %i\n", i);
-		} else {
-			printf("Vertical Line %i\n", i);
-			if (x1[i] > x1[rightIndex]) {
-				rightIndex = i;
-			}
-			if (x1[i] < x1[leftIndex]) {
-				leftIndex = i;
-			}
-		}
-	}
-	printf("Left %i Right %i\n", leftIndex, rightIndex);
-	leftLineIndex = leftIndex;
-	rightLineIndex = rightIndex;
-}
-*/
+ * Convex Hull methods --------------------------------------------------------------------------------
+ */
 
-void TableReader::IterativeFilterLines() {
-	printf("Num of Lines %i\n", angles.size());
-	int leftIndex = 0;
-	int rightIndex = 0;
-	for (unsigned int i = 0; i < angles.size(); i++) {
-		printf("%i\n", i);
-		if (fabs((double) angles[i]) < 45.0
-				|| fabs((double) angles[i]) > 135.0) {
-			printf("Horizontal Line %i\n", i);
-		} else {
-			printf("Vertical Line %i\n", i);
-			if (x1[i] > x1[rightIndex]) {
-				rightIndex = i;
-			}
-			if (x1[i] < x1[leftIndex]) {
-				leftIndex = i;
-			}
+void TableReader::printMyConvexHull() {
+	print(myConvexHull);
+}
+
+int TableReader::findLowestY() {
+	int indexOfBest = 0;
+	for(unsigned int i = 0; i < myPoints.size(); i++) {
+		if(myPoints[i].y > myPoints[indexOfBest].y) {
+			indexOfBest = i;
+		}
+		else if(myPoints[i].y == myPoints[indexOfBest].y && myPoints[i].x < myPoints[indexOfBest].x) {
+			indexOfBest = i;
 		}
 	}
-	printf("Left %i Right %i\n", leftIndex, rightIndex);
-	sumLeftX1 += x1[leftIndex];
-	sumLeftY1 += y1[leftIndex];
-	sumLeftX2 += x2[leftIndex];
-	sumLeftY2 += y2[leftIndex];
-	sumRightX1 += x1[rightIndex];
-	sumRightY1 += y1[rightIndex];
-	sumRightX2 += x2[rightIndex];
-	sumRightY2 += y2[rightIndex];
+	return indexOfBest;
+}
+
+int TableReader::findCounterClockwise(MyPoint firstPoint, MyPoint a, MyPoint b) { //static
+	double slopeThing = (a.y - firstPoint.y) * (b.x - a.x) - (a.x - firstPoint.x) * (b.y - a.y);
+	slopeThing *= -1; //1 if y is bigger going up
+	if(slopeThing == 0) {
+		return 0;
+	}
+	else if(slopeThing < 0) { //counter
+		return -1;
+	}
+	else {
+		return 1;
+	}
+}
+
+double TableReader::computeDistSquared(MyPoint a, MyPoint b) { //static
+	return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
+}
+
+MyPoint TableReader::firstPoint;
+
+bool TableReader::comparePoints(MyPoint a, MyPoint b) { //static
+	int c = findCounterClockwise(firstPoint, a, b);
+	if(c == 0) {
+		return computeDistSquared(a, firstPoint) < computeDistSquared(b, firstPoint);
+	}
+	return c < 0;
+}
+
+bool TableReader::include(std::vector<MyPoint> pts, MyPoint p) {
+	for (unsigned int i = 0; i < pts.size(); i++) {
+		if (pts[i].x == p.x && pts[i].y == p.y) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+void TableReader::print(std::vector<MyPoint> a) { //static
+	for (unsigned int i = 0; i < a.size(); i++) {
+		printf("(%f, %f) \n", a[i].x, a[i].y);
+	}
 }

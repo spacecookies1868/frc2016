@@ -5,20 +5,30 @@
 CameraController::CameraController(RobotModel* robot) {
 	this->robot = robot;
 	table = robot->gripLines;
-//	focalX = 404.5;
-//	focalY = 403.37;
-//	centerX = 155.32;
-//	centerY = 126.32;
-	focalX = 809;
-	focalY = 806.74;
-	centerX = 310.64;
-	centerY = 252.64;
-	targetHeight = 17.75; //inches, fake goal
-	leftDisFromCenter = 12; //inches, fake goal
-	rightDisFromCenter = 12; //inches, fake goal
+	topFromGround = 95.0; //inches
+	bottomFromGround = 83.0; //inches
+	//distortion coefficients!
+	/*
+	 * [-0.5430259802451465; 0.270945658136815; 0.006719749057770554; 0.009482155791447877; 0.1002601217038307
+	 *
+	 */
+	focalX = 813.4497;
+	focalY = 814.8689;
+	cameraCenterX = 323;
+	cameraCenterY = 233.527; //DO NOT CONFUSE WITH OTHER CENTERX AND CENTERY!!!
+
+	targetHeight = 12; //inches
+	leftDisFromCenter = 10; //inches, fake goal
+	rightDisFromCenter = 10; //inches, fake goal
 	x = 0;
 	y = 0;
-	PI = 3.14159265358979;
+	leftR = 0.0;
+	rightR = 0.0;
+
+	cameraAngle = 3.1415926535897932 * 18 / 180; //subject to change * 5/36
+	heightOfCamera = 14.5; //inches subject to change
+	targetLength2 = 20; //inches
+
 }
 
 void CameraController::Reset() {
@@ -27,19 +37,20 @@ void CameraController::Reset() {
 	y = 0;
 }
 
-void CameraController::CalculateDistanceWithAngles() {
-	table->ReadValues();
+void CameraController::CalculateDistanceWithAngles(bool leftTargetDesired) {
+	table->ReadValues(leftTargetDesired);
 	printf("Read Table Values \n");
-
-	leftR = CalculateRadius(table->GetTopLeftX(), table->GetTopLeftY(),
-			table->GetBottomLeftX(), table->GetBottomLeftY());
-	rightR = CalculateRadius(table->GetTopRightX(), table->GetTopRightY(),
-			table->GetBottomRightX(), table->GetBottomRightY());
+	printf("Top Left (%f, %f) \n", table->GetTopLeftX(), table->GetTopLeftY());
+	printf("Top Right (%f, %f)\n", table->GetTopRightX(), table->GetTopRightY());
+	printf("Bottom Left (%f, %f)\n", table->GetBottomLeftX(), table->GetBottomLeftY());
+	printf("Bottom Right (%f, %f)\n", table->GetBottomRightX(), table->GetBottomRightY());
+	leftR = CalculateRadiusWithTriangles(true);
+	rightR = CalculateRadiusWithTriangles(false);
 	double leftx = (table->GetTopLeftX() + table->GetBottomLeftX()) / 2;
 	double rightx = ((table->GetTopRightX() + table->GetBottomRightX())) / 2;
 	printf("image average x (left, right) : (%f,%f)\n", leftx, rightx);
-	leftx = leftx - centerX;
-	rightx = rightx - centerX;
+	leftx = leftx - cameraCenterX;
+	rightx = rightx - cameraCenterX;
 	printf("normalled x (left, right) : (%f, %f)\n", leftx, rightx);
 	// RADIANS BTW
 	double leftAngle = atan(leftx / focalX);
@@ -58,8 +69,8 @@ void CameraController::CalculateDistanceWithAngles() {
 	printf("Target length %f\n", targetLength);
 	printf("Target center %f\n", targetCenter);
 
-	x = rightXOffset - targetCenter;
-	y = (leftYdis + rightYdis)/2;
+	x = (rightXOffset + leftXOffset)/2.0; //used to be targetCenter
+	y = (leftYdis + rightYdis)/2.0;
 
 	printf("(x,y): (%f,%f) \n", x, y);
 	DUMP("Left Radius: ", leftR);
@@ -72,8 +83,8 @@ void CameraController::CalculateDistanceWithAngles() {
 
 }
 
-void CameraController::CalculateDistance() {
-	table->ReadValues();
+void CameraController::CalculateDistance(bool leftTargetDesired) {
+	table->ReadValues(leftTargetDesired);
 	printf("Read Table Values \n");
 
 	leftR = CalculateRadius(table->GetTopLeftX(), table->GetTopLeftY(),
@@ -108,8 +119,8 @@ std::vector<double> CameraController::CalculateRealCoords(double imageX, double 
 	std::vector<double> realCoords = std::vector<double>();
 	//double realX = (imageX - centerX) / focalX;
 	//double realY = (imageY - centerY) / focalY;
-	double realX = (imageX - centerX) / focalX;
-	double realY = (imageY - centerY) / focalY;
+	double realX = (imageX - cameraCenterX) / focalX;
+	double realY = (imageY - cameraCenterY) / focalY;
 //	printf("Calculating COORDINATES \n");
 //	printf("imageX %f, imageY %f \n", imageX, imageY);
 //	printf("realX %f, realY %f \n", realX, realY);
@@ -146,3 +157,19 @@ double CameraController::CalculateRadius(double imageX1, double imageY1, double 
 //	printf("-----------------------------------------\n");
 	return radius;
 }
+
+double CameraController::CalculateRadiusWithTriangles(bool leftRadiusDesired) {
+	if(leftRadiusDesired) {
+		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
+		printf("atan stuff %f \n", atan((cameraCenterY - table->GetTopLeftY())/focalY));
+		printf("tan stuff %f \n", tan(atan((cameraCenterY - table->GetTopLeftY())/focalY)+cameraAngle));
+		return (topFromGround-heightOfCamera)/tan(atan((cameraCenterY - table->GetTopLeftY())/focalY)+cameraAngle);
+	}
+	else {
+		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
+		printf("atan stuff %f \n", atan((cameraCenterY - table->GetTopRightY())/focalY));
+		printf("tan stuff %f \n", tan(atan((cameraCenterY- table->GetTopRightY())/focalY)+cameraAngle));
+		return (topFromGround-heightOfCamera)/tan(atan((cameraCenterY - table->GetTopRightY())/focalY)+cameraAngle);
+	}
+}
+

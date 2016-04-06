@@ -61,8 +61,8 @@ RobotModel::RobotModel() {
 //	leftEncoder->SetDistancePerPulse(0.0104);
 //	rightEncoder->SetDistancePerPulse(0.0104);
 #if USE_CAMERA
-	camera = new AxisCamera("10.18.68.11");
-	frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0); // 0 bordersize
+//	camera = new AxisCamera("10.18.68.11");
+//	frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0); // 0 bordersize
 #endif
 
 	compressor = new Compressor(PNEUMATICS_CONTROL_MODULE_ID);
@@ -75,7 +75,7 @@ RobotModel::RobotModel() {
 	timer->Start();
 
 	pini = new Ini("/home/lvuser/robot.ini");
-	gripLines = new TableReader("GRIP/myLinesReport");
+	gripLines = new TableReader("GRIP/myLinesReport", "GRIP/myContReport");
 }
 
 void RobotModel::Reset() {
@@ -406,8 +406,9 @@ void RobotModel::SetCompressorStop() {
 
 Image* RobotModel::GetCameraImage() {
 #if USE_CAMERA
-	camera->GetImage(frame);
-	return frame;
+//	camera->GetImage(frame);
+//	return frame;
+	return NULL;
 #else
 	return NULL;
 #endif

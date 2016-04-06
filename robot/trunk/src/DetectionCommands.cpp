@@ -30,7 +30,7 @@ CameraDetectionCommand::CameraDetectionCommand(CameraController* myCamera, bool 
 	y = 0;
 	sumx = 0;
 	sumy = 0;
-	numIterations = 5;
+	numIterations = 1;
 	iterationCounter = 0;
 	waitTime = 0.1;
 	lastReadTime = 0;
@@ -42,8 +42,9 @@ void CameraDetectionCommand::Init() {
 
 void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
 #if USE_CAMERA
+DUMP("Camera State", "IN UPDATE");
 	if (iterationCounter == 0) {
-		camera->CalculateDistanceWithAngles();
+		camera->CalculateDistanceWithAngles(onLeft);
 		sumx += camera->GetX();
 		sumy += camera->GetY();
 		lastReadTime = currTimeSec;
@@ -52,7 +53,7 @@ void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
 	}
 	if (iterationCounter < numIterations){
 		if ((currTimeSec - lastReadTime) >= waitTime) {
-			camera->CalculateDistanceWithAngles();
+			camera->CalculateDistanceWithAngles(onLeft);
 			sumx += camera->GetX();
 			sumy += camera->GetY();
 			lastReadTime = currTimeSec;
@@ -77,11 +78,13 @@ bool CameraDetectionCommand::IsDone() {
 }
 
 double CameraDetectionCommand::GetX() {
-	return x;
+	//returns in feet
+	return x/12.0;
 }
 
 double CameraDetectionCommand::GetY() {
-	return y;
+	//returns in feet
+	return y/12.0;
 }
 
 

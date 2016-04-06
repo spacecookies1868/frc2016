@@ -7,8 +7,8 @@
 class CameraController {
 public:
 	CameraController(RobotModel* robot);
-	void CalculateDistance();
-	void CalculateDistanceWithAngles();
+	void CalculateDistance(bool leftTargetDesired);
+	void CalculateDistanceWithAngles(bool leftTargetDesired);
 	void Reset();
 	double GetX();
 	double GetY();
@@ -17,21 +17,27 @@ private:
 	std::vector<double> CalculateRealCoords(double imageX, double imageY);
 	double CalculateSlope(double imageX, double imageY);
 	double CalculateRadius(double imageX1, double imageY1, double imageX2, double imageY2);
+	double CalculateRadiusWithTriangles(bool leftRadiusDesired);
 	TableReader* table;
 	RobotModel* robot;
 	//constants
-	double focalX;
-	double focalY;
-	double centerX;
-	double centerY;
-	double targetHeight;
 	double leftDisFromCenter;
 	double rightDisFromCenter;
-	double z;
 	double x;
 	double y;
 	double leftR;
 	double rightR;
-	double PI;
+	double cameraCenterX;
+	double cameraCenterY;
+	double focalX;
+	double focalY;
+	double targetHeight;
+
+	double topFromGround;
+	double bottomFromGround;
+	double cameraAngle;
+	double heightOfCamera;
+	double targetLength2;
+
 };
 #endif
