@@ -205,12 +205,12 @@ bool RobotModel::IsLowGear() {
 }
 
 void RobotModel::ShiftToHighGear() {
-	gearShiftSolenoid->Set(false);
+	gearShiftSolenoid->Set(true);
 	isLowGear = false;
 }
 
 void RobotModel::ShiftToLowGear() {
-	gearShiftSolenoid->Set(true);
+	gearShiftSolenoid->Set(false);
 	isLowGear = true;
 }
 

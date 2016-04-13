@@ -40,7 +40,7 @@ ControlBoard::ControlBoard() {
 	rightJoyY = 0.0;
 
 	reverseDriveDesired = false;
-	lowGearDesired = false;
+	gearShiftDesired = false;
 	arcadeDriveDesired = false;
 	quickTurnDesired = false;
 	defenseManipToggleDesired = false;
@@ -69,7 +69,7 @@ void ControlBoard::ReadControls() {
 	rightJoyY = rightJoy->GetY();
 
 	reverseDriveDesired = driveDirectionButton->IsDown();
-	lowGearDesired = gearShiftButton->IsDown();
+	gearShiftDesired = gearShiftButton->StateJustChanged();
 	arcadeDriveDesired = !arcadeDriveButton->IsDown();
 	quickTurnDesired = quickTurnButton->IsDown();
 /*
@@ -190,8 +190,8 @@ bool ControlBoard::GetReverseDriveDesired() {
 	return reverseDriveDesired;
 }
 
-bool ControlBoard::GetLowGearDesired() {
-	return lowGearDesired;
+bool ControlBoard::GetGearShiftDesired() {
+	return gearShiftDesired;
 }
 
 bool ControlBoard::GetArcadeDriveDesired() {

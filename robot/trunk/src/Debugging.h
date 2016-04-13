@@ -29,7 +29,6 @@ extern int enableDoPeriodic;
 // MATCH_PERIODIC used for periodic functions that always need to occur
 
 #define USE_NAVX true
-#define USE_CAMERA true
-#define USE_USB_CAMERA true
-
+#define USE_CAMERA false
+#define USE_USB_CAMERA false
 #endif

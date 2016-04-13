@@ -68,7 +68,7 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myHumanControl->GetIntakeMotorReverseDesired() << ", " <<
 			myHumanControl->GetIntakeMotorForwardDesired()  << ", " <<
 			myHumanControl->GetIntakePistonToggleDesired()  << ", " <<
-			myHumanControl->GetLowGearDesired() << ", " <<
+			myHumanControl->GetGearShiftDesired() << ", " <<
 			myHumanControl->GetOuttakeDesired()  << ", " <<
 			myHumanControl->GetQuickTurnDesired() << ", " <<
 			myHumanControl->GetPowerBudgetDesired() << "\r\n";
@@ -130,6 +130,11 @@ void Logger::LogAction(const std::string& fileName, int line, const std::string&
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();
+}
+
+void Logger::CloseLogs() {
+	logData.close();
+	logAction.close();
 }
 
 std::string Logger::GetTimeStamp(const char* fileName) {

@@ -21,7 +21,7 @@ public:
 
 	//Drive controller button accessors
 	bool GetReverseDriveDesired();
-	bool GetLowGearDesired();
+	bool GetGearShiftDesired();
 	bool GetArcadeDriveDesired();
 	bool GetQuickTurnDesired();
 	bool GetPivotButtonDesired();
@@ -69,7 +69,7 @@ public:
 	};
 
 private:
-	bool reverseDriveDesired, lowGearDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
+	bool reverseDriveDesired, gearShiftDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
 		 intakePistonToggleDesired,intakePistonDownDesired,
 		 intakeMotorForwardDesired, intakeMotorReverseDesired, outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired,
 		 pivotButtonDesired, pivotSwitchDesired, powerBudgetDesired, stopAutoDesired;

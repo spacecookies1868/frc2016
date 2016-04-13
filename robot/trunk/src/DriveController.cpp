@@ -43,7 +43,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 		break;
 	case (kTeleopDrive):
 		printf("In case kTeleopDrive \n");
-		if(humanControl->GetLowGearDesired()){
+		/*if(humanControl->GetGearShiftDesired()){
 			if (!(robot->IsLowGear())){
 				robot->ShiftToLowGear();
 				DO_PERIODIC(1, printf("Shifting to Low Gear\n"));
@@ -53,7 +53,10 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 				robot->ShiftToHighGear();
 				DO_PERIODIC(1, printf("Shifting to High Gear\n"));
 			}
-		}
+		}*/
+
+		//Always want to be in low gear
+		robot->ShiftToLowGear();
 
 		double rightJoyX;
 		rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);

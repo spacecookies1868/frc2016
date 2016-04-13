@@ -40,6 +40,7 @@ public:
 			const std::string& state);
 
 	static std::string GetTimeStamp(const char* fileName);
+	static void CloseLogs();
 
 private:
 	static std::ofstream logData, logAction;
