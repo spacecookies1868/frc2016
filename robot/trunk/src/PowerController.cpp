@@ -60,6 +60,8 @@ void PowerController::Update(double currTimeSec, double deltaTimeSec) {
 	avgCompCurr = GetAverage(pastCompCurr);
 	avgRioCurr = GetAverage(pastRioCurr);
 
+	LOG(robot, "average current", avgRightCurr); // for testing ramparts
+
 	totalCurrent = avgCompCurr + avgLeftCurr + avgRightCurr + avgIntakeCurr
 			+ avgRioCurr;
 	totalVoltage = robot->GetVoltage();

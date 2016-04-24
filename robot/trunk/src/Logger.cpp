@@ -31,15 +31,15 @@ void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 			myRobot->GetRightEncoderVal() << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kLeftWheels) << ", " <<
 			myRobot->GetWheelSpeed(RobotModel::kRightWheels) << ", " <<
-#if USE_NAVX
+//#if USE_NAVX
 			myRobot->GetNavXYaw() << ", " <<
 			myRobot->GetNavXRoll() << ", " <<
 			myRobot->GetNavXPitch() << ", " <<
-#else
+/*#else
 			0.0 << ", " <<
 			0.0 << ", " <<
 			0.0 << ", " <<
-#endif
+#endif*/
 			myRobot->GetVoltage() << ", " <<
 			myRobot->GetTotalCurrent() << ", " <<
 			myRobot->GetCurrent(LEFT_DRIVE_MOTOR_A_PDP_CHAN) << ", " <<
