@@ -32,6 +32,7 @@ public:
 	virtual bool GetIntakePistonDownDesired() = 0;
 	virtual bool GetIntakeMotorForwardDesired() = 0;
 	virtual bool GetIntakeMotorReverseDesired() = 0;
+	virtual bool GetBallInIntakeDesired() = 0;
 	virtual bool GetOuttakeDesired() = 0;
 	virtual bool GetManualOuttakeForwardDesired() = 0;
 	virtual bool GetManualOuttakeReverseDesired() = 0;

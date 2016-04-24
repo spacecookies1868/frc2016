@@ -19,6 +19,7 @@ ControlBoard::ControlBoard() {
 	intakePistonButton = new ButtonReader(operatorJoy, INTAKE_PISTON_BUTTON_PORT);
 	intakeMotorForwardButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_FORWARD_BUTTON_PORT);
 	intakeMotorReverseButton = new ButtonReader(operatorJoy, INTAKE_MOTOR_REVERSE_BUTTON_PORT);
+	ballInIntakeButton = new ButtonReader(operatorJoy, BALL_IN_INTAKE_BUTTON_PORT);
 	outtakeButton = new ButtonReader(operatorJoy, OUTTAKE_BUTTON_PORT);
 	manualOuttakeForwardButton = new ButtonReader(operatorJoy, MANUAL_OUTTAKE_FORWARD_BUTTON_PORT);
 	manualOuttakeReverseButton = new ButtonReader(operatorJoy, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
@@ -49,6 +50,7 @@ ControlBoard::ControlBoard() {
 	intakePistonDownDesired = false;
 	intakeMotorForwardDesired = false;
 	intakeMotorReverseDesired = false;
+	ballInIntakeDesired = false;
 	outtakeDesired = false;
 	pivotButtonDesired = false;
 	pivotSwitchDesired = false;
@@ -142,6 +144,7 @@ void ControlBoard::ReadControls() {
 	intakePistonDownDesired = intakePistonButton->IsDown();
 	intakeMotorForwardDesired = intakeMotorForwardButton->IsDown();
 	intakeMotorReverseDesired = intakeMotorReverseButton->IsDown();
+	ballInIntakeDesired = ballInIntakeButton->WasJustPressed();
 	outtakeDesired = outtakeButton->WasJustPressed();
 	manualOuttakeForwardDesired = manualOuttakeForwardButton->IsDown();
 	manualOuttakeReverseDesired = manualOuttakeReverseButton->IsDown();
@@ -238,6 +241,10 @@ bool ControlBoard::GetIntakeMotorReverseDesired() {
 	return intakeMotorReverseDesired;
 }
 
+bool ControlBoard::GetBallInIntakeDesired() {
+	return ballInIntakeDesired;
+}
+
 bool ControlBoard::GetOuttakeDesired() {
 	return outtakeDesired;
 }
@@ -263,6 +270,7 @@ void ControlBoard::ReadAllButtons() {
 	intakePistonButton ->ReadValue();
 	intakeMotorForwardButton->ReadValue();
 	intakeMotorReverseButton->ReadValue();
+	ballInIntakeButton->ReadValue();
 	outtakeButton->ReadValue();
 	manualOuttakeForwardButton->ReadValue();
 	manualOuttakeReverseButton->ReadValue();

@@ -39,6 +39,8 @@ static const int LEFT_ENCODER_B_PWM_PORT				= 3;
 static const int RIGHT_ENCODER_A_PWM_PORT				= 0;
 static const int RIGHT_ENCODER_B_PWM_PORT				= 1;
 
+static const int INTAKE_SWITCH_PWM_PORT					= 4;
+
 //******************* ANALOG IN PORTS*******************
 
 static const int PRESSURE_SENSOR_PORT					= 3;
@@ -75,6 +77,7 @@ static const int DEFENSE_MANIP_BUTTON_PORT				= 5;
 static const int INTAKE_PISTON_BUTTON_PORT				= 1;
 static const int INTAKE_MOTOR_FORWARD_BUTTON_PORT		= 11;
 static const int INTAKE_MOTOR_REVERSE_BUTTON_PORT		= 12;
+static const int BALL_IN_INTAKE_BUTTON_PORT				= 6;
 static const int OUTTAKE_BUTTON_PORT					= 4;
 static const int MANUAL_OUTTAKE_FORWARD_BUTTON_PORT		= 8;
 static const int MANUAL_OUTTAKE_REVERSE_BUTTON_PORT		= 9;

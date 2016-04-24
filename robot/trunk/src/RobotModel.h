@@ -71,6 +71,7 @@ public:
 
 	double GetIntakeMotorSpeed();
 	void SetIntakeMotorSpeed(double speed);
+	bool GetIntakeSwitchState();
 
 	bool IsDefenseManipDown();
 	void MoveDefenseManipUp();
@@ -111,6 +112,7 @@ private:
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder;
 	AnalogInput *pressureSensor;
+	DigitalInput *intakeSwitch;
 	UltrasonicSensor *ultra;
 
 #if USE_CAMERA

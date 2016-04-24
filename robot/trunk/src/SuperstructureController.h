@@ -20,16 +20,17 @@ public:
 	void SetAutoIntakeDown(bool desired);
 	void SetAutoIntakeMotorForward(bool desired);
 	void SetAutoIntakeMotorBackward(bool desired);
+	void SetAutoBallInIntake(bool desired);
 	void SetAutoOuttake(bool desired);
 	void SetAutoManualOuttakeForward(bool desired);
 	void SetAutoManualOuttakeReverse(bool desired);
 
 	//auto boolean accessor methods
+	bool GetAutoBallInIntakeFinished();
 	bool GetOuttakeFinished();
 
 	enum SuperstructureState {
-		kInit, kIdle, kAutoPrepToOuttake, kTeleopPrepToOuttake, kEncOuttake, kAutoTimeOuttake,
-		kTeleopTimeOuttake
+		kInit, kIdle, kPrepToOuttake, kEncOuttake, kTimeOuttake, kBallInIntake
 	};
 
 private:
@@ -60,6 +61,8 @@ private:
 	bool autoIntakeDown;
 	bool autoIntakeMotorForward;
 	bool autoIntakeMotorBackward;
+	bool autoBallInIntake;
+	bool autoBallInIntakeFinished;
 	bool autoOuttake;
 	bool autoOuttakeFinished;
 	bool autoManualOuttakeForward;

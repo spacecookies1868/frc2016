@@ -41,6 +41,8 @@ RobotModel::RobotModel() {
 	pressureSensor = new AnalogInput(PRESSURE_SENSOR_PORT);
 	pressureSensor->SetAverageBits(2);
 
+	intakeSwitch = new DigitalInput(INTAKE_SWITCH_PWM_PORT);
+
 	ultra = new UltrasonicSensor(ULTRASONIC_SENSOR_PORT);
 
 	leftDriveACurrent = 0;
@@ -322,7 +324,7 @@ void RobotModel::RefreshIni() {
 }
 
 bool RobotModel::IsIntakeArmDown() {
-	return intakeArmSolenoidA->Get();
+	return !intakeArmSolenoidB->Get();
 }
 
 void RobotModel::MoveIntakeArmUp() {
@@ -349,14 +351,17 @@ double RobotModel::GetIntakeMotorSpeed() {
 	return intakeMotor->Get();
 }
 
+bool RobotModel::GetIntakeSwitchState() {
+	return !intakeSwitch->Get();
+}
+
 void RobotModel::SetIntakeMotorSpeed(double speed) {
 	DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
 	intakeMotor->Set(speed);
 }
 
 bool RobotModel::IsDefenseManipDown() {
-	//TODO check that this is the correct solenoid
-	return defenseManipSolenoidA->Get();
+	return !defenseManipSolenoidB->Get();
 }
 
 void RobotModel::MoveDefenseManipUp() {
