@@ -53,7 +53,7 @@ bool RegisterIO_SPI::Read(uint8_t first_address, uint8_t* buffer, uint8_t buffer
     }
     uint8_t crc = IMURegisters::getCRC(rx_buffer, buffer_len);
     if ( crc != rx_buffer[buffer_len] ) {
-        printf("SPI CRC err.  Length:  %d, Got:  %d; Calculated:  %d\n", buffer_len, rx_buffer[buffer_len], crc);
+        //printf("SPI CRC err.  Length:  %d, Got:  %d; Calculated:  %d\n", buffer_len, rx_buffer[buffer_len], crc);
         return false; // CRC ERROR
     } else {
         memcpy(buffer, rx_buffer, buffer_len);
