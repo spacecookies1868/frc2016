@@ -80,7 +80,6 @@ public:
 
 	double GetOuttakeMotorSpeed();
 	void SetOuttakeMotorSpeed(double speed);
-
 	double GetOuttakeEncoderVal();
 	void ResetOuttakeEncoders();
 
@@ -90,6 +89,7 @@ public:
 
 	Ini* pini;
 	TableReader* gripLines;
+	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB, *intakeMotor, *outtakeMotorA, *outtakeMotorB;
 private:
 	bool isLowGear;
 	Compressor *compressor;
@@ -101,7 +101,6 @@ private:
 	Timer *timer;
 
 	//Actuators
-	Victor *leftDriveMotorA, *leftDriveMotorB, *rightDriveMotorA, *rightDriveMotorB, *intakeMotor, *outtakeMotorA, *outtakeMotorB;
 	Servo* servo;
 	double servoAngle;
 	bool servoDirection;
@@ -110,10 +109,15 @@ private:
 	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB, *defenseManipSolenoidA, *defenseManipSolenoidB;
 
 	//Sensors
-	Encoder *leftEncoder, *rightEncoder;
+	Encoder *leftEncoder, *rightEncoder, *outtakeEncoder1, *outtakeEncoder2;
 	AnalogInput *pressureSensor;
 	DigitalInput *intakeSwitch;
 	UltrasonicSensor *ultra;
+
+#if USE_USB_CAMERA
+	USBCamera* usbCamera;
+	Image* usbFrame;
+#endif
 
 #if USE_CAMERA
 //	AxisCamera *camera;

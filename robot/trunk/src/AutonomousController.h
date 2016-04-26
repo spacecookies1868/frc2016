@@ -21,10 +21,13 @@ public:
 					kBlankAuto = 1,
 					kReachAuto = 2,
 					kCrossAuto = 3,
-					kShootAuto = 4,
-					kHoardingAuto = 5,
-					kSpyBotShootAuto = 6,
-					kSpyBotCatCAuto = 7};
+					kCrossAndBackAuto = 4,
+					kBallAndCrossAuto = 5,
+					kShootAuto = 6,
+					kBallLowBarShootAuto = 7,
+					kHoardingAuto = 8,
+					kSpyBotShootAuto = 9,
+					kSpyBotCatCAuto = 10};
 	enum FirstDefensePos {
 		kNone = 0,
 		kLowBar = 1,

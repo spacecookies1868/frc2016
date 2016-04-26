@@ -194,7 +194,8 @@ public:
 		RoughTerrain = 8
 	};
 
-	DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, uint32_t myDefense);
+	DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, uint32_t myDefense,
+			bool forward, bool lineUp, bool defenseManipFirst);
 	~DefenseCommand() {}
 	virtual void Init();
 	virtual void Update(double currTimeSec, double deltaTimeSec);
@@ -207,6 +208,9 @@ private:
 	SuperstructureController* superstructure;
 	uint32_t defense;
 	bool isDone;
+	bool forward;
+	bool lineUp;
+	bool defenseManipFirst;
 
 	DriveStraightCommand* lowBarDriveUp;
 	DefenseManipPosCommand* lowBarDefenseDown;

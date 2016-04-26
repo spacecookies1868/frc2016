@@ -37,6 +37,8 @@ RobotModel::RobotModel() {
 
 	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
+	outtakeEncoder1 = new Encoder(OUTTAKE_ENCODER_1_A_PWM_PORT, OUTTAKE_ENCODER_1_B_PWM_PORT, true);
+	outtakeEncoder2 = new Encoder(OUTTAKE_ENCODER_2_A_PWM_PORT, OUTTAKE_ENCODER_2_B_PWM_PORT, true);
 
 	pressureSensor = new AnalogInput(PRESSURE_SENSOR_PORT);
 	pressureSensor->SetAverageBits(2);
@@ -65,6 +67,20 @@ RobotModel::RobotModel() {
 #if USE_CAMERA
 //	camera = new AxisCamera("10.18.68.11");
 //	frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0); // 0 bordersize
+#endif
+
+#if USE_USB_CAMERA
+	usbCamera = new USBCamera("cam1", true);
+	usbCamera->OpenCamera();
+	usbCamera->SetBrightness(50);
+	usbCamera->SetWhiteBalanceManual(30);
+//	usbCamera->SetExposureManual(30);
+	usbCamera->SetExposureHoldCurrent();
+//	usbCamera->SetExposureAuto();
+//	usbCamera->SetWhiteBalanceAuto();
+	usbCamera->UpdateSettings();
+	usbCamera->StartCapture();
+	usbFrame = imaqCreateImage(IMAQ_IMAGE_RGB, 0);
 #endif
 
 	compressor = new Compressor(PNEUMATICS_CONTROL_MODULE_ID);
@@ -352,7 +368,7 @@ double RobotModel::GetIntakeMotorSpeed() {
 }
 
 bool RobotModel::GetIntakeSwitchState() {
-	return !intakeSwitch->Get();
+	return intakeSwitch->Get();
 }
 
 void RobotModel::SetIntakeMotorSpeed(double speed) {
@@ -398,11 +414,12 @@ void RobotModel::SetOuttakeMotorSpeed(double speed) {
 }
 
 double RobotModel::GetOuttakeEncoderVal() {
-	return 0.0;
+	return outtakeEncoder1->Get() - outtakeEncoder2->Get() /2;
 }
 
 void RobotModel::ResetOuttakeEncoders() {
-
+	outtakeEncoder1->Reset();
+	outtakeEncoder2->Reset();
 }
 
 void RobotModel::SetCompressorStop() {
@@ -414,6 +431,9 @@ Image* RobotModel::GetCameraImage() {
 //	camera->GetImage(frame);
 //	return frame;
 	return NULL;
+#elif USE_USB_CAMERA
+	usbCamera->GetImage(usbFrame);
+	return usbFrame;
 #else
 	return NULL;
 #endif

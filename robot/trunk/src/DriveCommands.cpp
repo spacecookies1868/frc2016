@@ -358,6 +358,7 @@ void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
 	} else {
 		double disOutput = disPID->Update(currDis);
 		double rOutput = rPID->Update(GetAccumulatedYaw());
+
 		printf("Current Distance %f\n", currDis);
 		LOG(robot, "Current Distance", currDis);
 		LOG(robot, "Current Yaw", GetAccumulatedYaw());
@@ -626,19 +627,39 @@ double CurveCommand::GetSign(double n) {
 	}
 }
 
-DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, uint32_t myDefense) {
+DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, uint32_t myDefense,
+		bool forward, bool lineUp, bool defenseManipFirst) {
 	robot = myRobot;
 	superstructure = mySuperstructure;
 	defense = myDefense;
 	isDone = false;
+	this->forward = forward;
+	this->lineUp = lineUp;
+	this->defenseManipFirst = defenseManipFirst;
 
-	lowBarDriveUp = new DriveStraightCommand(robot, -2.0); //NOT ACTUAL VALUE PROBABLY, SHOULD MEASURE
-	lowBarDriving = new DriveStraightCommand(robot, -11.0);
+	if (forward) {
+		if (lineUp) {
+			lowBarDriveUp = new DriveStraightCommand(robot, -2.0);
+		} else {
+			lowBarDriveUp = new DriveStraightCommand(robot, 0.0);
+		}
+		lowBarDriving = new DriveStraightCommand(robot, -11.0);
+	} else {
+		if (lineUp) {
+			lowBarDriveUp = new DriveStraightCommand(robot, 2.0);
+		} else {
+			lowBarDriveUp = new DriveStraightCommand(robot, 0.0);
+		}
+		lowBarDriving = new DriveStraightCommand(robot, 7.0);
+	}
 	lowBarDefenseDown = new DefenseManipPosCommand(superstructure, true);
 	lowBarIntakeDown = new IntakePositionCommand(superstructure, true);
-	lowBarPivot = new PivotCommand(robot, 180.0);
 
-	portcullisDriveUp = new DriveStraightCommand(robot, 5.75);
+	if (lineUp) {
+		portcullisDriveUp = new DriveStraightCommand(robot, 5.75);
+	} else {
+		portcullisDriveUp = new DriveStraightCommand(robot, 0.0);
+	}
 	portcullisDriving = new DriveStraightCommand(robot, 6.3);
 //	portcullisDriving = new DriveStraightCommand(robot, 0.0);
 	portcullisDefenseUp = new DefenseManipPosCommand(superstructure, false);
@@ -648,7 +669,11 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	portcullisWaiting = 0.0;
 	portcullisDriveTimeOut = 3.5;
 
-	chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.4);
+	if (lineUp) {
+		chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.4);
+	} else {
+		chevalDeFriseDriveUp = new DriveStraightCommand(robot, 0.0);
+	}
 	chevalDeFriseDriving = new DriveStraightCommand(robot, 6.0);
 	chevalDeFriseStay = new DriveStraightCommand(robot, 0.0);
 //	chevalDeFriseDriving = new DriveStraightCommand(robot, 0.0);
@@ -662,18 +687,85 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	chevalDeFriseFirstTime = true;
 	chevalDeFriseInitTime = 0.0;
 
-	rampartsDriveStraight = new DriveStraightCommand(robot, 4.0);
-	rampartsDriveOver = new DriveStraightCommand(robot, 10.0);
-	//rampartsDriveOver = new DriveStraightCommand(robot, 0.0);
-	rampartsPivotToAngle = new PivotToAngleCommand(robot, 330);
+	if (forward) {
+		if (lineUp) {
+			rampartsDriveStraight = new DriveStraightCommand(robot, 4.0);
+		} else {
+			rampartsDriveStraight = new DriveStraightCommand(robot, 0.0);
+		}
+		rampartsDriveOver = new DriveStraightCommand(robot, 10.0);
+		rampartsPivotToAngle = new PivotToAngleCommand(robot, 330);
+	} else {
+		if (lineUp) {
+			rampartsDriveStraight = new DriveStraightCommand(robot, -2.0);
+		} else {
+			rampartsDriveStraight = new DriveStraightCommand(robot, 0.0);
+		}
+		rampartsPivotToAngle = new PivotToAngleCommand(robot, 330.0);
+		rampartsDriveOver = new DriveStraightCommand(robot, -7.0);
+	}
 	currRampartsState = kRampartsBeforeRamp;
 	nextRampartsState = kRampartsBeforeRamp;
 
-	hardCodeMoat = new DriveStraightCommand(robot, 18.0);
+	if (forward) {
+		if (lineUp) {
+			if (defenseManipFirst) {
+				hardCodeMoat = new DriveStraightCommand(robot, 16.0);
+			} else {
+				hardCodeMoat = new DriveStraightCommand(robot, -16.0);
+			}
+		} else {
+			if (defenseManipFirst) {
+				hardCodeMoat = new DriveStraightCommand(robot, 10.0);
+			} else {
+				hardCodeMoat = new DriveStraightCommand(robot, -10.0);
+			}
+		}
+	} else {
+		if (defenseManipFirst) {
+			hardCodeMoat = new DriveStraightCommand(robot, 10.0);
+		} else {
+			hardCodeMoat = new DriveStraightCommand(robot, -10.0);
+		}
+	}
 
-	hardCodeRockWall = new DriveStraightCommand(robot, 18.0);
+	if (forward) {
+		if (lineUp) {
+			if (defenseManipFirst) {
+				hardCodeRockWall = new DriveStraightCommand(robot, 17.0);
+			} else {
+				hardCodeRockWall = new DriveStraightCommand(robot, -17.0);
+			}
+		} else {
+			if (defenseManipFirst) {
+				hardCodeRockWall = new DriveStraightCommand(robot, 11.0);
+			} else {
+				hardCodeRockWall = new DriveStraightCommand(robot, -11.0);
+			}
+		}
+	} else {
+		if (defenseManipFirst) {
+			hardCodeRockWall = new DriveStraightCommand(robot, 11.0);
+		} else {
+			hardCodeRockWall = new DriveStraightCommand(robot, -11.0);
+		}
+	}
 
-	hardCodeRoughTerrain = new DriveStraightCommand(robot, 16.0);
+	if (forward) {
+		if (lineUp) {
+			hardCodeRoughTerrain = new DriveStraightCommand(robot, 14.0);
+			// when the rough terrain gets reversed
+			// hardCodeRoughTerrain = new DriveStraightCommand(robot, -14.0);
+		} else {
+			hardCodeRoughTerrain = new DriveStraightCommand(robot, 8.0);
+			// when the rough terrain get reversed
+			// hardCodeRoughTerrain = new DriveStraightCommand(robot, -8.0);
+		}
+	} else {
+		hardCodeRoughTerrain = new DriveStraightCommand(robot, -8.0);
+		// when the rough terrain gets reversed
+		// hardCodeRoughtTerrain = new DriveStraightCommand(robot, 8.0);
+	}
 }
 
 void DefenseCommand::Init() {
@@ -713,9 +805,9 @@ void DefenseCommand::Init() {
 	}
 	case (Ramparts): {
 		printf("Ramparts Init \n");
-		rampartsDriveStraight->disPFac = 1.0;
-		rampartsDriveStraight->disIFac = 0.001;
-		rampartsDriveStraight->disDFac = 13.4;
+		rampartsDriveStraight->disPFac = 0.75;
+		rampartsDriveStraight->disIFac = 0.005;
+		rampartsDriveStraight->disDFac = 4.0;
 		rampartsDriveStraight->Init(); //drive straight for 4 feet until bottom of ramp
 		nextRampartsState = kRampartsBeforeRamp;
 		break;
@@ -761,9 +853,6 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 			lowBarDriving->disPIDConfig->maxAbsOutput = 0.5;
 		} else if (!lowBarDriving->IsDone()) {
 			lowBarDriving->Update(currTimeSec, deltaTimeSec);
-			lowBarPivot->Init();
-		} else if (!lowBarPivot->IsDone()) {
-			lowBarPivot->Update(currTimeSec, deltaTimeSec);
 		} else {
 			isDone = true;
 			robot->SetWheelSpeed(RobotModel::kAllWheels, 0.0);

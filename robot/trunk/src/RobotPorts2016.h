@@ -39,6 +39,12 @@ static const int LEFT_ENCODER_B_PWM_PORT				= 3;
 static const int RIGHT_ENCODER_A_PWM_PORT				= 0;
 static const int RIGHT_ENCODER_B_PWM_PORT				= 1;
 
+static const int OUTTAKE_ENCODER_1_A_PWM_PORT			= 7; //arbitrary value
+static const int OUTTAKE_ENCODER_1_B_PWM_PORT			= 8; //arbitrary value
+
+static const int OUTTAKE_ENCODER_2_A_PWM_PORT			= 7; //arbitrary value
+static const int OUTTAKE_ENCODER_2_B_PWM_PORT			= 8; //arbitrary value
+
 static const int INTAKE_SWITCH_PWM_PORT					= 4;
 
 //******************* ANALOG IN PORTS*******************

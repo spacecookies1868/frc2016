@@ -73,12 +73,12 @@ private:
 	bool condition;
 };
 
-class ParallelAutoCommand : public AutoCommand {
+class ParallelAutoCommand : public SimpleAutoCommand {
 public:
 	ParallelAutoCommand(SimpleAutoCommand* myFirst, SimpleAutoCommand* mySecond) {
 		first = myFirst;
 		second = mySecond;
-		nextCommand = NULL;
+		//nextCommand = NULL;
 		firstDone = false;
 		secondDone = false;
 		done = false;
@@ -105,17 +105,17 @@ public:
 		return done;
 	}
 	virtual ~ParallelAutoCommand() {}
-	virtual void SetNextCommand(AutoCommand* myNextCommand) {
-		nextCommand = myNextCommand;
-	}
-	virtual AutoCommand* GetNextCommand() {
-		return nextCommand;
-	}
+//	virtual void SetNextCommand(AutoCommand* myNextCommand) {
+//		nextCommand = myNextCommand;
+//	}
+//	virtual AutoCommand* GetNextCommand() {
+//		return nextCommand;
+//	}
 
 private:
 	SimpleAutoCommand* first;
 	SimpleAutoCommand* second;
-	AutoCommand* nextCommand;
+//	AutoCommand* nextCommand;
 	bool firstDone;
 	bool secondDone;
 	bool done;
@@ -174,6 +174,30 @@ private:
 	bool isDone;
 };
 
+class DiagnosticCommand : public SimpleAutoCommand {
+	enum DiagnosticStates {
+		kInit,
+		kLeftMotorA, kLeftMotorB, kRightMotorA, kRightMotorB,
+		kLeftMotor, kRightMotor, kAllMotors,
+		kIntakeMotor, kOuttakeMotor,
+		kIntakeDown, kIntakeUp,
+		kDefenseManipDown, kDefenseManipUp
+	};
+public:
+	DiagnosticCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure);
+	~DiagnosticCommand() {}
+	virtual void Init();
+	virtual void Update(double currTimeSec, double deltaTimeSec);
+	virtual bool IsDone();
+private:
+	RobotModel* robot;
+	SuperstructureController* superstructure;
+	bool isDone;
+	uint32_t m_stateVal;
+	uint32_t nextState;
+	double timeCount;
+	double waitTime;
+};
 
 
 

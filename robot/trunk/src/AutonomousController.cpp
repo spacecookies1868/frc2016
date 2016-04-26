@@ -165,13 +165,49 @@ void AutonomousController::CreateQueue() {
 	if (humanControl->GetStopAutoDesired()) {
 		autoMode = kBlankAuto;
 	}
-//	autoMode = kTestAuto; //DO NOT COMMIT DO NOT COMMIT !!!!!!!!!!!!!!!
+
 	switch (autoMode) {
 	case (kTestAuto): {
 		printf("kTestAuto ------------------\n");
 		DUMP("TEST AUTO", 0.0);
-		CameraDetectionCommand* detector = new CameraDetectionCommand(camera, false);
-		firstCommand = detector;
+		//CameraDetectionCommand* detector = new CameraDetectionCommand(camera, false);
+		//firstCommand = detector;
+		//DefenseManipPosCommand* testtest = new DefenseManipPosCommand(superstructure, false);
+		//firstCommand = testtest;
+/*
+		// backward moat
+		DriveStraightCommand* backwardMoat = new DriveStraightCommand(robot, -16.0);
+		firstCommand = backwardMoat;
+*/
+/*
+		// backward ramparts
+		DriveStraightCommand* backwardRampart1 = new DriveStraightCommand(robot, -4.0);
+		firstCommand = backwardRampart1;
+		PivotToAngleCommand* backwardRampart2 = new PivotToAngleCommand(robot, 330.0);
+		backwardRampart1->SetNextCommand(backwardRampart2);
+		DriveStraightCommand* backwardRampart3 = new DriveStraightCommand(robot, -10.0);
+		backwardRampart2->SetNextCommand(backwardRampart3);
+*/
+/*
+ 	 	YAY! But distance is tuned for metal not wood fah sure
+		// backward rock wall
+		DriveStraightCommand* backwardRockWall = new DriveStraightCommand(robot, -17.0);
+		firstCommand = backwardRockWall;
+*/
+
+/*
+		// backward rough terrain
+		DriveStraightCommand* backwardRoughTerrain = new DriveStraightCommand(robot, -14.0);
+		firstCommand = backwardRoughTerrain;
+*/
+/*
+		DefenseCommand* testBackward = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+				true, true, false);
+*/
+		PivotCommand* testPivot = new PivotCommand(robot, 180.0);
+		firstCommand = testPivot;
+		PivotToAngleCommand* testPA = new PivotToAngleCommand(robot, 0.0);
+		testPivot->SetNextCommand(testPA);
 		break;
 	}
 	case (kBlankAuto): {
@@ -203,7 +239,7 @@ void AutonomousController::CreateQueue() {
 
 		printf("kReachAuto ------------------------\n");
 		DUMP("REACH AUTO", 0.0);
-		DriveStraightCommand* reachDrive = new DriveStraightCommand(robot, 6.0);
+		DriveStraightCommand* reachDrive = new DriveStraightCommand(robot, 4.0);
 		mechanismsUpWhee->SetNextCommand(reachDrive);
 
 		break;
@@ -219,29 +255,104 @@ void AutonomousController::CreateQueue() {
 				myDefenseGoesUp);
 		firstCommand = andThemMechanismsGoUp;
 
-		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+				true, true, true);
 		andThemMechanismsGoUp->SetNextCommand(cross);
 		//OuttakeByTimeCommand* crossOuttake = new OuttakeByTimeCommand(superstructure, 3.0);
 		//cross->SetNextCommand(crossOuttake);
+		break;
+	}
+	case (kCrossAndBackAuto): {
+		/*
+		 * Only usable on driving defenses or low bar
+		 */
+		ParallelAutoCommand* cabMechanismsGoUp = new ParallelAutoCommand(
+				new IntakePositionCommand(superstructure, false),
+				new DefenseManipPosCommand(superstructure, false));
+		firstCommand = cabMechanismsGoUp;
+
+		DefenseCommand* cabCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+				true, true, true);
+		cabMechanismsGoUp->SetNextCommand(cabCross);
+		PivotToAngleCommand* cabLineUp = new PivotToAngleCommand(robot, 0.0);
+		cabCross->SetNextCommand(cabLineUp);
+		if (humanControl->GetDefense() == ControlBoard::LowBar ||
+			humanControl->GetDefense() == ControlBoard::Moat ||
+			humanControl->GetDefense() == ControlBoard::RockWall ||
+			humanControl->GetDefense() == ControlBoard::RoughTerrain) {
+			DefenseCommand* cabCrossBack = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+					false, false, false);
+			cabLineUp->SetNextCommand(cabCrossBack);
+		}
+		break;
+	}
+	case (kBallAndCrossAuto): {
+		ParallelAutoCommand* bacMechanismsGoUp = new ParallelAutoCommand(
+				new IntakePositionCommand(superstructure, false),
+				new DefenseManipPosCommand(superstructure, false));
+		firstCommand = bacMechanismsGoUp;
+
+		DriveStraightCommand* bacForwardToIntake = new DriveStraightCommand(robot, 0.4);
+		bacMechanismsGoUp->SetNextCommand(bacForwardToIntake);
+		ParallelAutoCommand* bacIntake = new ParallelAutoCommand(
+				new IntakePositionCommand(superstructure, true),
+				new IntakeRollersCommand(superstructure, true, 0.7));
+		bacForwardToIntake->SetNextCommand(bacIntake);
+		CurveCommand* bacLineUp;
+		switch (humanControl->GetDefensePosition()) {
+		case (kNone) : {
+			break;
+		}
+		case (kLowBar): {
+			PivotCommand* bacSpin = new PivotCommand(robot, 180.0);
+			DefenseManipPosCommand* bacDefenseDown = new DefenseManipPosCommand(superstructure, true);
+			ParallelAutoCommand* bacSpinnyStuff = new ParallelAutoCommand(
+					bacSpin, bacDefenseDown);
+			bacIntake->SetNextCommand(bacSpinnyStuff);
+			bacLineUp = new CurveCommand(robot, 0.75, -3.5);
+			bacSpinnyStuff->SetNextCommand(bacLineUp);
+			break;
+		}
+		case (kSecond): {
+			bacLineUp = new CurveCommand(robot, -0.25, 3.5);
+			bacIntake->SetNextCommand(bacLineUp);
+			break;
+		}
+		case (kThird): {
+			bacLineUp = new CurveCommand(robot, 0.0, 3.5);
+			bacIntake->SetNextCommand(bacLineUp);
+			break;
+		}
+		case (kFourth): {
+			bacLineUp = new CurveCommand(robot, 0.25, 3.5);
+			bacIntake->SetNextCommand(bacLineUp);
+			break;
+		}
+		case (kFifth): {
+			bacLineUp = new CurveCommand(robot, 0.5, 3.5);
+			bacIntake->SetNextCommand(bacLineUp);
+			break;
+		}
+		}
+		PivotToAngleCommand* bacAngle = new PivotToAngleCommand(robot, 180.0);
+		bacLineUp->SetNextCommand(bacAngle);
+		DefenseCommand* bacCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+				true, false, true);
+		bacAngle->SetNextCommand(bacCross);
+
 		break;
 	}
 	case (kShootAuto): {
 		printf("kShootAuto --------------------------------\n");
 		DUMP("SHOOT AUTO", 0.0);
 		DUMP("DEFENSE POSITION", (double) humanControl->GetDefensePosition());
-		/*
-		 * Assumption: starting position is back of robot on auto line
-		 * GOING THROUGH LOW BAR IN THESE CALCULATIONS
-		 * Length of robot is 2.823 ft
-		 * Distance from auto line to end of autoworks is
-		 *
-		 */
 		IntakePositionCommand* intakeUp = new IntakePositionCommand(superstructure, false);
 		DefenseManipPosCommand* defenseUp = new DefenseManipPosCommand(superstructure, false);
 		ParallelAutoCommand* mechanismsUp = new ParallelAutoCommand(intakeUp, defenseUp);
 		firstCommand = mechanismsUp;
 		if (hardCodeShoot) {
-			DefenseCommand* hardCodeCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+			DefenseCommand* hardCodeCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+					true, true, true);
 			mechanismsUp->SetNextCommand(hardCodeCross);
 			PivotToAngleCommand* hardCodeStraighten = new PivotToAngleCommand(robot, 0.0);
 			hardCodeCross->SetNextCommand(hardCodeStraighten);
@@ -253,39 +364,43 @@ void AutonomousController::CreateQueue() {
 				break;
 			}
 			case (kLowBar): {
-				hardCodeDrive = new CurveCommand(robot, 6.2, -10.0); //was 12.3
+				hardCodeDrive = new CurveCommand(robot, -6.2, -10.0); //was 12.3
 				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
 				break;
 			}
 			case (kSecond): {
 				hardCodeDrive = new CurveCommand(robot, 2.2, 10.0); //was 12.3
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 220.0);
 				break;
 			}
 			case (kThird): {
 				hardCodeDrive = new CurveCommand(robot, -2.0, 10.0); //was 12.3
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 40.0);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 220.0);
 				break;
 			}
 			case (kFourth): {
 				hardCodeDrive = new CurveCommand(robot, 3.2, 10.0); //was 12.3
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 290.0);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 110.0);
 				break;
 			}
 			case (kFifth): {
-				// hardCodeDrive = new CurveCommand(robot, -0.5, 12.3);
 				hardCodeDrive = new CurveCommand(robot, -1.0, 10.0); //was 12.3
-				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 290.0);
+				hardCodeLineUpShoot = new PivotToAngleCommand(robot, 110.0);
 				break;
 			}
 			}
-			hardCodeStraighten->SetNextCommand(hardCodeDrive);
+		//	hardCodeStraighten->SetNextCommand(hardCodeDrive);
 			hardCodeDrive->SetNextCommand(hardCodeLineUpShoot);
-			OuttakeByTimeCommand* outtaking = new OuttakeByTimeCommand(superstructure, 1.0);
-			hardCodeLineUpShoot->SetNextCommand(outtaking);
+			ParallelAutoCommand* hardCodeArmsUp = new ParallelAutoCommand(
+					new IntakePositionCommand(superstructure, false),
+					new DefenseManipPosCommand(superstructure, false));
+			hardCodeLineUpShoot->SetNextCommand(hardCodeArmsUp);
+			OuttakeByTimeCommand* outtaking = new OuttakeByTimeCommand(superstructure, 1.0, false);
+			hardCodeArmsUp->SetNextCommand(outtaking);
 
 		} else {
-			DefenseCommand* cameraCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+			DefenseCommand* cameraCross = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+					true, true, true);
 			mechanismsUp->SetNextCommand(cameraCross);
 			PivotToAngleCommand* cameraStraighten = new PivotToAngleCommand(robot, 0.0);
 			cameraCross->SetNextCommand(cameraStraighten);
@@ -337,6 +452,55 @@ void AutonomousController::CreateQueue() {
 
 		break;
 	}
+	case (kBallLowBarShootAuto): {
+		ParallelAutoCommand* blbsMechanismsGoUp = new ParallelAutoCommand(
+				new IntakePositionCommand(superstructure, false),
+				new DefenseManipPosCommand(superstructure, false));
+		firstCommand = blbsMechanismsGoUp;
+
+		DriveStraightCommand* blbsForwardToIntake = new DriveStraightCommand(
+				robot, 0.4);
+		blbsMechanismsGoUp->SetNextCommand(blbsForwardToIntake);
+		ParallelAutoCommand* blbsIntake = new ParallelAutoCommand(
+				new IntakePositionCommand(superstructure, true),
+				new IntakeRollersCommand(superstructure, true, 0.70));
+		blbsForwardToIntake->SetNextCommand(blbsIntake);
+		PivotCommand* blbsSpin = new PivotCommand(robot, 180.0);
+		DefenseManipPosCommand* blbsDefenseDown = new DefenseManipPosCommand(
+				superstructure, true);
+		ParallelAutoCommand* blbsSpinnyStuff = new ParallelAutoCommand(blbsSpin,
+				blbsDefenseDown);
+		blbsIntake->SetNextCommand(blbsSpinnyStuff);
+		//CurveCommand* blbsLineUp = new CurveCommand(robot, 0.75, -3.5);
+		ChainedCommand* blbsLineUp = new ChainedCommand(
+				new PivotCommand(robot, -15.0),
+				new DriveStraightCommand(robot, -3.3));
+		blbsSpinnyStuff->SetNextCommand(blbsLineUp);
+		PivotToAngleCommand* blbsAngle = new PivotToAngleCommand(robot, 180.0);
+		blbsLineUp->SetNextCommand(blbsAngle);
+		DefenseCommand* blbsCross = new DefenseCommand(robot, superstructure,
+				ControlBoard::LowBar,
+				true, false, true);
+		blbsAngle->SetNextCommand(blbsCross);
+		//CurveCommand* blbsGoToGoal = new CurveCommand(robot, -6.0, -8.5);
+		ChainedCommand* blbsGoToGoal = new ChainedCommand(
+				new PivotCommand(robot, 37.0),
+				new DriveStraightCommand(robot, -8.0));
+		IntakePositionCommand* blbsIntakeUp = new IntakePositionCommand(superstructure, true);
+		DefenseManipPosCommand* blbsDefenseUp = new DefenseManipPosCommand(superstructure, false);
+		ParallelAutoCommand* blbsStuffUp = new ParallelAutoCommand(blbsIntakeUp, blbsDefenseUp);
+		ParallelAutoCommand* blbsUpandGo = new ParallelAutoCommand(
+						blbsGoToGoal, blbsStuffUp);
+		blbsCross->SetNextCommand(blbsUpandGo);
+		PivotToAngleCommand* blbsLineUpGoal = new PivotToAngleCommand(robot, 240.0);
+		blbsUpandGo->SetNextCommand(blbsLineUpGoal);
+		DriveStraightCommand* blbsDriveUp = new DriveStraightCommand(robot, -2.5);
+		blbsLineUpGoal->SetNextCommand(blbsDriveUp);
+		IntakeRollersCommand* blbsShoot = new IntakeRollersCommand(superstructure, false, 1.0);
+		blbsDriveUp->SetNextCommand(blbsShoot);
+		break;
+	}
+
 	case (kHoardingAuto): {
 		printf("kHoardingAuto ------------------------------\n");
 		DUMP("HOARDING AUTO", 0.0);
@@ -344,7 +508,8 @@ void AutonomousController::CreateQueue() {
 		DefenseManipPosCommand* hoardDefenseUp = new DefenseManipPosCommand(superstructure, false);
 		ParallelAutoCommand* hoardMechanismsUp = new ParallelAutoCommand(hoardIntakeUp, hoardDefenseUp);
 		firstCommand = hoardMechanismsUp;
-		DefenseCommand* hoardFirstCrossA = new DefenseCommand(robot, superstructure, humanControl->GetDefense());
+		DefenseCommand* hoardFirstCrossA = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
+				true, true, true);
 		hoardMechanismsUp->SetNextCommand(hoardFirstCrossA);
 		CurveCommand* hoardGoToCatC = new CurveCommand(robot, 4.0*(secondDefensePos - humanControl->GetDefensePosition()), 1.0);
 		hoardFirstCrossA->SetNextCommand(hoardGoToCatC);
@@ -438,6 +603,9 @@ void AutonomousController::CreateQueue() {
 	}
 	case (kSpyBotShootAuto): {
 		printf("kSpyBotShootAuto -------------------------------------\n");
+		/*
+		 * REVERSED TO GO OUT INTAKE SIDE
+		 */
 		DUMP("SPYBOTSHOOTAUTO", 0.0);
 		IntakePositionCommand* intakeUpSBSA = new IntakePositionCommand(
 				superstructure, false);
@@ -447,11 +615,11 @@ void AutonomousController::CreateQueue() {
 				defenseUpSBSA);
 		firstCommand = mechanismsUpSBSA;
 
-		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, 1.8, 6.8); //was 0.8 on x
+		CurveCommand* drivingToTheLowGoal = new CurveCommand(robot, -1.8, -6.8); //was 0.8 on x
 		mechanismsUpSBSA->SetNextCommand(drivingToTheLowGoal);
 		PivotToAngleCommand* pivotMe = new PivotToAngleCommand(robot, 330.0);
 		drivingToTheLowGoal->SetNextCommand(pivotMe);
-		OuttakeByTimeCommand* yeahShooting = new OuttakeByTimeCommand(superstructure, 1.0);
+		OuttakeByTimeCommand* yeahShooting = new OuttakeByTimeCommand(superstructure, 1.0,false);
 		pivotMe->SetNextCommand(yeahShooting);
 
 		break;
@@ -473,7 +641,7 @@ void AutonomousController::CreateQueue() {
 		mechanismsUpSBC->SetNextCommand(driveToGoalSBC);
 		PivotToAngleCommand* pivotForGoalSBC = new PivotToAngleCommand(robot, 330.0);
 		driveToGoalSBC->SetNextCommand(pivotForGoalSBC);
-		OuttakeByTimeCommand* shootingSBC = new OuttakeByTimeCommand(superstructure, 1.0);
+		OuttakeByTimeCommand* shootingSBC = new OuttakeByTimeCommand(superstructure, 1.0, true);
 		pivotForGoalSBC->SetNextCommand(shootingSBC);
 
 		//LINING UP

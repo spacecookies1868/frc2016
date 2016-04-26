@@ -53,10 +53,13 @@ private:
 		robot->ResetTimer();
 		robot->Reset();
 #if USE_USB_CAMERA
-		CameraServer::GetInstance()->SetQuality(50);
+		//CameraServer::GetInstance()->SetQuality(50);
 		//the camera name (ex "cam1") can be found through the roborio web interface
-		CameraServer::GetInstance()->StartAutomaticCapture("cam1");
+		//CameraServer::GetInstance()->StartAutomaticCapture("cam1");
 #endif
+//		CameraServer::GetInstance()->SetQuality(50);
+//		//the camera name (ex "cam1") can be found through the roborio web interface
+//		CameraServer::GetInstance()->StartAutomaticCapture("cam1");
 		RefreshAllIni();
 	}
 
@@ -89,6 +92,11 @@ private:
 		Logger::LogState(robot, humanControl);
 
 		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
+#if USE_USB_CAMERA
+		CameraServer::GetInstance()->SetQuality(20);
+		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+#endif
+
 	}
 
 	void TeleopInit() {
@@ -130,12 +138,21 @@ private:
 		LOG(robot, "Left Current Draw A", robot->GetCurrent(7));
 		LOG(robot, "Left Current Draw B", robot->GetCurrent(8));
 #if USE_CAMERA
-		CameraServer::GetInstance()->SetQuality(50); // ?? what is quality?
+		CameraServer::GetInstance()->SetQuality(30); // ?? what is quality?
+		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+#endif
+#if USE_USB_CAMERA
+		CameraServer::GetInstance()->SetQuality(20);
 		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
 #endif
 	}
 
 	void TestPeriodic() {
+#if USE_USB_CAMERA
+		CameraServer::GetInstance()->SetQuality(20);
+		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+#endif
+
 		DO_PERIODIC(10, LOG(robot, "Navx angle", robot->GetNavXYaw()));
 		DO_PERIODIC(10, LOG(robot, "Navx pitch", robot->GetNavXPitch()));
 		DO_PERIODIC(10, LOG(robot, "Navx Roll", robot->GetNavXRoll()));
@@ -185,6 +202,11 @@ private:
 
 	void DisabledPeriodic() {
 		//LOG(robot, "I'm disabled!", 0.0);
+#if USE_USB_CAMERA
+		CameraServer::GetInstance()->SetQuality(20);
+		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+#endif
+
 	}
 
 	void RefreshAllIni() {

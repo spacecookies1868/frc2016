@@ -97,7 +97,7 @@ private:
 
 class OuttakeByTimeCommand : public SimpleAutoCommand {
 public:
-	OuttakeByTimeCommand(SuperstructureController* mySuperstructure, double myTime);
+	OuttakeByTimeCommand(SuperstructureController* mySuperstructure, double myTime, bool myDefenseOut);
 	~OuttakeByTimeCommand() {}
 	void Init();
 	void Update(double currTimeSec, double deltaTimeSec);
@@ -107,8 +107,36 @@ private:
 	WaitingCommand* wait;
 	DefenseManipPosCommand* defenseDown;
 	bool isDone;
+	bool out;
 	double time;
 	double initTime;
+};
+
+class OuttakeByEncoderCommand : public SimpleAutoCommand {
+public:
+	OuttakeByEncoderCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, double myRevs);
+	~OuttakeByEncoderCommand() {}
+	void Init();
+	void Update(double currTimeSec, double deltaTimeSec);
+	bool IsDone();
+private:
+	SuperstructureController* superstructure;
+	RobotModel* robot;
+	double desiredRevs;
+	bool isDone;
+	double initRevs;
+};
+
+class IntakeHoldCommand : public SimpleAutoCommand {
+public:
+	IntakeHoldCommand(SuperstructureController* mySuperstructure);
+	~IntakeHoldCommand() {}
+	void Init();
+	void Update(double currTimeSec, double deltaTimeSec);
+	bool IsDone();
+private:
+	SuperstructureController* superstructure;
+	bool isDone;
 };
 
 #endif /* SRC_SUPERSTRUCTURECOMMANDS_H_ */

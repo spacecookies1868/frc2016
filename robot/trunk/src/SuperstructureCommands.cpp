@@ -168,38 +168,111 @@ bool OuttakeCommand::IsDone() {
 	return isDone;
 }
 
-OuttakeByTimeCommand::OuttakeByTimeCommand(SuperstructureController* mySuperstructure, double myTime) {
+OuttakeByTimeCommand::OuttakeByTimeCommand(SuperstructureController* mySuperstructure, double myTime, bool myDefenseOut) {
 	superstructure = mySuperstructure;
 	defenseDown = new DefenseManipPosCommand(superstructure, true);
 	wait = new WaitingCommand(0.5);
 	isDone = false;
 	time = myTime;
 	initTime = 0.0;
+	out = myDefenseOut;
 }
 
 void OuttakeByTimeCommand::Init() {
-	defenseDown->Init();
+	if (out) {
+		defenseDown->Init();
+	} else {
+		superstructure->SetAutoDefenseManipUp(true);
+		superstructure->SetAutoIntakeUp(true);
+	}
 }
 
 void OuttakeByTimeCommand::Update(double currTimeSec, double deltaTimeSec) {
-	if (!defenseDown->IsDone()) {
-		defenseDown->Update(currTimeSec, deltaTimeSec);
-		wait->Init();
-	} else if (!wait->IsDone()) {
-		wait->Update(currTimeSec, deltaTimeSec);
-		initTime = currTimeSec;
-	} else if ((currTimeSec - initTime) <= time) {
-		printf("Outtaking \n");
-		superstructure->SetAutoManualOuttakeForward(true);
-		superstructure->Update(currTimeSec, deltaTimeSec);
+	if (out) {
+		if (!defenseDown->IsDone()) {
+			defenseDown->Update(currTimeSec, deltaTimeSec);
+			wait->Init();
+		} else if (!wait->IsDone()) {
+			wait->Update(currTimeSec, deltaTimeSec);
+			initTime = currTimeSec;
+		} else if ((currTimeSec - initTime) <= time) {
+			printf("Outtaking \n");
+			superstructure->SetAutoManualOuttakeForward(true);
+			superstructure->Update(currTimeSec, deltaTimeSec);
+		} else {
+			printf("Done \n");
+			superstructure->SetAutoManualOuttakeForward(false);
+			superstructure->Update(currTimeSec, deltaTimeSec);
+			isDone = true;
+		}
 	} else {
-		printf("Done \n");
-		superstructure->SetAutoManualOuttakeForward(false);
-		superstructure->Update(currTimeSec, deltaTimeSec);
-		isDone = true;
+		initTime += deltaTimeSec;
+		if (initTime <= time) {
+			superstructure->SetAutoManualOuttakeReverse(true);
+			superstructure->Update(currTimeSec, deltaTimeSec);
+		} else {
+			superstructure->SetAutoManualOuttakeReverse(false);
+			superstructure->SetAutoIntakeUp(false);
+			superstructure->SetAutoDefenseManipUp(false);
+			superstructure->Update(currTimeSec, deltaTimeSec);
+			isDone = true;
+			initTime = 0.0;
+		}
 	}
 }
 
 bool OuttakeByTimeCommand::IsDone() {
+	return isDone;
+}
+
+OuttakeByEncoderCommand::OuttakeByEncoderCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, double myRevs) {
+	superstructure = mySuperstructure;
+	robot = myRobot;
+	desiredRevs = myRevs;
+	isDone = false;
+	initRevs = 0.0;
+}
+
+void OuttakeByEncoderCommand::Init() {
+	initRevs = robot->GetOuttakeEncoderVal();
+	if (desiredRevs < 0) {
+		superstructure->SetAutoManualOuttakeReverse(true);
+	} else {
+		superstructure->SetAutoManualOuttakeForward(true);
+	}
+}
+
+void OuttakeByEncoderCommand::Update(double currTimeSec, double deltaTimeSec) {
+	double currRev = robot->GetOuttakeEncoderVal();
+	if (fabs(currRev - initRevs) >= fabs(desiredRevs)) {
+		superstructure->SetAutoManualOuttakeForward(false);
+		superstructure->SetAutoManualOuttakeReverse(false);
+		isDone = true;
+	}
+	superstructure->Update(currTimeSec, deltaTimeSec);
+}
+
+bool OuttakeByEncoderCommand::IsDone() {
+	return isDone;
+}
+
+IntakeHoldCommand::IntakeHoldCommand(SuperstructureController* mySuperstructure) {
+	superstructure = mySuperstructure;
+	isDone = false;
+}
+
+void IntakeHoldCommand::Init() {
+	superstructure->SetAutoBallInIntake(true);
+}
+
+void IntakeHoldCommand::Update(double currTimeSec, double deltaTimeSec) {
+	if (superstructure->GetAutoBallInIntakeFinished()) {
+		superstructure->SetAutoBallInIntake(false);
+		isDone = true;
+	}
+	superstructure->Update(currTimeSec, deltaTimeSec);
+}
+
+bool IntakeHoldCommand::IsDone() {
 	return isDone;
 }
