@@ -34,6 +34,7 @@ RobotModel::RobotModel() {
 	intakeArmSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_B_PORT);
 	defenseManipSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, DEFENSE_MANIP_SOLENOID_A_PORT);
 	defenseManipSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, DEFENSE_MANIP_SOLENOID_B_PORT);
+	brakeSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, BRAKE_SOLENOID_PORT);
 
 	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
@@ -424,6 +425,14 @@ void RobotModel::ResetOuttakeEncoders() {
 
 void RobotModel::SetCompressorStop() {
 	compressor->Stop();
+}
+
+bool RobotModel::GetBrake() {
+	return brakeSolenoid->Get();
+}
+
+void RobotModel::SetBrake() {
+	brakeSolenoid->Set(true);
 }
 
 Image* RobotModel::GetCameraImage() {

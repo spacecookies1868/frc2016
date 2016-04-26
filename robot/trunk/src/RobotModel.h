@@ -85,6 +85,9 @@ public:
 
 	void SetCompressorStop();
 
+	bool GetBrake();
+	void SetBrake();
+
 	Image* GetCameraImage();
 
 	Ini* pini;
@@ -106,7 +109,8 @@ private:
 	bool servoDirection;
 
 	// Solenoids
-	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB, *defenseManipSolenoidA, *defenseManipSolenoidB;
+	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB,
+		*defenseManipSolenoidA, *defenseManipSolenoidB, *brakeSolenoid;
 
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder, *outtakeEncoder1, *outtakeEncoder2;

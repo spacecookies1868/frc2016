@@ -44,6 +44,7 @@ public:
 	bool GetOuttakeDesired();
 	bool GetManualOuttakeForwardDesired();
 	bool GetManualOuttakeReverseDesired();
+	bool GetBrakeDesired();
 
 	// power controller button accessor
 	bool GetPowerBudgetDesired();
@@ -73,7 +74,7 @@ private:
 	bool reverseDriveDesired, gearShiftDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
 		 intakePistonToggleDesired,intakePistonDownDesired,intakeMotorForwardDesired, intakeMotorReverseDesired, ballInIntakeDesired,
 		 outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired, pivotButtonDesired, pivotSwitchDesired,
-		 powerBudgetDesired, stopAutoDesired;
+		 powerBudgetDesired, stopAutoDesired, brakeDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY, desiredAngle;
 	uint32_t defense;
 	uint32_t defensePos;

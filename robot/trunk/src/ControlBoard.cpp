@@ -261,6 +261,10 @@ bool ControlBoard::GetPowerBudgetDesired() {
 	return powerBudgetDesired;
 }
 
+bool ControlBoard::GetBrakeDesired() {
+	return stopAutoDesired; // purposely using stop auto switch
+}
+
 void ControlBoard::ReadAllButtons() {
 	driveDirectionButton->ReadValue();
 	gearShiftButton->ReadValue();

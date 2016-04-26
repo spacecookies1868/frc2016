@@ -75,6 +75,10 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 	case (kIdle):
 		nextState = kIdle;
 
+		if (humanControl->GetBrakeDesired()) {
+			robot->SetBrake();
+		}
+
 		//Change the position of the defense manipulator in teleop
 		if (useDoorbellButtons) {
 			if (humanControl->GetDefenseManipDownDesired()) {
