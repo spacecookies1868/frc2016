@@ -693,7 +693,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 		} else {
 			rampartsDriveStraight = new DriveStraightCommand(robot, 0.0);
 		}
-		rampartsDriveOver = new DriveStraightCommand(robot, 10.0);
+		rampartsDriveOver = new DriveStraightCommand(robot, 13.0);
 		rampartsPivotToAngle = new PivotToAngleCommand(robot, 330);
 	} else {
 		if (lineUp) {
