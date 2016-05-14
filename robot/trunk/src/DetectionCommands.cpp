@@ -34,6 +34,7 @@ CameraDetectionCommand::CameraDetectionCommand(CameraController* myCamera, bool 
 	iterationCounter = 0;
 	waitTime = 0.1;
 	lastReadTime = 0;
+printf("constructed! \n");
 }
 
 void CameraDetectionCommand::Init() {
@@ -43,6 +44,7 @@ void CameraDetectionCommand::Init() {
 void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
 #if USE_CAMERA
 DUMP("Camera State", "IN UPDATE");
+printf("camera state, in update");
 	if (iterationCounter == 0) {
 		camera->CalculateDistanceWithAngles(onLeft);
 		sumx += camera->GetX();
@@ -125,7 +127,7 @@ void CameraCommand::Update(double currTimeSec, double deltaTimeSec) {
 	case (kInit): {
 		nextState = kPivoting;
 		break;
-	}
+	 }
 	case (kPivoting): {
 		if (pivoting->IsDone()) {
 			nextState = kDetecting;

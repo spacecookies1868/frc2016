@@ -49,7 +49,6 @@ public:
 
 private:
 	void RobotInit() {
-		LOG(robot, "Initing", 0.0);
 		robot->ResetTimer();
 		robot->Reset();
 #if USE_USB_CAMERA
@@ -68,6 +67,7 @@ private:
 		robot->ResetTimer();
 		robot->ZeroNavXYaw();
 		robot->Reset();
+		robot->SetBrakeOff();
 		driveController->Reset();
 		superstructureController->Reset();
 		cameraController->Reset();
@@ -93,8 +93,12 @@ private:
 
 		//printf("Auto Intake Up: %i\n", superstructureController->autoIntakeUp);
 #if USE_USB_CAMERA
-		CameraServer::GetInstance()->SetQuality(20);
-		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+		if (robot->usbCamera->GetError().GetCode() == 0) {
+			CameraServer::GetInstance()->SetQuality(20);
+			CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+		} else {
+
+		}
 #endif
 
 	}
@@ -123,7 +127,6 @@ private:
 		humanControl->ReadControls();
 		robot->UpdateCurrent();
 		driveController->Update(currTimeSec, deltaTimeSec);
-		//LOG(robot, "Updating driveController", 0.0);
 		superstructureController->Update(currTimeSec, deltaTimeSec);
 		if (robot->GetVoltage() < 9.5) {
 			printf("LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS LOW VOLTS \n");
@@ -142,15 +145,23 @@ private:
 		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
 #endif
 #if USE_USB_CAMERA
-		CameraServer::GetInstance()->SetQuality(20);
-		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+		if (robot->usbCamera->GetError().GetCode() == 0) {
+			CameraServer::GetInstance()->SetQuality(20);
+			CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+		} else {
+
+		}
 #endif
 	}
 
 	void TestPeriodic() {
 #if USE_USB_CAMERA
-		CameraServer::GetInstance()->SetQuality(20);
-		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+		if (robot->usbCamera->GetError().GetCode() == 0) {
+			CameraServer::GetInstance()->SetQuality(20);
+			CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+		} else {
+
+		}
 #endif
 
 		DO_PERIODIC(10, LOG(robot, "Navx angle", robot->GetNavXYaw()));
@@ -197,14 +208,17 @@ private:
 		cameraController->Reset();
 		powerController->Reset();
 		Logger::CloseLogs();
-		//LOG(robot, "Finished disabled init", 0.0);
 	}
 
 	void DisabledPeriodic() {
-		//LOG(robot, "I'm disabled!", 0.0);
+
 #if USE_USB_CAMERA
+	if (robot->usbCamera->GetError().GetCode() == 0) {
 		CameraServer::GetInstance()->SetQuality(20);
 		CameraServer::GetInstance()->SetImage(robot->GetCameraImage());
+	} else {
+		printf("Camera unplugged");
+	}
 #endif
 
 	}

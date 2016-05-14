@@ -203,11 +203,21 @@ void AutonomousController::CreateQueue() {
 /*
 		DefenseCommand* testBackward = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
 				true, true, false);
-*/
-		PivotCommand* testPivot = new PivotCommand(robot, 180.0);
-		firstCommand = testPivot;
-		PivotToAngleCommand* testPA = new PivotToAngleCommand(robot, 0.0);
-		testPivot->SetNextCommand(testPA);
+//*/
+//		PivotCommand* testPivot = new PivotCommand(robot, 180.0);
+//		firstCommand = testPivot;
+//		PivotToAngleCommand* testPA = new PivotToAngleCommand(robot, 0.0);
+//		testPivot->SetNextCommand(testPA);
+		IntakePositionCommand* andYouThoughtItWasBlankIntakeUp1 = new IntakePositionCommand(
+						superstructure, false);
+				DefenseManipPosCommand* andYouThoughtItWasBlankDefenseUp1 = new DefenseManipPosCommand(
+						superstructure, false);
+				ParallelAutoCommand* andYouThoughtItWasBlankMechanismsUp1 = new ParallelAutoCommand(
+						andYouThoughtItWasBlankIntakeUp1, andYouThoughtItWasBlankDefenseUp1);
+				firstCommand = andYouThoughtItWasBlankMechanismsUp1;
+
+		OuttakeByTimeCommand* out = new OuttakeByTimeCommand(superstructure, 3.0, false);
+		andYouThoughtItWasBlankMechanismsUp1->SetNextCommand(out);
 		break;
 	}
 	case (kBlankAuto): {
@@ -254,10 +264,11 @@ void AutonomousController::CreateQueue() {
 		ParallelAutoCommand* andThemMechanismsGoUp = new ParallelAutoCommand(myIntakeGoesUp,
 				myDefenseGoesUp);
 		firstCommand = andThemMechanismsGoUp;
-
+		WaitingCommand* wc = new WaitingCommand(0.0);
+		andThemMechanismsGoUp->SetNextCommand(wc);
 		DefenseCommand* cross = new DefenseCommand(robot, superstructure, humanControl->GetDefense(),
 				true, true, true);
-		andThemMechanismsGoUp->SetNextCommand(cross);
+		wc->SetNextCommand(cross);
 		//OuttakeByTimeCommand* crossOuttake = new OuttakeByTimeCommand(superstructure, 3.0);
 		//cross->SetNextCommand(crossOuttake);
 		break;

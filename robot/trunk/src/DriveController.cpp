@@ -57,6 +57,15 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 
 		//Always want to be in low gear
 		robot->ShiftToLowGear();
+		if (robot->GetTime() > 134.0 && humanControl->GetJustBeforeDisableBrakeDesired()) {
+					robot->SetBrakeOn();
+		} else {
+			if (humanControl->GetBrakeDesired()) {
+				robot->SetBrakeOn();
+			} else {
+				robot->SetBrakeOff();
+			}
+		}
 
 		double rightJoyX;
 		rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
@@ -69,10 +78,10 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			printf("Quicktuning \n");
 			QuickTurn(rightJoyX);
 		} else if(humanControl->GetArcadeDriveDesired()) {
-			printf("Arcade Driving \n");
+			//printf("Arcade Driving \n");
 			ArcadeDrive(rightJoyX, leftJoyY);
 		} else {
-			printf("Tank Driving \n");
+			//printf("Tank Driving \n");
 			TankDrive(leftJoyY, rightJoyY);
 		}
 

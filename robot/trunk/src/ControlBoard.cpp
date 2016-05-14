@@ -25,6 +25,7 @@ ControlBoard::ControlBoard() {
 	manualOuttakeReverseButton = new ButtonReader(operatorJoy, MANUAL_OUTTAKE_REVERSE_BUTTON_PORT);
 	dialPivotButton = new ButtonReader(operatorJoy, DIAL_PIVOT_BUTTON_PORT);
 	dialPivotSwitch = new ButtonReader(operatorJoy, DIAL_PIVOT_SWITCH_PORT);
+	brakeButton = new ButtonReader(leftJoy, BRAKE_BUTTON_PORT);
 
 	defense_ID_1_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_1_BUTTON_PORT);
 	defense_ID_2_Button = new ButtonReader(operatorJoyB, DEFENSE_ID_2_BUTTON_PORT);
@@ -61,6 +62,7 @@ ControlBoard::ControlBoard() {
 	manualOuttakeReverseDesired = false;
 	powerBudgetDesired = false;
 	stopAutoDesired = false;
+	brakeDesired = false;
 };
 
 void ControlBoard::ReadControls() {
@@ -74,6 +76,7 @@ void ControlBoard::ReadControls() {
 	gearShiftDesired = gearShiftButton->StateJustChanged();
 	arcadeDriveDesired = !arcadeDriveButton->IsDown();
 	quickTurnDesired = quickTurnButton->IsDown();
+	brakeDesired = brakeButton->IsDown();
 /*
  * Add buttons for defense combinations and if statement on buttons here, then assign defense to
  * the corresponding defense enum
@@ -137,6 +140,7 @@ void ControlBoard::ReadControls() {
 	}
 
 	stopAutoDesired = !stopAutoButton->IsDown();
+	justBeforeBrakeDesired = defense_ID_3_Button->IsDown();
 
 	defenseManipToggleDesired = defenseManipButton->WasJustPressed();
 	defenseManipDownDesired = defenseManipButton->IsDown();
@@ -262,7 +266,11 @@ bool ControlBoard::GetPowerBudgetDesired() {
 }
 
 bool ControlBoard::GetBrakeDesired() {
-	return stopAutoDesired; // purposely using stop auto switch
+	return brakeDesired; // purposely using stop auto switch
+}
+
+bool ControlBoard::GetJustBeforeDisableBrakeDesired() {
+	return justBeforeBrakeDesired;
 }
 
 void ControlBoard::ReadAllButtons() {
@@ -287,4 +295,5 @@ void ControlBoard::ReadAllButtons() {
 	dialPivotButton->ReadValue();
 	dialPivotSwitch->ReadValue();
 	powerBudgetButton->ReadValue();
+	brakeButton->ReadValue();
 }

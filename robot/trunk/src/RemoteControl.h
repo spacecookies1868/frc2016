@@ -37,6 +37,7 @@ public:
 	virtual bool GetManualOuttakeForwardDesired() = 0;
 	virtual bool GetManualOuttakeReverseDesired() = 0;
 	virtual bool GetBrakeDesired() = 0;
+	virtual bool GetJustBeforeDisableBrakeDesired() = 0;
 
 	// power controller button accessors
 	virtual bool GetPowerBudgetDesired() = 0;

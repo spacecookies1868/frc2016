@@ -58,7 +58,8 @@ static const int PNEUMATICS_CONTROL_MODULE_ID			= 1;
 
 // ***************** SOLENOID PORTS *****************
 static const int GEAR_SHIFT_SOLENOID_PORT				= 7;
-static const int BRAKE_SOLENOID_PORT					= 6;
+static const int BRAKE_SOLENOID_A_PORT					= 6;
+static const int BRAKE_SOLENOID_B_PORT					= 5;
 static const int INTAKE_SOLENOID_A_PORT					= 0;
 static const int INTAKE_SOLENOID_B_PORT					= 1;
 static const int DEFENSE_MANIP_SOLENOID_A_PORT			= 3;
@@ -78,6 +79,7 @@ static const int ARCADE_DRIVE_BUTTON_PORT				= 3;
 static const int QUICK_TURN_BUTTON_PORT					= 1;
 static const int DIAL_PIVOT_BUTTON_PORT					= 7;
 static const int DIAL_PIVOT_SWITCH_PORT					= 2;
+static const int BRAKE_BUTTON_PORT						= 2;
 
 //Superstructure controller button ports
 static const int DEFENSE_MANIP_BUTTON_PORT				= 5;

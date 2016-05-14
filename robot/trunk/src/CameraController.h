@@ -18,6 +18,7 @@ private:
 	double CalculateSlope(double imageX, double imageY);
 	double CalculateRadius(double imageX1, double imageY1, double imageX2, double imageY2);
 	double CalculateRadiusWithTriangles(bool leftRadiusDesired);
+	double CalculateRadiusWithBottomCoords(bool leftRadiusDesired);
 	TableReader* table;
 	RobotModel* robot;
 	//constants

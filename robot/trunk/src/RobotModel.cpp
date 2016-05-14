@@ -34,7 +34,8 @@ RobotModel::RobotModel() {
 	intakeArmSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, INTAKE_SOLENOID_B_PORT);
 	defenseManipSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, DEFENSE_MANIP_SOLENOID_A_PORT);
 	defenseManipSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, DEFENSE_MANIP_SOLENOID_B_PORT);
-	brakeSolenoid = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, BRAKE_SOLENOID_PORT);
+	brakeSolenoidA = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, BRAKE_SOLENOID_A_PORT);
+	brakeSolenoidB = new Solenoid(PNEUMATICS_CONTROL_MODULE_ID, BRAKE_SOLENOID_B_PORT);
 
 	leftEncoder = new Encoder(LEFT_ENCODER_A_PWM_PORT, LEFT_ENCODER_B_PWM_PORT, true);
 	rightEncoder = new Encoder(RIGHT_ENCODER_A_PWM_PORT, RIGHT_ENCODER_B_PWM_PORT, true);
@@ -71,7 +72,7 @@ RobotModel::RobotModel() {
 #endif
 
 #if USE_USB_CAMERA
-	usbCamera = new USBCamera("cam1", true);
+	usbCamera = new USBCamera("cam0", true);
 	usbCamera->OpenCamera();
 	usbCamera->SetBrightness(50);
 	usbCamera->SetWhiteBalanceManual(30);
@@ -428,11 +429,17 @@ void RobotModel::SetCompressorStop() {
 }
 
 bool RobotModel::GetBrake() {
-	return brakeSolenoid->Get();
+	return brakeSolenoidA->Get();
 }
 
-void RobotModel::SetBrake() {
-	brakeSolenoid->Set(true);
+void RobotModel::SetBrakeOn() {
+	brakeSolenoidA->Set(true);
+	brakeSolenoidB->Set(false);
+}
+
+void RobotModel::SetBrakeOff() {
+	brakeSolenoidA->Set(false);
+	brakeSolenoidB->Set(true);
 }
 
 Image* RobotModel::GetCameraImage() {

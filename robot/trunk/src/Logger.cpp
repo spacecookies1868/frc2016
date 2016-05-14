@@ -13,7 +13,7 @@ std::ofstream Logger::logAction;
 
 void Logger::LogState(RobotModel* myRobot, RemoteControl *myHumanControl) {
 	if (!logData.is_open()) {
-		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out);
+		logData.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_datalog.txt")).c_str()), std::ofstream::out | std::ofstream::app);
 		logData << "Time, Left Encoder, Right Encoder, Left Wheel Speed,"
 				<< "Right Wheel Speed, Yaw, Roll, Pitch, Voltage, Total Current, "
 				<< "Left Drive A Current, Left Drive B Current, Right Drive A Current, "
@@ -89,7 +89,7 @@ void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int lin
 				const std::string& stateName, double state) {
 	logAction.flush();
 	if (!logAction.is_open()) {
-			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out | std::ofstream::app);
 	}
 	logAction << myRobot->GetTime() << ", " << fileName << ", " << line << ", " << stateName
 			<< ", " << state << "\r\n";
@@ -99,7 +99,7 @@ void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int lin
 void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int line,
 				const std::string& stateName, const std::string& state) {
 	if (!logAction.is_open()) {
-			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+			logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out | std::ofstream::app);
 	}
 	logAction << myRobot->GetTime() << ", " << fileName << ", " << line << ", " << stateName
 			<< ", " << state << "\r\n";
@@ -110,7 +110,7 @@ void Logger::LogAction(RobotModel* myRobot, const std::string& fileName, int lin
 void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
 			bool state) {
 	if (!logAction.is_open()) {
-		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out | std::ofstream::app);
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();
@@ -118,7 +118,7 @@ void Logger::LogAction(const std::string& fileName, int line, const std::string&
 void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
 			double state) {
 	if (!logAction.is_open()) {
-		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out | std::ofstream::app);
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();
@@ -126,7 +126,7 @@ void Logger::LogAction(const std::string& fileName, int line, const std::string&
 void Logger::LogAction(const std::string& fileName, int line, const std::string& stateName,
 			const std::string& state) {
 	if (!logAction.is_open()) {
-		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out);
+		logAction.open(GetTimeStamp((std::string("/home/lvuser/%F_%H_%M_actionlog.txt")).c_str()), std::ofstream::out | std::ofstream::app);
 	}
 	logAction << fileName << ", " << line << ", " << stateName << ", " << state << "\r\n";
 	logAction.flush();

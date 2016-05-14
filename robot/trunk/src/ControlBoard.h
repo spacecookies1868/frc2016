@@ -45,6 +45,7 @@ public:
 	bool GetManualOuttakeForwardDesired();
 	bool GetManualOuttakeReverseDesired();
 	bool GetBrakeDesired();
+	bool GetJustBeforeDisableBrakeDesired();
 
 	// power controller button accessor
 	bool GetPowerBudgetDesired();
@@ -74,7 +75,7 @@ private:
 	bool reverseDriveDesired, gearShiftDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
 		 intakePistonToggleDesired,intakePistonDownDesired,intakeMotorForwardDesired, intakeMotorReverseDesired, ballInIntakeDesired,
 		 outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired, pivotButtonDesired, pivotSwitchDesired,
-		 powerBudgetDesired, stopAutoDesired, brakeDesired;
+		 powerBudgetDesired, stopAutoDesired, brakeDesired, justBeforeBrakeDesired;
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY, desiredAngle;
 	uint32_t defense;
 	uint32_t defensePos;
@@ -82,7 +83,7 @@ private:
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
 				 *intakeMotorForwardButton,*intakeMotorReverseButton, *ballInIntakeButton, *outtakeButton, *manualOuttakeForwardButton, *dialPivotButton, *dialPivotSwitch,
 				 *manualOuttakeReverseButton, *defense_ID_1_Button, *defense_ID_2_Button, *defense_ID_3_Button,
-				 *powerBudgetButton, *stopAutoButton, *defensePos_ID_1_Button, *defensePos_ID_2_Button;
+				 *powerBudgetButton, *stopAutoButton, *defensePos_ID_1_Button, *defensePos_ID_2_Button, *brakeButton;
 	void ReadAllButtons();
 };
 

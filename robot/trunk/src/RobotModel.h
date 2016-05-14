@@ -86,9 +86,14 @@ public:
 	void SetCompressorStop();
 
 	bool GetBrake();
-	void SetBrake();
+	void SetBrakeOn();
+	void SetBrakeOff();
 
 	Image* GetCameraImage();
+#if USE_USB_CAMERA
+	USBCamera* usbCamera;
+	Image* usbFrame;
+#endif
 
 	Ini* pini;
 	TableReader* gripLines;
@@ -110,7 +115,7 @@ private:
 
 	// Solenoids
 	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB,
-		*defenseManipSolenoidA, *defenseManipSolenoidB, *brakeSolenoid;
+		*defenseManipSolenoidA, *defenseManipSolenoidB, *brakeSolenoidA, *brakeSolenoidB;
 
 	//Sensors
 	Encoder *leftEncoder, *rightEncoder, *outtakeEncoder1, *outtakeEncoder2;
@@ -118,10 +123,6 @@ private:
 	DigitalInput *intakeSwitch;
 	UltrasonicSensor *ultra;
 
-#if USE_USB_CAMERA
-	USBCamera* usbCamera;
-	Image* usbFrame;
-#endif
 
 #if USE_CAMERA
 //	AxisCamera *camera;

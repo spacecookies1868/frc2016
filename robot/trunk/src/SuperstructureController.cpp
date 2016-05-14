@@ -75,10 +75,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 	case (kIdle):
 		nextState = kIdle;
 
-		if (humanControl->GetBrakeDesired()) {
-			robot->SetBrake();
-		}
-
 		//Change the position of the defense manipulator in teleop
 		if (useDoorbellButtons) {
 			if (humanControl->GetDefenseManipDownDesired()) {
@@ -217,7 +213,10 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		}
 		break;
 	case (kBallInIntake):
-		if (!robot->GetIntakeSwitchState()) {
+		if (humanControl->GetBallInIntakeDesired()) {
+			robot->SetIntakeMotorSpeed(0.0);
+			nextState = kIdle;
+		} else if (!robot->GetIntakeSwitchState()) {
 			printf("Ball in intake \n");
 			robot->SetIntakeMotorSpeed(intakeSpeed);
 			nextState = kBallInIntake;
