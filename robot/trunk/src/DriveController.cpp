@@ -67,6 +67,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		}
 
+		//Joysticks sending values
 		double rightJoyX;
 		rightJoyX = humanControl->GetJoystickValue(RemoteControl::kRightJoy, RemoteControl::kX);
 		double rightJoyY;
@@ -85,6 +86,7 @@ void DriveController::Update(double currTimeSec, double deltaTimeSec) {
 			TankDrive(leftJoyY, rightJoyY);
 		}
 
+		//robot pivots according to dial if the switch or button is pressed
 		if (humanControl->GetPivotButtonDesired()){
 			printf("Switching to kDialToAngleButton \n");
 			pivotCommandButton->Init();
@@ -183,6 +185,7 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 		initializedRPID = false;
 	}
 
+	//make sure motor ouputs do not exceed 1.0
 	if (leftMotorOutput > 1.0) {
 		rightMotorOutput = rightMotorOutput / leftMotorOutput;
 		leftMotorOutput = 1.0;
@@ -197,6 +200,7 @@ void DriveController::ArcadeDrive(double myX, double myY) {
 		rightMotorOutput = -1.0;
 	}
 
+	//Make the joysticks less sensitive
 	leftMotorOutput = sin(leftMotorOutput * PI / 2);
 	rightMotorOutput = sin(rightMotorOutput * PI / 2);
 

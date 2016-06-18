@@ -4,6 +4,7 @@
 
 #include "Debugging.h"
 
+// RobotModel constructor: initializes all variables and objects
 RobotModel::RobotModel() {
 	pdp = new PowerDistributionPanel();
 
@@ -57,15 +58,10 @@ RobotModel::RobotModel() {
 	compressorCurrent = 0;
 	intakeCurrent = 0;
 
-//	// 8 inch wheels (2/3 ft), 256 tics per rotation
+	// 8 inch wheels (2/3 ft), 256 tics per rotation
 	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
 	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
-//
-	/*
-	 * SKETCH VALUES
-	 */
-//	leftEncoder->SetDistancePerPulse(0.0104);
-//	rightEncoder->SetDistancePerPulse(0.0104);
+
 #if USE_CAMERA
 //	camera = new AxisCamera("10.18.68.11");
 //	frame = imaqCreateImage(IMAQ_IMAGE_RGB, 0); // 0 bordersize
@@ -98,6 +94,7 @@ RobotModel::RobotModel() {
 	gripLines = new TableReader("GRIP/myLinesReport", "GRIP/myContReport");
 }
 
+//resets variables and objects
 void RobotModel::Reset() {
 	isLowGear = !gearShiftSolenoid->Get();
 	gripLines->Reset();
@@ -106,44 +103,28 @@ void RobotModel::Reset() {
 	SetWheelSpeed(RobotModel::kAllWheels, 0.0);
 }
 
+//sets the speed for a given wheel(s)
 void RobotModel::SetWheelSpeed(Wheels w, double speed) {
-	//IMPORTANT: Check which motors need to be inverted.
-
 	switch (w) {
 	case (kLeftWheels):
-/* comp bot inverted
-		leftDriveMotorA->Set(speed);
-		leftDriveMotorB->Set(speed);
-	*/
 		leftDriveMotorA->Set(speed);
 		leftDriveMotorB->Set(speed);
 		break;
 	case (kRightWheels):
-/* comp bot inverted
-		rightDriveMotorA->Set(-speed);
-		rightDriveMotorB->Set(-speed);
-*/
-		rightDriveMotorA->Set(-speed);
-		rightDriveMotorB->Set(-speed);
+		rightDriveMotorA->Set(-speed); //negative value since wheels are inverted on robot
+		rightDriveMotorB->Set(-speed); //negative value since wheels are inverted on robot
 		break;
 	case (kAllWheels):
-/* comp bot inverted
 		leftDriveMotorA->Set(speed);
 		leftDriveMotorB->Set(speed);
-		rightDriveMotorA->Set(-speed);
-		rightDriveMotorB->Set(-speed);
-*/
-		leftDriveMotorA->Set(speed);
-		leftDriveMotorB->Set(speed);
-		rightDriveMotorA->Set(-speed);
-		rightDriveMotorB->Set(-speed);
-
+		rightDriveMotorA->Set(-speed); //negative value since wheels are inverted on robot
+		rightDriveMotorB->Set(-speed); //negative value since wheels are inverted on robot
 		break;
 	}
 }
 
+//returns the speed of a given wheel
 float RobotModel::GetWheelSpeed(Wheels w) {
-	//IMPORTANT: Check which motors need to be inverted.
 	switch(w) {
 	case (kLeftWheels):
 		return leftDriveMotorA->Get();
@@ -157,10 +138,12 @@ float RobotModel::GetWheelSpeed(Wheels w) {
 	}
 }
 
+//sets the servo to an initial angle
 void RobotModel::InitServo(double angle) {
 	servo->SetAngle(angle);
 }
 
+//sets the servo to the end angle at a speed proportional to the deltaAngle
 void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle) {
 	servoAngle = servo->GetAngle();
 	if (servoAngle >= endAngle){
@@ -174,23 +157,24 @@ void RobotModel::SetServo(double startAngle, double endAngle, double deltaAngle)
 	} else {
 		servoAngle -= deltaAngle;
 	}
-//	printf("Start angle: %f \n", startAngle);
-//	printf("End Angle: %f \n", endAngle);
-//	printf("Delta Angle: %f \n", deltaAngle);
-//	printf("servoAnlge: %f \n", servoAngle);
 	servo->SetAngle(servoAngle);
 }
 
+//returns the angle of the servo
 double RobotModel::GetServoAngle() {
 	servoAngle = servo->GetAngle();
 	return servoAngle;
 }
 
+//returns the direction the servo is turning
 bool RobotModel::GetServoDirection() {
 	return servoDirection;
 }
 
+//returns the yaw
 double RobotModel::GetNavXYaw() {
+// if the navX is on the robot, return the value;
+// otherwise, return a default value.
 #if USE_NAVX
 	return navx->GetYaw();
 #else
@@ -198,42 +182,52 @@ double RobotModel::GetNavXYaw() {
 #endif
 }
 
+//returns the roll
 double RobotModel::GetNavXRoll() {
+// if the navX is on the robot, return the value;
+// otherwise, return a default value.
 #if USE_NAVX
 	return navx->GetRoll();
 #else
 	return 0.0;
 #endif
 }
-
+//returns the pitch
 double RobotModel::GetNavXPitch() {
+// if the navX is on the robot, return the value;
+// otherwise, return a default value.
 #if USE_NAVX
 	return navx->GetPitch();
 #else
 	return 0.0;
 #endif
 }
-
+//zeroes the initial yaw
 void RobotModel::ZeroNavXYaw() {
+// if the navX is on the robot, zero the yaw.
 #if USE_NAVX
 	navx->ZeroYaw();
 #endif
 }
 
+//returns if we are in low hear (or high gear)
 bool RobotModel::IsLowGear() {
 	return isLowGear;
 }
 
-void RobotModel::ShiftToHighGear() {
-	gearShiftSolenoid->Set(true);
-	isLowGear = false;
-}
-
+//shifts to low gear
 void RobotModel::ShiftToLowGear() {
 	gearShiftSolenoid->Set(false);
 	isLowGear = true;
 }
 
+//shifts to high gear
+void RobotModel::ShiftToHighGear() {
+	gearShiftSolenoid->Set(true);
+	isLowGear = false;
+}
+
+//initializes variables pertaining to current
 void RobotModel::UpdateCurrent() {
 	leftDriveACurrent = pdp->GetCurrent(LEFT_DRIVE_MOTOR_A_PDP_CHAN);
 	leftDriveBCurrent = pdp->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN);
@@ -244,26 +238,26 @@ void RobotModel::UpdateCurrent() {
 	roboRIOCurrent = ControllerPower::GetInputCurrent();
 }
 
+//returns the voltage
 double RobotModel::GetVoltage() {
 	return pdp->GetVoltage();
 }
 
+//returns the total energy of the PDP
 double RobotModel::GetTotalCurrent() {
 	return pdp->GetTotalCurrent();
 }
-
+//returns the total current of the PDP
 double RobotModel::GetTotalEnergy() {
 	return pdp->GetTotalEnergy();
 }
 
+//returns the total power of the PDP
 double RobotModel::GetTotalPower() {
 	return pdp->GetTotalPower();
 }
 
-/**
- * @param channel PDP channels from 0 to 15
- * check robotports for channels
- */
+//returns the current of a given channel
 double RobotModel::GetCurrent(int channel) {
 	switch(channel) {
 	case RIGHT_DRIVE_MOTOR_A_PDP_CHAN:
@@ -286,77 +280,78 @@ double RobotModel::GetCurrent(int channel) {
 	}
 }
 
+//returns the current of the compressor
 double RobotModel::GetCompressorCurrent() {
 	return compressorCurrent;
 }
 
+//returns the current of the roboRIO
 double RobotModel::GetRIOCurrent() {
 	return roboRIOCurrent;
 }
 
+//resets the time
 void RobotModel::ResetTimer() {
 	timer->Reset();
 }
 
+//returns the time
 double RobotModel::GetTime() {
 	return timer->Get();
 }
 
+//returns the distance of the left encoder
 double RobotModel::GetLeftEncoderVal() {
-	// IF PRACTICE return -leftEncoder->GetDistance();
-	//IF COMP
-	//printf("Left 2 Stuff %i\n", leftEncoder->CheckDigitalChannel(2));
-	//printf("Left 3 Stuff %i\n", leftEncoder->CheckDigitalChannel(3));
-	//printf("Left raw %i\n", leftEncoder->GetRaw());
 	return leftEncoder->GetDistance();
 }
 
+//returns the distance of the right encoder
 double RobotModel::GetRightEncoderVal() {
-	/*
-	 * inverted
-	 */
-
-	//IF PRACTICE return rightEncoder->GetDistance();
-	//printf("Right 0 Stuff %i\n", rightEncoder->CheckDigitalChannel(0));
-	//printf("Right 1 Stuff %i\n", rightEncoder->CheckDigitalChannel(1));
-	//printf("Right raw %i\n", rightEncoder->GetRaw());
 	return rightEncoder->GetDistance();
 }
 
+//resets both the left and the right encoders
 void RobotModel::ResetDriveEncoders() {
 	leftEncoder->Reset();
 	rightEncoder->Reset();
 }
 
+//returns the pressure
 double RobotModel::GetPressureSensorVal() {
 	return 250 * (pressureSensor->GetAverageVoltage() / 5) - 25;
 }
 
+//returns the distance of the ultrasonic sensor
 double RobotModel::GetUltrasonicDistance() {
 	return ultra->GetRangeInInches();
 }
 
+//refreshes the ini file
 void RobotModel::RefreshIni() {
 	delete pini;
 	pini = new Ini("/home/lvuser/robot.ini");
 }
 
+// SUPERESTRUCTURE ACCESSORS AND MUTATORS IN ROBOTMODEL
+
+//returns if the intake arm is down (or up)
 bool RobotModel::IsIntakeArmDown() {
 	return !intakeArmSolenoidB->Get();
 }
 
+//moves intake arm up
 void RobotModel::MoveIntakeArmUp() {
-	DO_PERIODIC(1, printf("Move intake arm up\n"));
 	intakeArmSolenoidA->Set(false);
 	intakeArmSolenoidB->Set(true);
 }
 
+//moves intake arm down
 void RobotModel::MoveIntakeArmDown() {
-	DO_PERIODIC(1, printf("Move intake arm down\n"));
 	intakeArmSolenoidA->Set(true);
 	intakeArmSolenoidB->Set(false);
 }
 
+//changes the state of the intake arm (i.e. if up, move down)
 void RobotModel::ChangeIntakeArmState() {
 	if (IsIntakeArmDown()) {
 		MoveIntakeArmUp();
@@ -365,37 +360,41 @@ void RobotModel::ChangeIntakeArmState() {
 	}
 }
 
+//returns the speed of the intake motor
 double RobotModel::GetIntakeMotorSpeed() {
 	return intakeMotor->Get();
 }
 
-bool RobotModel::GetIntakeSwitchState() {
-	return intakeSwitch->Get();
-}
-
+//sets the speed of the intake motor
 void RobotModel::SetIntakeMotorSpeed(double speed) {
 	DO_PERIODIC(20, printf("Set intake speed to %f\n", speed));
 	intakeMotor->Set(speed);
 }
 
+//returns if the intake switch is up (or down)
+bool RobotModel::GetIntakeSwitchState() {
+	return intakeSwitch->Get();
+}
+
+//returns if the defense manipulator is down (or up)
 bool RobotModel::IsDefenseManipDown() {
 	return !defenseManipSolenoidB->Get();
 }
 
+// moves the defense manipulator up
 void RobotModel::MoveDefenseManipUp() {
-	//TODO check that this is the correct direction
-	DO_PERIODIC(1, printf("Move defense arm up\n"));
 	defenseManipSolenoidA->Set(false);
 	defenseManipSolenoidB->Set(true);
 }
 
+// moves the defense manipulator down
 void RobotModel::MoveDefenseManipDown() {
-	//TODO check that this is the correct direction
 	DO_PERIODIC(1, printf("Move defense arm down\n"));
 	defenseManipSolenoidA->Set(true);
 	defenseManipSolenoidB->Set(false);
 }
 
+//changes the state of the defense manipulator (i.e. if up, move down)
 void RobotModel::ChangeDefenseManipState() {
 	if (IsDefenseManipDown()) {
 		MoveDefenseManipUp();
@@ -404,45 +403,54 @@ void RobotModel::ChangeDefenseManipState() {
 	}
 }
 
+//returns the speed of the outake motor
 double RobotModel::GetOuttakeMotorSpeed() {
 	return outtakeMotorA->Get();
 }
 
+//sets the speed of the outake motor
 void RobotModel::SetOuttakeMotorSpeed(double speed) {
-	//TODO check that this is the correct direction
-	DO_PERIODIC(20, printf("Set outtake speed to %f\n", speed));
 	outtakeMotorA->Set(-speed);
 	outtakeMotorB->Set(speed);
 }
 
+//returns the distance of the outake motor encoder
 double RobotModel::GetOuttakeEncoderVal() {
 	return outtakeEncoder1->Get() - outtakeEncoder2->Get() /2;
 }
 
+//resets the outake motor encoder
 void RobotModel::ResetOuttakeEncoders() {
 	outtakeEncoder1->Reset();
 	outtakeEncoder2->Reset();
 }
 
+//stops the compressor
 void RobotModel::SetCompressorStop() {
 	compressor->Stop();
 }
 
+//returns if the brake is on or off
 bool RobotModel::GetBrake() {
 	return brakeSolenoidA->Get();
 }
 
+//puts the break on
 void RobotModel::SetBrakeOn() {
 	brakeSolenoidA->Set(true);
 	brakeSolenoidB->Set(false);
 }
 
+//takes the break off
 void RobotModel::SetBrakeOff() {
 	brakeSolenoidA->Set(false);
 	brakeSolenoidB->Set(true);
 }
 
+// return the camera image
 Image* RobotModel::GetCameraImage() {
+// if the camera is on the robot, return the camera frame
+// else if the USB camera is on, return the USB Camera frame
 #if USE_CAMERA
 //	camera->GetImage(frame);
 //	return frame;

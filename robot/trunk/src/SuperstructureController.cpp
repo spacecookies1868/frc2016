@@ -38,8 +38,6 @@ SuperstructureController::SuperstructureController(RobotModel* myRobot, RemoteCo
 }
 
 void SuperstructureController::Reset() {
-	//Zero all necessary variables
-	//NOTE: some variables are not set to zero here because their values are set in the ini file
 	m_stateVal = kInit;
 	nextState = kInit;
 
@@ -74,7 +72,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		break;
 	case (kIdle):
 		nextState = kIdle;
-
 		//Change the position of the defense manipulator in teleop
 		if (useDoorbellButtons) {
 			if (humanControl->GetDefenseManipDownDesired()) {
@@ -84,18 +81,15 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		} else {
 			if (humanControl->GetDefenseManipToggleDesired()) {
-				DO_PERIODIC(1, printf("Teleop Defense Manip Desired\n"));
 				robot->ChangeDefenseManipState();
 			}
 		}
 
 		//Change the position of the defense manipulator in auto
 		if (autoDefenseManipUp) {
-			DO_PERIODIC(1, printf("Auto Defense Manip Up\n"));
 			robot->MoveDefenseManipUp();
 			autoDefenseManipUp = false;
 		} else if (autoDefenseManipDown) {
-			DO_PERIODIC(1, printf("Auto Defense Manip Down\n"));
 			robot->MoveDefenseManipDown();
 			autoDefenseManipDown = false;
 		}
@@ -109,7 +103,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			}
 		} else {
 			if (humanControl->GetIntakePistonToggleDesired()) {
-				DO_PERIODIC(1, printf("Teleop Intake Desired\n"));
 				robot->ChangeIntakeArmState();
 			}
 
@@ -117,11 +110,9 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 
 		//Change the position of the intake in auto
 		if (autoIntakeUp) {
-			DO_PERIODIC(1, printf("Auto Intake Up \n"));
 			robot->MoveIntakeArmUp();
 			autoIntakeUp = false;
 		} else if (autoIntakeDown) {
-			DO_PERIODIC(1, printf("Auto Intake Down \n"));
 			robot->MoveIntakeArmDown();
 			autoIntakeDown = false;
 		}
@@ -155,7 +146,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		//Allows for manual control of the outtake motors
 		if (humanControl->GetManualOuttakeForwardDesired() || autoManualOuttakeForward) {
 			robot->SetOuttakeMotorSpeed(outtakeSpeed);
-			//robot->MoveDefenseManipDown();
 		} else if (humanControl->GetManualOuttakeReverseDesired() || autoManualOuttakeReverse) {
 			robot->SetOuttakeMotorSpeed(-outtakeSpeed);
 		} else {
@@ -217,7 +207,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 			robot->SetIntakeMotorSpeed(0.0);
 			nextState = kIdle;
 		} else if (!robot->GetIntakeSwitchState()) {
-			printf("Ball in intake \n");
 			robot->SetIntakeMotorSpeed(intakeSpeed);
 			nextState = kBallInIntake;
 		} else {
@@ -227,7 +216,6 @@ void SuperstructureController::Update(double currTimeSec, double deltaTimeSec) {
 		}
 		break;
 	default:
-		DO_PERIODIC(1, printf("SuperstructureController default. You should not be here!\n"));
 		break;
 	}
 	m_stateVal = nextState;

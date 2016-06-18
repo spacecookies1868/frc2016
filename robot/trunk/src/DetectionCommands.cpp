@@ -42,7 +42,7 @@ void CameraDetectionCommand::Init() {
 }
 
 void CameraDetectionCommand::Update(double currTimeSec, double deltaTimeSec) {
-#if USE_CAMERA
+#if USE_CAMERA //If using camera perform calculations for distance
 DUMP("Camera State", "IN UPDATE");
 printf("camera state, in update");
 	if (iterationCounter == 0) {
@@ -174,7 +174,12 @@ bool CameraCommand::IsDone() {
 	return isDone;
 }
 
-
+/*
+ * Ultrasonic Detection Command:
+ * Detects the boulder using ultrasonic and returns (x,y) coordinates
+ * The actual code has not been tested on the competition robot and therefore
+ * has not been committed into the code
+ */
 UltrasonicDetectionCommand::UltrasonicDetectionCommand() {
 	x = 0.0;
 	y = 0.0;
@@ -201,6 +206,12 @@ double UltrasonicDetectionCommand::GetY() {
 	return y;
 }
 
+/*
+ * Ultrasonic Command
+ * Using the (x,y) coordinates given from the ultrasonic detection command,
+ * the robot  drives towards the boulder and intakes it from the center line
+ * and backs out to avoid penalty
+ */
 UltrasonicCommand::UltrasonicCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure) {
 	robot = myRobot;
 	superstructure = mySuperstructure;

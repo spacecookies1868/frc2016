@@ -7,7 +7,7 @@ UltrasonicSensor::UltrasonicSensor(uint32_t myPortNumber) {
 
 float UltrasonicSensor::GetRangeInInches(){
 	float voltage = ultraInput->GetVoltage();
-	float inches = voltage/(.009766);
+	float inches = voltage/(.009766); //Number is from the sensor document
 	return inches;
 }
 

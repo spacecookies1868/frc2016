@@ -12,8 +12,6 @@
 #include "nivision.h"
 #include "UltrasonicSensor.h"
 
-// todo cache current and voltage methods so theyre called only once per loop
-
 class RobotModel {
 public:
 	enum Wheels {kLeftWheels, kRightWheels, kAllWheels};
@@ -21,75 +19,75 @@ public:
 	RobotModel();
 	~RobotModel() {}
 
-	void SetWheelSpeed(Wheels w, double speed);
-	float GetWheelSpeed(Wheels w);
+	void Reset(); //resets variables and objects
 
-	void InitServo(double angle);
-	void SetServo(double startAngle, double endAngle, double deltaAngle);
-	double GetServoAngle();
-	bool GetServoDirection();
+	void SetWheelSpeed(Wheels w, double speed); //sets the speed for a given wheel(s)
+	float GetWheelSpeed(Wheels w); //returns the speed of a given wheel
 
-	double GetNavXYaw();
-	double GetNavXRoll();
-	double GetNavXPitch();
-	void ZeroNavXYaw();
+	void InitServo(double angle); //sets the servo to an initial angle
+	void SetServo(double startAngle, double endAngle, double deltaAngle); //sets the servo to the end angle at a speed proportional to the deltaAngle
+	double GetServoAngle(); //returns the angle of the servo
+	bool GetServoDirection(); //returns the direction the servo is turning
 
-	void Reset();
+	double GetNavXYaw(); //returns the yaw
+	double GetNavXRoll(); //returns the roll
+	double GetNavXPitch(); //returns the pitch
+	void ZeroNavXYaw(); //zeroes the initial yaw
 
-	void UpdateCurrent();
+	bool IsLowGear(); //returns if we are in low hear (or high gear)
+	void ShiftToLowGear(); //shifts to low gear
+	void ShiftToHighGear(); //shifts to high gear
 
-	double GetVoltage();
-	double GetCurrent(int channel);
-	double GetCompressorCurrent();
-	double GetRIOCurrent();
-	double GetTotalEnergy();
-	double GetTotalCurrent();
-	double GetTotalPower();
+	void UpdateCurrent(); //initializes variables pertaining to current
 
-	double GetLeftEncoderVal();
-	double GetRightEncoderVal();
-	void ResetDriveEncoders();
+	double GetVoltage(); //returns the voltage
+	double GetTotalEnergy(); //returns the total energy of the PDP
+	double GetTotalCurrent(); //returns the total current of the PDP
+	double GetTotalPower(); //returns the total power of the PDP
+	double GetCurrent(int channel); //returns the current of a given channel
+	double GetCompressorCurrent(); //returns the current of the compressor
+	double GetRIOCurrent(); //returns the current of the roboRIO
 
-	double GetPressureSensorVal();
+	void ResetTimer(); //resets the timer
+	double GetTime(); //returns the time
 
-	double GetUltrasonicDistance();
+	double GetLeftEncoderVal(); //returns the distance of the left encoder
+	double GetRightEncoderVal(); //returns the distance of the right encoder
+	void ResetDriveEncoders(); //resets both the left and the right encoders
 
-	void RefreshIni();
-	void ResetTimer();
+	double GetPressureSensorVal(); //returns the pressure
 
-	bool IsLowGear();
-	void ShiftToLowGear();
-	void ShiftToHighGear();
+	double GetUltrasonicDistance(); //returns the distance of the ultrasonic sensor
 
-	double GetTime();
+	void RefreshIni(); //refreshes the ini file
 
-	//Superstructure accessor and mutator methods for RobotModel
-	bool IsIntakeArmDown();
-	void MoveIntakeArmUp();
-	void MoveIntakeArmDown();
-	void ChangeIntakeArmState();
+	//Superstructure accessors and mutators in RobotModel
+	bool IsIntakeArmDown(); //returns if the intake arm is down (or up)
+	void MoveIntakeArmUp(); //moves intake arm up
+	void MoveIntakeArmDown(); //moves intake arm down
+	void ChangeIntakeArmState(); //changes the state of the intake arm (i.e. if up, move down)
 
-	double GetIntakeMotorSpeed();
-	void SetIntakeMotorSpeed(double speed);
-	bool GetIntakeSwitchState();
+	double GetIntakeMotorSpeed(); //returns the speed of the intake motor
+	void SetIntakeMotorSpeed(double speed); //sets the speed of the intake motor
+	bool GetIntakeSwitchState(); //returns if the intake switch is up (or down)
 
-	bool IsDefenseManipDown();
-	void MoveDefenseManipUp();
-	void MoveDefenseManipDown();
-	void ChangeDefenseManipState();
+	bool IsDefenseManipDown(); //returns if the defense manipulator is down (or up)
+	void MoveDefenseManipUp(); // moves the defense manipulator up
+	void MoveDefenseManipDown(); // moves the defense manipulator down
+	void ChangeDefenseManipState(); //changes the state of the defense manipulator (i.e. if up, move down)
 
-	double GetOuttakeMotorSpeed();
-	void SetOuttakeMotorSpeed(double speed);
-	double GetOuttakeEncoderVal();
-	void ResetOuttakeEncoders();
+	double GetOuttakeMotorSpeed(); //returns the speed of the outake motor
+	void SetOuttakeMotorSpeed(double speed); //sets the speed of the outake motor
+	double GetOuttakeEncoderVal(); //returns the distance of the outake motor encoder
+	void ResetOuttakeEncoders(); //resets the outake motor encoder
 
-	void SetCompressorStop();
+	void SetCompressorStop(); //stops the compressor
 
-	bool GetBrake();
-	void SetBrakeOn();
-	void SetBrakeOff();
+	bool GetBrake(); //returns if the brake is on or off
+	void SetBrakeOn(); //puts the break on
+	void SetBrakeOff(); //takes the break off
 
-	Image* GetCameraImage();
+	Image* GetCameraImage(); //returns the camera image
 #if USE_USB_CAMERA
 	USBCamera* usbCamera;
 	Image* usbFrame;
@@ -113,7 +111,7 @@ private:
 	double servoAngle;
 	bool servoDirection;
 
-	// Solenoids
+	//Solenoids
 	Solenoid *gearShiftSolenoid, *intakeArmSolenoidA, *intakeArmSolenoidB,
 		*defenseManipSolenoidA, *defenseManipSolenoidB, *brakeSolenoidA, *brakeSolenoidB;
 

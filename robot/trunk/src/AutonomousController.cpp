@@ -21,7 +21,7 @@ AutonomousController::AutonomousController(RobotModel* myRobot, DriveController*
 	useSallyPort = true;
 }
 
-/**
+/*
  * Creates the queue of AutoCommand instances
  */
 void AutonomousController::StartAutonomous() {

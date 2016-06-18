@@ -2,8 +2,6 @@
 #define ROBOTPORTS2016_H
 #include "Debugging.h"
 
-//TODO These motor/solenoid ports are arbitrary fix, them to fit the real robot
-
 // ***************** PWM PORTS *****************
 static const int LEFT_DRIVE_MOTOR_A_PWM_PORT 			= 7;
 static const int LEFT_DRIVE_MOTOR_B_PWM_PORT			= 8;
@@ -23,15 +21,6 @@ static const int RIGHT_DRIVE_MOTOR_B_PDP_CHAN			= 3;
 static const int INTAKE_MOTOR_PDP_CHAN					= 11;
 
 // ***************** DIGITAL I/O PORTS *****************
-/*
- * practice bot??
-
-static const int LEFT_ENCODER_A_PWM_PORT 				= 0;
-static const int LEFT_ENCODER_B_PWM_PORT				= 1;
-
-static const int RIGHT_ENCODER_A_PWM_PORT				= 2;
-static const int RIGHT_ENCODER_B_PWM_PORT				= 3;
-*/
 
 static const int LEFT_ENCODER_A_PWM_PORT 				= 2;
 static const int LEFT_ENCODER_B_PWM_PORT				= 3;
@@ -47,7 +36,7 @@ static const int OUTTAKE_ENCODER_2_B_PWM_PORT			= 8; //arbitrary value
 
 static const int INTAKE_SWITCH_PWM_PORT					= 4;
 
-//******************* ANALOG IN PORTS*******************
+// ******************* ANALOG IN PORTS*******************
 
 static const int PRESSURE_SENSOR_PORT					= 3;
 static const int ULTRASONIC_SENSOR_PORT				    = 2; //arbitrary value
@@ -72,8 +61,9 @@ static const int OPERATOR_JOY_USB_PORT					= 2;
 static const int OPERATOR_JOY_B_USB_PORT				= 3;
 
 // ***************** BUTTON PORTS *****************
+
 //Drive controller button ports
-static const int DRIVE_DIRECTION_BUTTON_PORT			= 3; //new on left joystick, was 12 on op b
+static const int DRIVE_DIRECTION_BUTTON_PORT			= 3;
 static const int HIGH_LOW_GEAR_BUTTON_PORT				= 8;
 static const int ARCADE_DRIVE_BUTTON_PORT				= 3;
 static const int QUICK_TURN_BUTTON_PORT					= 1;
@@ -100,7 +90,7 @@ static const int STOP_AUTO_BUTTON_PORT					= 6;
 static const int DEFENSE_POSITION_ID_1_BUTTON_PORT		= 1;
 static const int DEFENSE_POSITION_ID_2_BUTTON_PORT		= 2;
 
-// Power controller button port
+//Power controller button port
 static const int POWER_BUDGET_SWITCH					= 7;
 
 #endif

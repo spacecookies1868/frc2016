@@ -9,9 +9,7 @@
 #define PI 3.14159265358979
 
 /*
- * Waiting Command
- *
- * checked by Katy, works
+ * Waiting Command: Robot waits. Takes in a double in seconds.
  */
 
 WaitingCommand::WaitingCommand(double myWaitTimeSec) {
@@ -34,6 +32,11 @@ void WaitingCommand::Update(double currTimeSec, double deltaTimeSec) {
 bool WaitingCommand::IsDone() {
 	return isDone;
 }
+
+
+/*
+ * Diagnostic Command: Automatic functionality test.
+ */
 
 DiagnosticCommand::DiagnosticCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure) {
 	robot = myRobot;

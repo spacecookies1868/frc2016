@@ -3,6 +3,8 @@
 
 #include "WPILib.h"
 
+//This file outlines classes that read the states of buttons.
+//ButtonReader reads the states of push buttons
 class ButtonReader {
 public:
 	ButtonReader(Joystick *joy, int buttonNum);
@@ -20,6 +22,7 @@ private:
 	bool currState;
 };
 
+//ToggleButtonReader reads the states of toggles
 class ToggleButtonReader : public ButtonReader {
 public:
 	ToggleButtonReader(Joystick *joy, int buttonNum);
@@ -36,6 +39,7 @@ enum SwitchState {
 	kDown = -1,
 };
 
+//SwitchReaader reads the state of switches
 class SwitchReader {
 public:
 	SwitchReader(Joystick *myJoy, int upButton, int downButton);

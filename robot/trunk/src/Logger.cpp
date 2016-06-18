@@ -143,11 +143,11 @@ std::string Logger::GetTimeStamp(const char* fileName) {
 	double realTime = (double)tp.tv_sec + (double)((double)tp.tv_nsec*1e-9);
 */
 	time_t rawtime = time(0);
-	struct tm * timeinfo;
+	struct tm * timeinfo;	// get current time
 	char buffer [80];
 
 	time (&rawtime);
-	timeinfo = localtime(&rawtime);
+	timeinfo = localtime(&rawtime);	// converts time_t to tm as local time
 	strftime (buffer, 80, fileName, timeinfo); // fileName contains %F_%H_%M
 
 	return buffer;

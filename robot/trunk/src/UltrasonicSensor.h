@@ -5,7 +5,7 @@
 
 class UltrasonicSensor {
 public:
-	UltrasonicSensor(uint32_t myPortNumber);
+	UltrasonicSensor(uint32_t myPortNumber); //the sensor only takes up one port
 	float GetRangeInInches();
 	float GetRangeInFeet();
 	float GetRangeInMM();

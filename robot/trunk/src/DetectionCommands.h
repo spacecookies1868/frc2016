@@ -24,7 +24,7 @@ using namespace std;
 
 
 /*
- * CAMERA COMMANDS YAY!
+ * CAMERA COMMANDS
  */
 
 class CameraDetectionCommand : public SimpleAutoCommand {
@@ -80,7 +80,7 @@ private:
 
 
 /*
- * ULTRASONIC COMMANDS YAY!
+ * ULTRASONIC COMMANDS
  */
 
 class UltrasonicDetectionCommand : public SimpleAutoCommand {

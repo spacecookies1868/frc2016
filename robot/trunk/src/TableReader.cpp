@@ -5,6 +5,9 @@
 #include <cmath>
 #include "Logger.h"
 
+/*
+ * Initializing ALL the variables
+ */
 TableReader::TableReader(llvm::StringRef lineTableName, llvm::StringRef contourTableName) {
 	lineTable = NetworkTable::GetTable(lineTableName);
 	contourTable = NetworkTable::GetTable(contourTableName);
@@ -20,6 +23,9 @@ TableReader::TableReader(llvm::StringRef lineTableName, llvm::StringRef contourT
 
 }
 
+/*
+ * Reading the values published to Network Tables
+ */
 void TableReader::ReadValues(bool leftTargetDesired) {
 	x1 = lineTable->GetNumberArray("x1", llvm::ArrayRef<double>());
 	x2 = lineTable->GetNumberArray("x2", llvm::ArrayRef<double>());
@@ -75,11 +81,15 @@ void TableReader::FilterLines(bool leftTargetDesired) {
 //post-processing stuff
 //find desired contour!
 /*
- * Finding the contours values of the target desired to analyze further
+ * Finding the contour's values of the target desired to analyze further
  */
 DUMP("in filterlines", 0.0);
 DUMP("size of centerXs", (double) centerXs.size());
 DUMP("size of centerXs", (double) centerYs.size());
+/*
+ * Checking the how many contours were found.
+ * Distinguishing the left contour/target from the right, and taking the desired.
+ */
 	if(centerXs.size() == 0) {
 		return;
 	}
@@ -118,7 +128,7 @@ DUMP("size of centerXs", (double) centerYs.size());
 	}
 DUMP("in filterlines", 1.0);
 /*
- * Filtering all the points found in lines report to figure out which points belong to the target desired
+ * Filtering all the points found in lines report to figure out which points belong to the desired target
  */
 	std::vector<int> maPoints;
 	printf("width and height %f %f \n", width, height);
@@ -142,6 +152,9 @@ DUMP("in filterlines", 1.0);
 DUMP("in filterlines", 2.0);
 }
 
+/*
+ * Finds the four corners of the target from the convex hull.
+ */
 void TableReader::FindCorners() {
 	FindConvexHull();
 //	printf("This is my convex hull! \n");
@@ -171,6 +184,10 @@ void TableReader::FindCorners() {
 	printf("bottom right (%f, %f) \n", bottomRightX, bottomRightY);
 }
 
+/*
+ * Find's convex hull given the vertices of the target from filter lines.
+ * Implemented the Graham Scan algorithm.
+ */
 void TableReader::FindConvexHull() {
 	int size = myPoints.size();
 	if(size < 3) {
@@ -249,7 +266,6 @@ MyLine TableReader::leastSquareRegression(std::vector<MyPoint> pts) {
 }
 
 void TableReader::splitIntoFour(std::vector<MyPoint> pts) {
-	// GOING AROUND CLOCKWISE. WILL NEED TO CHANGE IF CONVEX HULL IS COUNTERCLOCKWISE
 	double PI = 3.14159265358979;
 	for (unsigned int i = 0; i < pts.size(); i++) {
 		MyPoint p1 = pts[i];
@@ -308,6 +324,9 @@ void TableReader::printMyConvexHull() {
 	print(myConvexHull);
 }
 
+/*
+ * Finds the vertex with the lowest Y, we use this as a starting node.
+ */
 int TableReader::findLowestY() {
 	int indexOfBest = 0;
 	for(unsigned int i = 0; i < myPoints.size(); i++) {
@@ -321,6 +340,9 @@ int TableReader::findLowestY() {
 	return indexOfBest;
 }
 
+/*
+ * Finds out if points are in counter clockwise order.
+ */
 int TableReader::findCounterClockwise(MyPoint firstPoint, MyPoint a, MyPoint b) { //static
 	double slopeThing = (a.y - firstPoint.y) * (b.x - a.x) - (a.x - firstPoint.x) * (b.y - a.y);
 	slopeThing *= -1; //1 if y is bigger going up
@@ -335,12 +357,17 @@ int TableReader::findCounterClockwise(MyPoint firstPoint, MyPoint a, MyPoint b) 
 	}
 }
 
+
 double TableReader::computeDistSquared(MyPoint a, MyPoint b) { //static
 	return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
 }
 
 MyPoint TableReader::firstPoint;
 
+
+/*
+ * Comparator function passed into the C++ sort function.
+ */
 bool TableReader::comparePoints(MyPoint a, MyPoint b) { //static
 	int c = findCounterClockwise(firstPoint, a, b);
 	if(c == 0) {

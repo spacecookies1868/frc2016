@@ -15,6 +15,7 @@
  * Pivot Command
  *
  * hopefully positive desiredR makes turn counterclockwise
+ * Pivots according to the robot's perspective
  */
 #if USE_NAVX
 PivotCommand::PivotCommand(RobotModel* myRobot, double myDesiredR) {
@@ -62,6 +63,10 @@ PIDConfig* PivotCommand::CreateRPIDConfig(){
 	return pidConfig;
 }
 
+/*
+ * Becuase the navx returns values from 180 to -180 the accumulated yaw
+ * must be calculated to avoid the issue of the sudden change from 180 to -180
+ */
 double PivotCommand::GetAccumulatedYaw() {
 	lastYaw = currYaw;
 #if USE_NAVX
@@ -122,6 +127,7 @@ bool PivotCommand::IsDone() {
 #if USE_NAVX
 /*
  * Pivot to Angle Command:
+ * Pivots according to the perspective of the field.
  */
 
 PivotToAngleCommand::PivotToAngleCommand(RobotModel* myRobot, double myDesiredR) {
@@ -228,6 +234,11 @@ bool PivotToAngleCommand::IsDone() {
 }
 
 double PivotToAngleCommand::CalculateDesiredChange(double myDesired) {
+	/*
+	 * Using the current angle and the desired angle, the desired change must take
+	 * into account of the direction the robot needs to turn to be efficiently
+	 * at the right position
+	 */
 	double normalizedInitial = fmod(currYaw, 360.0);
 	if (normalizedInitial < 0) {
 		normalizedInitial += 360;
@@ -371,6 +382,7 @@ void DriveStraightCommand::Update(double currTimeSec, double deltaTimeSec) {
 		double leftOutput = disOutput + rOutput;
 		double rightOutput = disOutput - rOutput;
 
+		//to make sure the output does not exceed 1.0
 		double maxOutput = fmax(fabs(leftOutput), fabs(rightOutput));
 		if (maxOutput > 1.0) {
 			leftOutput = leftOutput / maxOutput;
@@ -392,6 +404,10 @@ bool DriveStraightCommand::IsDone() {
 
 }
 
+/*
+ * Curve Command
+ * Driving to a given (x,y) coordinate
+ */
 
 CurveCommand::CurveCommand(RobotModel* myRobot, double myDesiredX, double myDesiredY) {
 	robot = myRobot;
@@ -627,6 +643,11 @@ double CurveCommand::GetSign(double n) {
 	}
 }
 
+/*
+ * Defense Command
+ * Lines up to the defense and drives over it
+ */
+
 DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* mySuperstructure, uint32_t myDefense,
 		bool forward, bool lineUp, bool defenseManipFirst) {
 	robot = myRobot;
@@ -637,6 +658,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	this->lineUp = lineUp;
 	this->defenseManipFirst = defenseManipFirst;
 
+	//defense: low bar
 	if (forward) {
 		if (lineUp) {
 			lowBarDriveUp = new DriveStraightCommand(robot, -2.0);
@@ -655,6 +677,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	lowBarDefenseDown = new DefenseManipPosCommand(superstructure, true);
 	lowBarIntakeDown = new IntakePositionCommand(superstructure, true);
 
+	//defense: portcullis
 	if (lineUp) {
 		portcullisDriveUp = new DriveStraightCommand(robot, 5.75);
 	} else {
@@ -669,6 +692,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	portcullisWaiting = 0.0;
 	portcullisDriveTimeOut = 3.5;
 
+	//defense: cheval de frise
 	if (lineUp) {
 		chevalDeFriseDriveUp = new DriveStraightCommand(robot, 4.4);
 	} else {
@@ -687,6 +711,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	chevalDeFriseFirstTime = true;
 	chevalDeFriseInitTime = 0.0;
 
+	//defense: ramparts
 	if (forward) {
 		if (lineUp) {
 			rampartsDriveStraight = new DriveStraightCommand(robot, 4.0);
@@ -707,6 +732,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	currRampartsState = kRampartsBeforeRamp;
 	nextRampartsState = kRampartsBeforeRamp;
 
+	//defense: moat
 	if (forward) {
 		if (lineUp) {
 			if (defenseManipFirst) {
@@ -729,6 +755,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 		}
 	}
 
+	//defense: rock wall
 	if (forward) {
 		if (lineUp) {
 			if (defenseManipFirst) {
@@ -751,6 +778,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 		}
 	}
 
+	//defense: rough terrain
 	if (forward) {
 		if (lineUp) {
 			hardCodeRoughTerrain = new DriveStraightCommand(robot, 14.0);
@@ -870,7 +898,6 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 			portcullisDefenseUp->Init();
 			portcullisIntakeDown->Init();
 		} else if (!portcullisDefenseUp->IsDone() && !portcullisIntakeDown->IsDone()) {
-			printf("HI HI HI HI");
 			portcullisDefenseUp->Update(currTimeSec, deltaTimeSec);
 			portcullisIntakeDown->Update(currTimeSec, deltaTimeSec);
 			portcullisDriving->Init();
@@ -1019,6 +1046,3 @@ void DefenseCommand::Update(double currTimeSec, double deltaTimeSec) {
 bool DefenseCommand::IsDone() {
 	return isDone;
 }
-
-
-

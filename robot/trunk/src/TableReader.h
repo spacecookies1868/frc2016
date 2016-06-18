@@ -4,11 +4,17 @@
 #include "WPILib.h"
 
 struct MyPoint {
+/*
+ * Struct for points
+ */
 	double x;
 	double y;
 };
 
 struct MyLine {
+/*
+ * Struct for lines
+ */
 	double slope, y_intercept;
 };
 

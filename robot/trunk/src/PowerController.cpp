@@ -12,19 +12,19 @@ PowerController::PowerController(RobotModel* myRobot, RemoteControl* myHumanCont
 	totalCurrent = 0;
 	totalVoltage = 0;
 
-	avgLeftCurr = 0;
-	avgRightCurr = 0;
-	avgIntakeCurr = 0;
-	avgCompCurr = 0;
-	avgRioCurr = 0;
-
-	size = 5;
+	size = 5;	// used to find average of 5 readings of current
 
 	std::vector<double> pastLeftCurr(size, 0);
 	std::vector<double> pastRightCurr(size, 0);
 	std::vector<double> pastIntakeCurr(size, 0);
 	std::vector<double> pastCompCurr(size, 0);
 	std::vector<double> pastRioCurr(size, 0);
+
+	avgLeftCurr = 0;
+	avgRightCurr = 0;
+	avgIntakeCurr = 0;
+	avgCompCurr = 0;
+	avgRioCurr = 0;
 
 	driveCurrentLimit = 0; // pdp measures amps inaccurately :. these are in chloeamps now
 	intakeCurrentLimit = 0;
@@ -40,7 +40,7 @@ PowerController::PowerController(RobotModel* myRobot, RemoteControl* myHumanCont
 void PowerController::Update(double currTimeSec, double deltaTimeSec) {
 	pastLeftCurr.insert(pastLeftCurr.begin(),
 			(robot->GetCurrent(LEFT_DRIVE_MOTOR_A_PDP_CHAN) +
-			robot->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN)) / 2);
+			robot->GetCurrent(LEFT_DRIVE_MOTOR_B_PDP_CHAN)) / 2); // putting average current draw of motorA and motorB into arr
 	pastRightCurr.insert(pastRightCurr.begin(),
 			(robot->GetCurrent(RIGHT_DRIVE_MOTOR_A_PDP_CHAN) +
 			robot->GetCurrent(RIGHT_DRIVE_MOTOR_B_PDP_CHAN)) / 2);
@@ -48,13 +48,13 @@ void PowerController::Update(double currTimeSec, double deltaTimeSec) {
 	pastCompCurr.insert(pastCompCurr.begin(), robot->GetCompressorCurrent());
 	pastRioCurr.insert(pastRioCurr.begin(), robot->GetRIOCurrent());
 
-	pastLeftCurr.pop_back();
+	pastLeftCurr.pop_back();	// taking out previous current
 	pastRightCurr.pop_back();
 	pastIntakeCurr.pop_back();
 	pastCompCurr.pop_back();
 	pastRioCurr.pop_back();
 
-	avgLeftCurr = GetAverage(pastLeftCurr);
+	avgLeftCurr = GetAverage(pastLeftCurr);		// getting average of five current readings
 	avgRightCurr = GetAverage(pastRightCurr);
 	avgIntakeCurr = GetAverage(pastIntakeCurr);
 	avgCompCurr = GetAverage(pastCompCurr);
@@ -74,6 +74,7 @@ void PowerController::Update(double currTimeSec, double deltaTimeSec) {
 	intakeWeight = 0.6 * (totalVoltage / 12) *
 		(humanControl->GetIntakeMotorForwardDesired() * humanControl->GetIntakeMotorReverseDesired());
 	// todo add outtake motors
+
 	if (IsBatteryLow()) {
 		LOG(robot, "battery low", true);
 	}
@@ -117,6 +118,7 @@ void PowerController::LimitSingle() {
 	// scaledSpeed = robot->GetIntakeMotorSpeed() -
 	// todo add scaling for intake motor and outtake motor, compressor, roborio
 }
+
 void PowerController::PriorityScale() {
 	double roboRIORatio = avgRioCurr / totalCurrent;
 

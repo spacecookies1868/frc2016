@@ -212,12 +212,14 @@ private:
 	bool lineUp;
 	bool defenseManipFirst;
 
+	//defense: low bar
 	DriveStraightCommand* lowBarDriveUp;
 	DefenseManipPosCommand* lowBarDefenseDown;
 	IntakePositionCommand* lowBarIntakeDown;
 	DriveStraightCommand* lowBarDriving;
 	PivotCommand* lowBarPivot;
 
+	//defense: portcullis
 	DriveStraightCommand* portcullisDriveUp;
 	DriveStraightCommand* portcullisDriving;
 	DefenseManipPosCommand* portcullisDefenseUp;
@@ -228,6 +230,7 @@ private:
 	double portcullisInitTime;
 	double portcullisWaiting;
 
+	//defense cheval de frise
 	DriveStraightCommand* chevalDeFriseDriveUp;
 	DriveStraightCommand* chevalDeFriseStay;
 	DriveStraightCommand* chevalDeFriseDriving;
@@ -241,6 +244,7 @@ private:
 	bool chevalDeFriseFirstTime;\
 	double chevalDeFriseInitTime;
 
+	//defense: ramparts
 	DriveStraightCommand* rampartsDriveStraight;
 	DriveStraightCommand* rampartsDriveOver;
 	PivotToAngleCommand* rampartsPivotToAngle;
@@ -251,12 +255,14 @@ private:
 	uint32_t currRampartsState;
 	uint32_t nextRampartsState;
 
+	//defense: moat
 	DriveStraightCommand* hardCodeMoat;
 
+	//defense: rock wall
 	DriveStraightCommand* hardCodeRockWall;
 
+	//defense: rough terrain
 	DriveStraightCommand* hardCodeRoughTerrain;
 };
-
 
 #endif /* SRC_DRIVECOMMANDS_H_ */

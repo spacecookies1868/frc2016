@@ -1,8 +1,11 @@
 #ifndef REMOTECONTROL_H
 #define REMOTECONTROL_H
 
+//This file states all methods that are defined in ControlBoard
+//ControlBoard inherits RemoteControl, which makes it easier to switch to new driver stations
 class RemoteControl {
 public:
+	//Joysticks and Axes for switch case
 	enum Joysticks {kLeftJoy, kRightJoy};
 	enum Axes {kX, kY};
 
@@ -39,7 +42,7 @@ public:
 	virtual bool GetBrakeDesired() = 0;
 	virtual bool GetJustBeforeDisableBrakeDesired() = 0;
 
-	// power controller button accessors
+	//Power controller button accessors
 	virtual bool GetPowerBudgetDesired() = 0;
 	virtual ~RemoteControl() {}
 };

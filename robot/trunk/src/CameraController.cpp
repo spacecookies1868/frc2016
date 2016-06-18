@@ -2,11 +2,14 @@
 #include <math.h>
 #include "Logger.h"
 
+/*
+ * Initializing ALL the variables
+ */
 CameraController::CameraController(RobotModel* robot) {
 	this->robot = robot;
 	table = robot->gripLines;
-	topFromGround = 95.0; //inches
-	bottomFromGround = 83.0; //inches
+	topFromGround = 95.0; //inches, Top of the target from the ground
+	bottomFromGround = 83.0; //inches, Bottom of the target from the ground
 	//distortion coefficients!
 	/*
 	 * [-0.5430259802451465; 0.270945658136815; 0.006719749057770554; 0.009482155791447877; 0.1002601217038307
@@ -26,8 +29,8 @@ CameraController::CameraController(RobotModel* robot) {
 	rightR = 0.0;
 
 	cameraAngle = 3.1415926535897932 * 36 / 180; //subject to change * 5/36
-	heightOfCamera = 12; //inches subject to change
-	targetLength2 = 20; //inches
+	heightOfCamera = 12; //in inches...Height of camera from the ground
+	targetLength2 = 20; //in inches, horizontal length of the target
 
 }
 
@@ -39,18 +42,18 @@ void CameraController::Reset() {
 
 void CameraController::CalculateDistanceWithAngles(bool leftTargetDesired) {
 	table->ReadValues(leftTargetDesired);
-	printf("Read Table Values \n");
-	printf("Top Left (%f, %f) \n", table->GetTopLeftX(), table->GetTopLeftY());
-	printf("Top Right (%f, %f)\n", table->GetTopRightX(), table->GetTopRightY());
-	printf("Bottom Left (%f, %f)\n", table->GetBottomLeftX(), table->GetBottomLeftY());
-	printf("Bottom Right (%f, %f)\n", table->GetBottomRightX(), table->GetBottomRightY());
+//	printf("Read Table Values \n");
+//	printf("Top Left (%f, %f) \n", table->GetTopLeftX(), table->GetTopLeftY());
+//	printf("Top Right (%f, %f)\n", table->GetTopRightX(), table->GetTopRightY());
+//	printf("Bottom Left (%f, %f)\n", table->GetBottomLeftX(), table->GetBottomLeftY());
+//	printf("Bottom Right (%f, %f)\n", table->GetBottomRightX(), table->GetBottomRightY());
 
 	double leftx = (table->GetTopLeftX() + table->GetBottomLeftX()) / 2;
 	double rightx = ((table->GetTopRightX() + table->GetBottomRightX())) / 2;
-	printf("image average x (left, right) : (%f,%f)\n", leftx, rightx);
+//	printf("image average x (left, right) : (%f,%f)\n", leftx, rightx);
 	leftx = leftx - cameraCenterX;
 	rightx = rightx - cameraCenterX;
-	printf("normalled x (left, right) : (%f, %f)\n", leftx, rightx);
+//	printf("normalled x (left, right) : (%f, %f)\n", leftx, rightx);
 	// RADIANS BTW
 	double leftAngle = atan(leftx / focalX);
 	double rightAngle = atan(rightx / focalX);
@@ -64,25 +67,25 @@ void CameraController::CalculateDistanceWithAngles(bool leftTargetDesired) {
 	leftR = (topLeftRadius + bottomLeftRadius)/2; //WAS CalculateRadiusWithTriangles(true)
 	rightR = (topRightRadius + bottomRightRadius)/2; //CalculateRadiusWithTriangles(false)
 
-	printf("bottom radii, left, right: %f, %f \n", bottomLeftRadius, bottomRightRadius);
-
+//	printf("bottom radii, left, right: %f, %f \n", bottomLeftRadius, bottomRightRadius);
+//
 	printf("angles (radians) (left, right): (%f, %f)\n", leftAngle, rightAngle);
 
 	double leftXOffset = leftR * sin(leftAngle);
 	double rightXOffset = rightR * sin(rightAngle);
-	printf("X offset (left, right): (%f, %f)\n", leftXOffset, rightXOffset);
+//	printf("X offset (left, right): (%f, %f)\n", leftXOffset, rightXOffset);
 	double leftYdis = leftR * cos(leftAngle);
 	double rightYdis = rightR * cos(rightAngle);
-	printf("Y dis (left, right): (%f, %f) \n", leftYdis, rightYdis);
+//	printf("Y dis (left, right): (%f, %f) \n", leftYdis, rightYdis);
 	double targetLength = sqrt(pow((rightXOffset - leftXOffset),2) + pow((leftYdis - rightYdis), 2));
 	double targetCenter = targetLength / 2;
-	printf("Target length %f\n", targetLength);
-	printf("Target center %f\n", targetCenter);
+//	printf("Target length %f\n", targetLength);
+//	printf("Target center %f\n", targetCenter);
 
 	x = (rightXOffset + leftXOffset)/2.0; //used to be targetCenter
 	y = (leftYdis + rightYdis)/2.0;
 
-	printf("(x,y): (%f,%f) \n", x, y);
+//	printf("(x,y): (%f,%f) \n", x, y);
 	DUMP("Left Radius: ", leftR);
 	DUMP("Right Radius: ", rightR);
 	DUMP("Left Angle: ", leftAngle);
@@ -122,6 +125,9 @@ double CameraController::GetY() {
 	return y;
 }
 
+/*
+ * Calculates the real coordinates given the ones provided in the image
+ */
 std::vector<double> CameraController::CalculateRealCoords(double imageX, double imageY) {
 	/*
 	 * Very basic, not dealing with radial distortion
@@ -168,32 +174,38 @@ double CameraController::CalculateRadius(double imageX1, double imageY1, double 
 	return radius;
 }
 
+/*
+ * CalculateRadiusWithTriangles: Calculates the radius using similar triangles
+ */
 double CameraController::CalculateRadiusWithTriangles(bool leftRadiusDesired) {
 	if(leftRadiusDesired) {
-		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
-		printf("atan stuff %f \n", atan((cameraCenterY - table->GetTopLeftY())/focalY));
-		printf("tan stuff %f \n", tan(atan((cameraCenterY - table->GetTopLeftY())/focalY)+cameraAngle));
+//		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
+//		printf("atan stuff %f \n", atan((cameraCenterY - table->GetTopLeftY())/focalY));
+//		printf("tan stuff %f \n", tan(atan((cameraCenterY - table->GetTopLeftY())/focalY)+cameraAngle));
 		return (topFromGround-heightOfCamera)/tan(atan((cameraCenterY - table->GetTopLeftY())/focalY)+cameraAngle);
 	}
 	else {
-		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
-		printf("atan stuff %f \n", atan((cameraCenterY - table->GetTopRightY())/focalY));
-		printf("tan stuff %f \n", tan(atan((cameraCenterY- table->GetTopRightY())/focalY)+cameraAngle));
+//		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
+//		printf("atan stuff %f \n", atan((cameraCenterY - table->GetTopRightY())/focalY));
+//		printf("tan stuff %f \n", tan(atan((cameraCenterY- table->GetTopRightY())/focalY)+cameraAngle));
 		return (topFromGround-heightOfCamera)/tan(atan((cameraCenterY - table->GetTopRightY())/focalY)+cameraAngle);
 	}
 }
 
+/*
+ * Calculate the radius with the coordinates of the bottom of the target
+ */
 double CameraController::CalculateRadiusWithBottomCoords(bool leftRadiusDesired) {
 	if(leftRadiusDesired) {
-		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
-		printf("atan stuff %f \n", atan((cameraCenterY - table->GetBottomLeftY())/focalY));
-		printf("tan stuff %f \n", tan(atan((cameraCenterY - table->GetBottomLeftY())/focalY)+cameraAngle));
+//		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
+//		printf("atan stuff %f \n", atan((cameraCenterY - table->GetBottomLeftY())/focalY));
+//		printf("tan stuff %f \n", tan(atan((cameraCenterY - table->GetBottomLeftY())/focalY)+cameraAngle));
 		return (topFromGround-heightOfCamera)/tan(atan((cameraCenterY - table->GetBottomLeftY())/focalY)+cameraAngle);
 	}
 	else {
-		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
-		printf("atan stuff %f \n", atan((cameraCenterY - table->GetBottomRightY())/focalY));
-		printf("tan stuff %f \n", tan(atan((cameraCenterY- table->GetBottomRightY())/focalY)+cameraAngle));
+//		printf("95 - height of camera %f \n", topFromGround - heightOfCamera);
+//		printf("atan stuff %f \n", atan((cameraCenterY - table->GetBottomRightY())/focalY));
+//		printf("tan stuff %f \n", tan(atan((cameraCenterY- table->GetBottomRightY())/focalY)+cameraAngle));
 		return (topFromGround-heightOfCamera)/tan(atan((cameraCenterY - table->GetBottomRightY())/focalY)+cameraAngle);
 	}
 }

@@ -9,6 +9,8 @@
 #include <cstring>
 #include <stdlib.h>
 
+//Header file for control board––gets input from the human controlling the robot through buttons and joysticks on the driver station
+//ControlBoard inherits methods of RemoteControl
 class ControlBoard : public RemoteControl {
 public:
 	ControlBoard();
@@ -72,13 +74,20 @@ public:
 	};
 
 private:
+	//Boolean variables for desired states of drivetrain, superstructure, and autonomous
 	bool reverseDriveDesired, gearShiftDesired, arcadeDriveDesired, quickTurnDesired, defenseManipToggleDesired, defenseManipDownDesired,
 		 intakePistonToggleDesired,intakePistonDownDesired,intakeMotorForwardDesired, intakeMotorReverseDesired, ballInIntakeDesired,
 		 outtakeDesired, manualOuttakeForwardDesired, manualOuttakeReverseDesired, pivotButtonDesired, pivotSwitchDesired,
 		 powerBudgetDesired, stopAutoDesired, brakeDesired, justBeforeBrakeDesired;
+
+	//Desired values for driving and pivoting
 	double leftJoyX, leftJoyY, rightJoyX, rightJoyY, desiredAngle;
+
+	//Autonomous defense and defense positions
 	uint32_t defense;
 	uint32_t defensePos;
+
+	//Joysticks and buttons
 	Joystick *leftJoy, *rightJoy, *operatorJoy, *operatorJoyB;
 	ButtonReader *driveDirectionButton, *gearShiftButton, *arcadeDriveButton, *quickTurnButton, *defenseManipButton, *intakePistonButton,
 				 *intakeMotorForwardButton,*intakeMotorReverseButton, *ballInIntakeButton, *outtakeButton, *manualOuttakeForwardButton, *dialPivotButton, *dialPivotSwitch,
