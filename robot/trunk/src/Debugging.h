@@ -30,5 +30,5 @@ extern int enableDoPeriodic;
 
 #define USE_NAVX true
 #define USE_CAMERA false
-#define USE_USB_CAMERA true
+#define USE_USB_CAMERA false
 #endif

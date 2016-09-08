@@ -46,7 +46,7 @@ static const int COMPRESSOR_PORT						= 1;
 static const int PNEUMATICS_CONTROL_MODULE_ID			= 1;
 
 // ***************** SOLENOID PORTS *****************
-static const int GEAR_SHIFT_SOLENOID_PORT				= 7;
+static const int GEAR_SHIFT_SOLENOID_PORT				= 4;
 static const int BRAKE_SOLENOID_A_PORT					= 6;
 static const int BRAKE_SOLENOID_B_PORT					= 5;
 static const int INTAKE_SOLENOID_A_PORT					= 0;
