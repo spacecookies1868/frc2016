@@ -209,6 +209,9 @@ private:
 		DO_PERIODIC(10, LOG(robot, "Reverse Drive Desired", humanControl->GetReverseDriveDesired()));
 		DO_PERIODIC(10, LOG(robot, "Arcade Drive Desired", humanControl->GetArcadeDriveDesired()));
 		DO_PERIODIC(10, printf("Intake switch state %d\n", robot->GetIntakeSwitchState()));
+		DO_PERIODIC(10, printf("Left Encoder %f\n", robot->GetLeftEncoderVal()));
+		DO_PERIODIC(10, printf("Right Encoder %f\n", robot->GetRightEncoderVal()));
+
 		//DO_PERIODIC(10, printf("Navx angle %f\n", robot->GetNavXYaw()));
 		/*DO_PERIODIC(10, printf("Navx pitch %f\n", robot->GetNavXPitch()));
 		DO_PERIODIC(10, printf("Navx Roll %f\n", robot->GetNavXRoll()));

@@ -59,8 +59,9 @@ RobotModel::RobotModel() {
 	intakeCurrent = 0;
 
 	// 8 inch wheels (2/3 ft), 256 tics per rotation
-	leftEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
-	rightEncoder->SetDistancePerPulse(((2.0/3.0) * PI) / 256.0);
+	// changed to 7.5 inch wheels
+	leftEncoder->SetDistancePerPulse(((7.4/12.0) * PI) / 256.0);
+	rightEncoder->SetDistancePerPulse(((7.4/12.0) * PI) / 256.0);
 
 #if USE_CAMERA
 //	camera = new AxisCamera("10.18.68.11");

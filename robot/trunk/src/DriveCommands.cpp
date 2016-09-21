@@ -714,7 +714,7 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 	//defense: ramparts
 	if (forward) {
 		if (lineUp) {
-			rampartsDriveStraight = new DriveStraightCommand(robot, 4.0);
+			rampartsDriveStraight = new DriveStraightCommand(robot, 3.0);
 		} else {
 			rampartsDriveStraight = new DriveStraightCommand(robot, 0.0);
 		}
@@ -742,9 +742,9 @@ DefenseCommand::DefenseCommand(RobotModel* myRobot, SuperstructureController* my
 			}
 		} else {
 			if (defenseManipFirst) {
-				hardCodeMoat = new DriveStraightCommand(robot, 10.0);
+				hardCodeMoat = new DriveStraightCommand(robot, 16.0);
 			} else {
-				hardCodeMoat = new DriveStraightCommand(robot, -10.0);
+				hardCodeMoat = new DriveStraightCommand(robot, -16.0);
 			}
 		}
 	} else {
